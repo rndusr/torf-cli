@@ -86,10 +86,19 @@ Read 'foo.torrent', edit its comment, remove the date and write the result to
 Installation
 ------------
 
-torf-cli is available on `PyPI <https://pypi.org/project/torf-cli>`_.
+The `latest release <https://pypi.org/project/torf-cli>`_ can be installed from PyPI.
 
-The latest development version is in the master branch on `GitHub
-<https://github.com/rndusr/torf-cli>`_.
+.. code:: sh
+
+   $ pip3 install torf-cli         # Installs torf system-wide (/usr/local/)
+   $ pip3 install --user torf-cli  # Installs torf in your home (~/.local/)
+
+The `latest development version <https://github.com/rndusr/torf-cli>`_ is
+available on GitHub in the `master` branch.
+
+.. code:: sh
+
+   $ pip3 install [--user] git+https://github.com/rndusr/torf-cli.git
 
 Contributing
 ------------
