@@ -86,8 +86,7 @@ Read 'foo.torrent', edit its comment, remove the date and write the result to
 Installation
 ------------
 
-..
-   torf-cli is available on `PyPI <https://pypi.org/project/torf-cli>`_.
+torf-cli is available on `PyPI <https://pypi.org/project/torf-cli>`_.
 
 The latest development version is in the master branch on `GitHub
 <https://github.com/rndusr/torf-cli>`_.
