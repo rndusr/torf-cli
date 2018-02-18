@@ -440,10 +440,10 @@ def _make_filetree(tree, parents_is_last=()):
 
 
 _DATE_FORMATS = ('%Y-%m-%d %H:%M:%S',
-                '%Y-%m-%dT%H:%M:%S',
-                '%Y-%m-%d %H:%M',
-                '%Y-%m-%dT%H:%M',
-                '%Y-%m-%d')
+                 '%Y-%m-%dT%H:%M:%S',
+                 '%Y-%m-%d %H:%M',
+                 '%Y-%m-%dT%H:%M',
+                 '%Y-%m-%d')
 def _parse_date(date_str):
     if date_str == 'now':
         return datetime.datetime.now()
