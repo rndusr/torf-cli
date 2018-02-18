@@ -154,6 +154,8 @@ def run():
         else:
             torrent_filepath = None
 
+        _apply_cli_args(torrent, args)
+
     if mode == 'read':
         _show_torrent_info(torrent)
 
@@ -182,45 +184,47 @@ def _get_torrent(args):
             torrent = torf.Torrent.read(args['in'])
         else:
             torrent = torf.Torrent()
-
-        # Set content file(s) to given PATH
-        if args['PATH']:
-            torrent.path = args['PATH']
-
-        # Set creation date if user specified one
-        try:
-            creation_date = _parse_date(args['date'])
-        except ValueError as e:
-            _error(CLIError(str(e), error_code=errno.EINVAL))
-
-        # Set attributes to given OPTIONS
-        for attr,value in (('name',               args['name']),
-                           ('exclude',            args['exclude']),
-                           ('trackers',           args['tracker']),
-                           ('webseeds',           args['webseed']),
-                           ('private',            args['private']),
-                           ('randomize_infohash', args['xseed']),
-                           ('source',             args['source']),
-                           ('creation_date',      creation_date),
-                           ('comment',            args['comment']),
-                           ('created_by',         _DEFAULT_CREATOR)):
-            if value:
-                setattr(torrent, attr, value)
-
-        # Set attributes to given OPTIONS
-        for attr,remove in (('trackers',           args['notracker']),
-                            ('webseeds',           args['nowebseed']),
-                            ('private',            args['noprivate']),
-                            ('randomize_infohash', args['noxseed']),
-                            ('source',             args['nosource']),
-                            ('creation_date',      args['nodate']),
-                            ('comment',            args['nocomment'])):
-            if remove:
-                setattr(torrent, attr, None)
     except torf.TorfError as e:
         _error(e)
     else:
         return torrent
+
+
+def _apply_cli_args(torrent, args):
+    # Set content file(s) to given PATH
+    if args['PATH']:
+        torrent.path = args['PATH']
+
+    # Set creation date if user specified one
+    try:
+        creation_date = _parse_date(args['date'])
+    except ValueError as e:
+        _error(CLIError(str(e), error_code=errno.EINVAL))
+
+    # Overwrite attributes according to CLI arguments
+    for attr,value in (('name',               args['name']),
+                       ('exclude',            args['exclude']),
+                       ('trackers',           args['tracker']),
+                       ('webseeds',           args['webseed']),
+                       ('private',            args['private']),
+                       ('randomize_infohash', args['xseed']),
+                       ('source',             args['source']),
+                       ('creation_date',      creation_date),
+                       ('comment',            args['comment']),
+                       ('created_by',         _DEFAULT_CREATOR)):
+        if value:
+            setattr(torrent, attr, value)
+
+    # Remove attributes according to CLI arguments
+    for attr,remove in (('trackers',           args['notracker']),
+                        ('webseeds',           args['nowebseed']),
+                        ('private',            args['noprivate']),
+                        ('randomize_infohash', args['noxseed']),
+                        ('source',             args['nosource']),
+                        ('creation_date',      args['nodate']),
+                        ('comment',            args['nocomment'])):
+        if remove:
+            setattr(torrent, attr, None)
 
 
 def _get_torrent_filepath(torrent, args):
