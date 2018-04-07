@@ -9,4 +9,11 @@
 # GNU General Public License for more details
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
-from ._cli import run
+def run():
+    from ._cli import run, CLIError
+    try:
+        run()
+    except CLIError as e:
+        import sys
+        print(str(e), file=sys.stderr)
+        sys.exit(e.errno or 1)
