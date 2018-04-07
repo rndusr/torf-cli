@@ -75,7 +75,7 @@ cross-seeding issues without hashing the pieces again).
             - The delimiter between label and value as well as between multiple
               values (e.g. trackers) is a tab character (	).
               Example: torf ... | cut -f 2-   # Remove labels
-            - Size and Piece Size are not scaled to be easier to read by humans
+            - Numbers are not scaled (e.g. "1024" instead of "1 KiB")
 
     Homepage: https://github.com/rndusr/torf-cli
 
