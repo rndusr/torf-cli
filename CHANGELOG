@@ -1,3 +1,10 @@
+2018-04-?? 1.1
+  - The options --source and --nosource have been removed
+  - The option --nocreator has been added
+  - Output is now easier to parse when stdout is not a TTY (e.g. when piping to
+    grep, cut, awk, etc)
+
+
 2018-02-01 1.0
   Final release
 
