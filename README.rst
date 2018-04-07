@@ -9,12 +9,14 @@ cross-seeding issues without hashing the pieces again).
 ::
 
     $ torf -h
-    torf 1.0a1 <https://github.com/rndusr/torf-cli>
+    torf 1.1
+
+    Create, display and edit torrents
 
     USAGE
-        torf PATH [OPTIONS] [-o FILE]
-        torf -i FILE
-        torf -i FILE [OPTIONS] -o FILE
+        torf PATH [OPTIONS] [-o TORRENT]
+        torf -i TORRENT
+        torf -i TORRENT [OPTIONS] -o NEW TORRENT
 
     ARGUMENTS
         --help,-h              Show this help screen and exit
@@ -34,7 +36,8 @@ cross-seeding issues without hashing the pieces again).
         --webseed, -w WEBSEED  Webseed URL (BEP19) (may be given multiple times)
         --private, -p          Only use tracker(s) for peer discovery (no DHT/PEX)
         --xseed, -x            Randomize info hash to help with cross-seeding
-        --source, -s SOURCE    Source string in the torrent's info
+                               (internally, this adds a random integer to the
+                               'info' section of the torrent)
         --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now' for
                                current local time or 'today' for current local time
                                at midnight
@@ -45,21 +48,36 @@ cross-seeding issues without hashing the pieces again).
         --nowebseed, -W        Remove any webseeds from existing torrent
         --noprivate, -P        Make existing torrent public
         --noxseed, -X          De-randomize info hash of existing torrent
-        --nosource, -S         Remove source string from existing torrent
         --nodate, -D           Remove date from existing torrent
         --nocomment, -C        Remove comment from existing torrent
+        --nocreator, -R        Don't store the name and version of this application
+                               in the torrent
 
-        NOTE: Options starting with '--no' are only effective when editing a torrent
-              (i.e. both --in and --out are specified).
+        NOTE: With the exception of --nocreator, options starting with '--no' are
+              only effective when editing a torrent (i.e. both --in and --out are
+              specified).
 
     EXCLUDING FILES
-        The --exclude argument takes a pattern that is matched against file names in
-        PATH and matching files are not included in the torrent.  This argument is
-        ignored, if PATH is a single file.  Patterns use these special characters:
+        The --exclude argument takes a single pattern that is matched against file
+        names in PATH.  Any matching files are not included in the torrent.  This
+        argument is ignored if PATH is a single file.  Patterns use these special
+        characters:
             *      matches everything
             ?      matches any single character
-            [seq]  matches any character in seq
-            [!seq] matches any char not in seq
+            [SEQ]  matches any character in SEQ
+            [!SEQ] matches any character not in SEQ
+
+    PIPING OUTPUT
+        If the output is piped, the output is changed to be easier to parse with
+        common scripting tools:
+            - Leading spaces are removed.
+              Example: torf ... | grep '^Name'  # Show only name
+            - The delimiter between label and value as well as between multiple
+              values (e.g. trackers) is a tab character (	).
+              Example: torf ... | cut -f 2-   # Remove labels
+            - Size and Piece Size are not scaled to be easier to read by humans
+
+    Homepage: https://github.com/rndusr/torf-cli
 
 Examples
 --------
