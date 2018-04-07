@@ -22,7 +22,7 @@ setup(
 
     packages           = find_packages(),
     python_requires    = '>=3.6',
-    install_requires   = ['torf>=1.0rc5'],
+    install_requires   = ['torf>=1.3'],
 
     entry_points       = { 'console_scripts': [ 'torf = torfcli:run' ] },
 
