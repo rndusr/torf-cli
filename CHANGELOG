@@ -1,4 +1,5 @@
-2018-04-?? 1.1
+2018-04-08 1.1
+  - Major rewrite with lots of tests that should fix the most obvious bugs
   - The options --source and --nosource have been removed
   - The option --nocreator has been added
   - Output is now easier to parse when stdout is not a TTY (e.g. when piping to
