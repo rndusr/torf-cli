@@ -33,7 +33,7 @@ class CLIError(Exception):
 
 
 _DEFAULT_CREATOR = f'{_vars.__appname__}/{_vars.__version__}'
-_VERSION_INFO = f'{_vars.__appname__} {_vars.__version__}'
+_VERSION_INFO = f'{_vars.__appname__} {_vars.__version__} <{_vars.__url__}>'
 _HELP = f"""
 {_VERSION_INFO}
 
@@ -45,65 +45,34 @@ USAGE
     {_vars.__appname__} -i TORRENT [OPTIONS] -o NEW TORRENT
 
 ARGUMENTS
-    --help,-h              Show this help screen and exit
-    --version              Show version information and exit
-
     PATH                   Path to torrent's content
-    --exclude, -e EXCLUDE  Files from PATH to exclude (see below)
-                           (may be given multiple times)
-    --in, -i FILE          Read metainfo from torrent FILE
-    --out, -o FILE         Write metainfo to torrent FILE
-                           (defaults to NAME.torrent when creating new torrent)
-    --yes, -y              Overwrite FILE without asking
+    --in, -i TORRENT       Read metainfo from TORRENT
+    --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
     --magnet, -m           Create magnet link
 
-    --name, -n NAME        Torrent name (defaults to basename of PATH)
-    --tracker, -t TRACKER  Announce URL (may be given multiple times)
-    --webseed, -w WEBSEED  Webseed URL (BEP19) (may be given multiple times)
-    --private, -p          Only use tracker(s) for peer discovery (no DHT/PEX)
-    --xseed, -x            Randomize info hash to help with cross-seeding
-                           (internally, this adds a random integer to the
-                           'info' section of the torrent)
-    --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now' for
-                           current local time or 'today' for current local time
-                           at midnight
-                           (defaults to 'today' when creating new torrent)
-    --comment, -c COMMENT  Comment that is stored in the torrent file
+    --exclude, -e EXCLUDE  File matching pattern that is used to exclude
+                           files in PATH
+    --yes, -y              Answer all yes/no prompts with "yes"
 
-    --notracker, -T        Remove any trackers from existing torrent
-    --nowebseed, -W        Remove any webseeds from existing torrent
-    --noprivate, -P        Make existing torrent public
-    --noxseed, -X          De-randomize info hash of existing torrent
-    --nodate, -D           Remove date from existing torrent
-    --nocomment, -C        Remove comment from existing torrent
-    --nocreator, -R        Don't store the name and version of this application
-                           in the torrent
+    --name, -n NAME        Torrent name (default: basename of PATH)
+    --tracker, -t TRACKER  Announce URL
+    --webseed, -w WEBSEED  Webseed URL
+    --private, -p          Disable DHT and PEX
+    --xseed, -x            Randomize info hash
+    --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now'
+                           or 'today' (default: 'today')
+    --comment, -c COMMENT  Comment that is stored in TORRENT
 
-    NOTE: With the exception of --nocreator, options starting with '--no' are
-          only effective when editing a torrent (i.e. both --in and --out are
-          specified).
+    --notracker, -T        Remove trackers from TORRENT
+    --nowebseed, -W        Remove webseeds from TORRENT
+    --noprivate, -P        Make TORRENT public
+    --noxseed, -X          De-randomize info hash of TORRENT
+    --nodate, -D           Remove date from TORRENT
+    --nocomment, -C        Remove comment from TORRENT
+    --nocreator, -R        Don't store application/version in TORRENT
 
-EXCLUDING FILES
-    The --exclude argument takes a single pattern that is matched against file
-    names in PATH.  Any matching files are not included in the torrent.  This
-    argument is ignored if PATH is a single file.  Patterns use these special
-    characters:
-        *      matches everything
-        ?      matches any single character
-        [SEQ]  matches any character in SEQ
-        [!SEQ] matches any character not in SEQ
-
-PIPING OUTPUT
-    If the output is piped, the output is changed to be easier to parse with
-    common scripting tools:
-        - Leading spaces are removed.
-          Example: torf ... | grep '^Name'  # Show only name
-        - The delimiter between label and value as well as between multiple
-          values (e.g. trackers) is a tab character (\t).
-          Example: torf ... | cut -f 2-   # Remove labels
-        - Numbers are not scaled (e.g. "1024" instead of "1 KiB")
-
-Homepage: {_vars.__url__}
+    --help,-h              Show this help screen and exit
+    --version              Show version number and exit
 """.strip()
 
 
