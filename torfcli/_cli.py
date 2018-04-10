@@ -84,8 +84,8 @@ def _get_args(argv):
 
     argp.add_argument('PATH', nargs='?')
     argp.add_argument('--exclude', '-e', action='append', default=[])
-    argp.add_argument('--in', '-i', metavar='FILE')
-    argp.add_argument('--out', '-o', metavar='FILE')
+    argp.add_argument('--in', '-i')
+    argp.add_argument('--out', '-o')
     argp.add_argument('--yes', '-y', action='store_true')
     argp.add_argument('--magnet', '-m', action='store_true')
 
