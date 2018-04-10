@@ -1,0 +1,231 @@
+.TH torf 1 "April 10, 2018" "USER COMMANDS"
+.SH NAME
+torf \- Create, display and edit torrents
+.SH SYNOPSIS
+.B torf
+PATH [OPTIONS] [\-o TORRENT]
+.br
+.B torf
+\-i TORRENT
+.br
+.B torf
+\-i TORRENT [OPTIONS] \-o TORRENT
+.SH DESCRIPTION
+.B torf
+can create torrent files, display information about existing torrent files, and
+edit existing torrent files (e.g. to remove a comment or change the tracker)
+without re\-hashing the payload.
+.SH OPTIONS
+.I PATH
+.RS
+The path to the torrent's content.
+.RE
+.PP
+.BR \-\-in ,
+.B \-i
+.I TORRENT
+.RS
+Read metainfo from
+.IR TORRENT .
+.RE
+.PP
+.BR \-\-out ,
+.B \-o
+.I TORRENT
+.RS
+Write torrent metadata to
+.IR TORRENT .
+.br
+Default:
+.IR NAME \fB.torrent
+.RE
+.PP
+.BR \-\-yes ,
+.B \-y
+.RS
+Overwrite
+.I TORRENT
+without asking.
+.RE
+.PP
+.BR \-\-magnet ,
+.B \-m
+.RS
+Create magnet link.
+.RE
+.PP
+.BR \-\-exclude ,
+.B \-e
+.I EXCLUDE
+.RS
+Exclude files from
+.I PATH
+that match the pattern
+.IR EXCLUDE .
+This option may be given multiple times.  It is ignored if
+.I PATH
+is not a directory.  See
+.B EXCLUDING FILES
+for more information.
+.RE
+.PP
+.BR \-\-name ,
+.B \-n
+.I NAME
+.RS
+The name of the destination file or directory when the torrent is downloaded.
+.br
+Default: Basename of
+.I PATH
+.RE
+.PP
+.BR \-\-tracker ,
+.B \-t
+.I TRACKER
+.RS
+The announce URL of a tracker.  This option may be given multiple times.
+.RE
+.PP
+.BR \-\-webseed ,
+.B \-w
+.I WEBSEED
+.RS
+A webseed URL (BEP19).  This option may be given multiple times.
+.RE
+.PP
+.BR \-\-private ,
+.B \-p
+.RS
+Only use tracker(s) for peer discovery (don't use DHT or PEX).
+.RE
+.PP
+.BR \-\-comment ,
+.B \-c
+.I COMMENT
+.RS
+A comment that is stored in the torrent file.
+.RE
+.PP
+.BR \-\-date ,
+.B \-d
+.I DATE
+.RS
+The creation date as
+.IR YYYY\-MM\-DD[\ HH:MM[:SS]] ,
+"now" for local time or "today" for local time at midnight.
+.br
+Default: "today"
+.RE
+.PP
+.BR \-\-xseed ,
+.B \-x
+.RS
+Randomize the info hash to help with cross\-seeding.  This simply adds a random
+integer to the "info" section of the metainfo to make the info hash random.
+.RE
+.PP
+.BR \-\-notracker ,
+.B \-T
+.RS
+Remove any trackers from an existing torrent.
+.RE
+.PP
+.BR \-\-nowebseed ,
+.B \-W
+.RS
+Remove any webseeds from an existing torrent.
+.RE
+.PP
+.BR \-\-noprivate ,
+.B \-P
+.RS
+Allow an existing torrent to use DHT and PEX.
+.RE
+.PP
+.BR \-\-noxseed ,
+.B \-X
+.RS
+De\-randomize a previously randomized info hash of an existing torrent.
+.RE
+.PP
+.BR \-\-nodate ,
+.B \-D
+.RS
+Remove the creation date from an existing torrent.
+.RE
+.PP
+.BR \-\-nocomment ,
+.B \-C
+.RS
+Remove the comment from an existing torrent.
+.RE
+.PP
+.BR \-\-nocreator ,
+.B \-R
+.RS
+Don't store the name and version of this application in the generated torrent.
+.RE
+.PP
+.BR \-\-help ,
+.B \-h
+.RS
+Display a short help text.
+.RE
+.PP
+.BR \-\-version
+.RS
+Display the version number.
+.RE
+.SH EXCLUDING FILES
+The \-\-exclude option takes a pattern that is matched against file names in
+.IR PATH .
+Any matching files are not included in the torrent.  Patterns use these
+special characters:
+.PP
+.in +4n
+.nf
+     \fB*\fP  matches everything
+     \fB?\fP  matches any single character
+ \fB[\fP\fISEQ\fP\fB]\fP  matches any character in \fISEQ\fP
+\fB[!\fP\fISEQ\fP\fB]\fP  matches any character not in \fISEQ\fP
+.SH PIPING OUTPUT
+If stdout is not a TTY (i.e. when output is piped or redirected), the format is
+slightly different:
+.IP \(bu 2
+Leading spaces are removed.
+.IP \(bu 2
+The delimiter between label and value as well as between multiple values (files,
+trackers, etc) is a tab character (\\t; ASCII 0x9).
+.IP \(bu 2
+Numbers are not scaled (e.g. "1024" instead of "1 KiB").
+.SH EXAMPLES
+Create "foo.torrent" with two trackers and don't store the creation date:
+.PP
+.in +4n
+\fBtorf path/to/foo \\
+     \-t http://example.org:6881/announce \\
+     \-t http://example.com:6881/announce \\
+     \--nodate\fP
+.PP
+Read "foo.torrent" and print its metainfo:
+.PP
+.in +4n
+.B torf \-i foo.torrent
+.PP
+Print only the name:
+.PP
+.in +4n
+.B torf \-i foo.torrent | grep '^Name' | cut -f2
+.PP
+Change the comment and remove the date from "foo.torrent", write the result to
+"bar.torrent":
+.PP
+.in +4n
+.B torf \-i foo.torrent \-c 'New comment' \-D \-o bar.torrent
+.SH EXIT STATUS
+torf returns zero on success and non-zero on failure.  Run
+.B errno \-l
+for a list of potential error codes.
+.PP
+.SH REPORTING BUGS
+https://github.com/rndusr/torf\-cli/issues
