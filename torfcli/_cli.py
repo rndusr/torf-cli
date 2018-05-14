@@ -131,7 +131,7 @@ def _info_mode(args):
     try:
         torrent = torf.Torrent.read(args['in'])
     except torf.TorfError as e:
-        raise CLIError(str(e), error_code=e.errno)
+        raise CLIError(e, error_code=e.errno)
     else:
         _show_torrent_info(torrent)
 
@@ -169,7 +169,7 @@ def _edit_mode(args):
     try:
         torrent = torf.Torrent.read(args['in'])
     except torf.TorfError as e:
-        raise CLIError(str(e), error_code=e.errno)
+        raise CLIError(e, error_code=e.errno)
 
     def set_or_remove(arg_name, attr_name):
         arg_noname = 'no' + arg_name
