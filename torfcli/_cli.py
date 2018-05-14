@@ -19,7 +19,7 @@ import datetime
 from collections import abc
 
 from . import __vars__ as _vars
-from . import _util as util
+from . import _util as _util
 
 
 class CLIError(Exception):
@@ -152,11 +152,11 @@ def _create_mode(args):
 
     if args['date']:
         try:
-            torrent.creation_date = util.parse_date(args['date'])
+            torrent.creation_date = _util.parse_date(args['date'])
         except ValueError:
             raise CLIError(f'{args["date"]}: Invalid date', error_code=errno.EINVAL)
     elif not args['nodate']:
-        torrent.creation_date = util.parse_date('today')
+        torrent.creation_date = _util.parse_date('today')
 
     # Get user confirmation about overwriting existing output file
     _check_output_file_exists(torrent, args)
@@ -208,7 +208,7 @@ def _edit_mode(args):
 
     if args['date']:
         try:
-            torrent.creation_date = util.parse_date(args['date'])
+            torrent.creation_date = _util.parse_date(args['date'])
         except ValueError:
             raise CLIError(f'{args["date"]}: Invalid date', error_code=errno.EINVAL)
     elif args['nodate']:
@@ -234,7 +234,7 @@ def _show_torrent_info(torrent):
     lines.append(('Name', torrent.name))
     if torrent.is_ready:
         lines.append(('Info Hash', torrent.infohash))
-    size = util.bytes2string(torrent.size) if util.is_tty() else torrent.size
+    size = _util.bytes2string(torrent.size) if _util.is_tty() else torrent.size
     lines.append(('Size', size))
     if torrent.comment:
         lines.append(('Comment', torrent.comment.split('\n')))
@@ -255,7 +255,7 @@ def _show_torrent_info(torrent):
                     trackers.append(tier[0])
         else:
             # At least one tier has multiple trackers
-            if util.is_tty():
+            if _util.is_tty():
                 for i,tier in enumerate(torrent.trackers, 1):
                     if tier:
                         trackers.append(f'Tier {i}: {tier[0]}')
@@ -279,7 +279,7 @@ def _show_torrent_info(torrent):
         lines.append((label, torrent.httpseeds))
 
     if torrent.piece_size:
-        piece_size = util.bytes2string(torrent.piece_size) if util.is_tty() else torrent.piece_size
+        piece_size = _util.bytes2string(torrent.piece_size) if _util.is_tty() else torrent.piece_size
         lines.append(('Piece Size', piece_size))
     if torrent.piece_size:
         lines.append(('Piece Count', torrent.pieces))
@@ -288,8 +288,8 @@ def _show_torrent_info(torrent):
     lines.append(('File Count', len(files)))
     if torrent.exclude:
         lines.append(('Exclude', torrent.exclude))
-    if util.is_tty():
-        lines.append(('Files', util.make_filetree(torrent.filetree)))
+    if _util.is_tty():
+        lines.append(('Files', _util.make_filetree(torrent.filetree)))
     else:
         lines.append(('Files', files))
 
@@ -299,7 +299,7 @@ def _show_torrent_info(torrent):
 
 _INFO_LABEL_WIDTH = 13
 def _info(label, value, newline=True):
-    if util.is_tty():
+    if _util.is_tty():
         # Make output human-readable
         label = f'{label.rjust(_INFO_LABEL_WIDTH)}'
         sep = '  '
@@ -340,7 +340,7 @@ def _check_output_file_exists(torrent, args):
         if os.path.isdir(torrent_filepath):
             raise CLIError(f'{torrent_filepath}: {os.strerror(errno.EISDIR)}',
                            error_code=errno.EISDIR)
-        elif not args['yes'] and not util.ask_yes_no(f'{torrent_filepath}: Overwrite file?', default='n'):
+        elif not args['yes'] and not _util.ask_yes_no(f'{torrent_filepath}: Overwrite file?', default='n'):
             raise CLIError(f'{torrent_filepath}: {os.strerror(errno.EEXIST)}',
                            error_code=errno.EEXIST)
 
@@ -364,8 +364,8 @@ def _hash_pieces(torrent):
     _info('Path', torrent.path)
 
     start_time = time.time()
-    progress = util.Average(samples=5)
-    time_left = util.Average(samples=10)
+    progress = _util.Average(samples=5)
+    time_left = _util.Average(samples=10)
     def progress_callback(torrent, filepath, pieces_done, pieces_total):
         msg = f'{pieces_done / pieces_total * 100:.2f} %'
         if pieces_done < pieces_total:
@@ -385,7 +385,7 @@ def _hash_pieces(torrent):
             total_time_diff = datetime.timedelta(seconds=round(time.time() - start_time))
             bytes_per_sec = torrent.size / (total_time_diff.total_seconds()+1)
             msg += f'  |  {bytes_per_sec/1045876:.2f} MB/s  |  Time: {total_time_diff}'
-        util.clear_line()
+        _util.clear_line()
         _info('Progress', msg, newline=False)
 
     canceled = True
