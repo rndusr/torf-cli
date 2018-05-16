@@ -4,7 +4,7 @@ import pytest
 
 def test_no_arguments():
     with pytest.raises(CLIError,
-                       match=r'^torf: Missing PATH or --in option \(see `torf -h`\)$'):
+                       match=r'^torf: Missing PATH or --in argument \(see `torf -h`\)$'):
         run([])
 
 

@@ -123,7 +123,7 @@ def run(argv=sys.argv[1:]):
         elif args['PATH']:
             _create_mode(args)
         else:
-            raise CLIError(f'Missing PATH or --in option (see `{_vars.__appname__} -h`)',
+            raise CLIError(f'Missing PATH or --in argument (see `{_vars.__appname__} -h`)',
                            error_code=errno.EINVAL)
 
 
