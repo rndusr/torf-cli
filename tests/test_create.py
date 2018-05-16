@@ -56,6 +56,10 @@ def test_create_only_magnet_link(capsys, mock_content):
     content_path = str(mock_content)
     run([content_path, '--magnet'])
 
+    unexp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    unexp_torrent_filepath = os.path.join(os.getcwd(), unexp_torrent_filename)
+    assert not os.path.exists(unexp_torrent_filepath)
+
     cap = capsys.readouterr()
     assert 'Magnet URI\t' in cap.out
     assert 'Torrent File\t' not in cap.out
