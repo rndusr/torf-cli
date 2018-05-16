@@ -179,6 +179,22 @@ def test_exclude_everything(capsys, mock_content, autoremove):
         assert exc_info.value.errno == errno.ENODATA
 
 
+def test_noexclude_option(capsys, mock_content, autoremove):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    with autoremove(exp_torrent_filepath):
+        run([content_path, '--exclude', '*.jpg', '--noexclude'])
+
+        t = torf.Torrent.read(exp_torrent_filepath)
+        assert len(tuple(t.files)) == 3
+
+        cap = capsys.readouterr()
+        assert 'Exclude\t' not in cap.out
+        assert 'File Count\t3' in cap.out
+
+
 def test_name_option(capsys, mock_content, autoremove):
     content_path = str(mock_content)
     name = 'Your Torrent'
@@ -211,6 +227,21 @@ def test_private_option(capsys, mock_content, autoremove):
         assert 'Private\tyes' in cap.out
 
 
+def test_noprivate_option(capsys, mock_content, autoremove):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    with autoremove(exp_torrent_filepath):
+        run([content_path, '--private', '--noprivate'])
+
+        t = torf.Torrent.read(exp_torrent_filepath)
+        assert t.private == False
+
+        cap = capsys.readouterr()
+        assert 'Private\tno' in cap.out
+
+
 def test_xseed_option(capsys, mock_content, autoremove):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
@@ -232,6 +263,29 @@ def test_xseed_option(capsys, mock_content, autoremove):
 
     assert hash_line_1 != hash_line_2
     assert hash_1 != hash_2
+
+
+def test_noxseed_option(capsys, mock_content, autoremove):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    with autoremove(exp_torrent_filepath):
+        run([content_path, '--xseed', '--noxseed'])
+        cap = capsys.readouterr()
+        hash_line_1 = [line for line in cap.out.split('\n')
+                       if 'Info Hash' in line][0]
+        hash_1 = torf.Torrent.read(exp_torrent_filepath).infohash
+
+    with autoremove(exp_torrent_filepath):
+        run([content_path])
+        cap = capsys.readouterr()
+        hash_line_2 = [line for line in cap.out.split('\n')
+                       if 'Info Hash' in line][0]
+        hash_2 = torf.Torrent.read(exp_torrent_filepath).infohash
+
+    assert hash_line_1 == hash_line_2
+    assert hash_1 == hash_2
 
 
 def test_default_date(capsys, mock_content, autoremove):
@@ -321,7 +375,22 @@ def test_invalid_date(capsys, mock_content, autoremove):
         assert exc_info.value.errno == errno.EINVAL
 
 
-def test_comment(capsys, mock_content, autoremove):
+def test_nodate_option(capsys, mock_content, autoremove):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    with autoremove(exp_torrent_filepath):
+        run([content_path, '--date', '2000-01-02 03:04:05', '--nodate'])
+
+        t = torf.Torrent.read(exp_torrent_filepath)
+        assert t.creation_date == None
+
+        cap = capsys.readouterr()
+        assert 'Creation Date\t' not in cap.out
+
+
+def test_comment_option(capsys, mock_content, autoremove):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
@@ -336,7 +405,22 @@ def test_comment(capsys, mock_content, autoremove):
         assert 'Comment\tThis is a comment.' in cap.out
 
 
-def test_nocreator(capsys, mock_content, autoremove):
+def test_nocomment_option(capsys, mock_content, autoremove):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    with autoremove(exp_torrent_filepath):
+        run([content_path, '--comment', 'This is a comment.', '--nocomment'])
+
+        t = torf.Torrent.read(exp_torrent_filepath)
+        assert t.comment is None
+
+        cap = capsys.readouterr()
+        assert 'Comment\t' not in cap.out
+
+
+def test_nocreator_option(capsys, mock_content, autoremove):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
@@ -388,6 +472,21 @@ def test_multiple_trackers(capsys, mock_content, autoremove):
         assert '\thttps://tracker3.example.org/baz' in cap.out
 
 
+def test_notracker_option(capsys, mock_content, autoremove):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    with autoremove(exp_torrent_filepath):
+        run([content_path, '--tracker', 'https://mytracker.example.org', '--notracker'])
+
+        t = torf.Torrent.read(exp_torrent_filepath)
+        assert t.trackers == None
+
+        cap = capsys.readouterr()
+        assert 'Tracker\t' not in cap.out
+
+
 def test_single_webseed(capsys, mock_content, autoremove):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
@@ -423,3 +522,18 @@ def test_multiple_webseeds(capsys, mock_content, autoremove):
         assert 'Webseeds\thttps://webseed1.example.org/foo' in cap.out
         assert '\thttps://webseed2.example.org/bar/' in cap.out
         assert '\thttps://webseed3.example.org/baz' in cap.out
+
+
+def test_nowebseed_option(capsys, mock_content, autoremove):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    with autoremove(exp_torrent_filepath):
+        run([content_path, '--webseed', 'https://mywebseed.example.org/foo', '--nowebseed'])
+
+        t = torf.Torrent.read(exp_torrent_filepath)
+        assert t.webseeds == None
+
+        cap = capsys.readouterr()
+        assert 'Webseed\t' not in cap.out
