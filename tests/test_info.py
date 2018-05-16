@@ -155,12 +155,12 @@ def test_private(capsys, create_torrent, mock_tty):
         with mock_tty(True):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert not re.search(r'^\s*Private  ', cap.out, flags=re.MULTILINE)
+            assert re.search(r'^\s*Private  no', cap.out, flags=re.MULTILINE)
 
         with mock_tty(False):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert not re.search(r'^Private\t', cap.out, flags=re.MULTILINE)
+            assert re.search(r'^Private\tno', cap.out, flags=re.MULTILINE)
 
 
 def test_trackers___single_tracker_per_tier(capsys, create_torrent, mock_tty):

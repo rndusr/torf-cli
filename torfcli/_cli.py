@@ -243,8 +243,7 @@ def _show_torrent_info(torrent):
         lines.append(('Creation Date', torrent.creation_date.isoformat(sep=' ', timespec='seconds')))
     if torrent.created_by:
         lines.append(('Created By', torrent.created_by))
-    if torrent.private:
-        lines.append(('Private', 'yes'))
+    lines.append(('Private', 'yes' if torrent.private else 'no'))
 
     trackers = []  # List of lines
     if torrent.trackers:
