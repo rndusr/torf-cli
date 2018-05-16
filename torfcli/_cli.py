@@ -209,13 +209,13 @@ def _edit_mode(args):
     if args['nocreator']:
         torrent.created_by = None
 
-    if args['date']:
+    if args['nodate']:
+        torrent.creation_date = None
+    elif args['date']:
         try:
             torrent.creation_date = _util.parse_date(args['date'])
         except ValueError:
             raise CLIError(f'{args["date"]}: Invalid date', error_code=errno.EINVAL)
-    elif args['nodate']:
-        torrent.creation_date = None
 
     if args['PATH']:
         try:
