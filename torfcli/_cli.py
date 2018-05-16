@@ -142,23 +142,24 @@ def _create_mode(args):
     try:
         torrent = torf.Torrent(path=args['PATH'],
                                name=args['name'],
-                               exclude=args['exclude'],
-                               trackers=args['tracker'],
-                               webseeds=args['webseed'],
-                               private=args['private'],
-                               randomize_infohash=args['xseed'],
-                               comment=args['comment'],
+                               exclude=args['exclude'] if not args['noexclude'] else (),
+                               trackers=args['tracker'] if not args['notracker'] else None,
+                               webseeds=args['webseed'] if not args['nowebseed'] else None,
+                               private=args['private'] if not args['noprivate'] else False,
+                               randomize_infohash=args['xseed'] if not args['noxseed'] else False,
+                               comment=args['comment'] if not args['nocomment'] else None,
                                created_by=None if args['nocreator'] else _DEFAULT_CREATOR)
     except torf.TorfError as e:
         raise CLIError(e, error_code=e.errno)
 
-    if args['date']:
-        try:
-            torrent.creation_date = _util.parse_date(args['date'])
-        except ValueError:
-            raise CLIError(f'{args["date"]}: Invalid date', error_code=errno.EINVAL)
-    elif not args['nodate']:
-        torrent.creation_date = _util.parse_date('today')
+    if not args['nodate']:
+        if args['date']:
+            try:
+                torrent.creation_date = _util.parse_date(args['date'])
+            except ValueError:
+                raise CLIError(f'{args["date"]}: Invalid date', error_code=errno.EINVAL)
+        else:
+            torrent.creation_date = _util.parse_date('today')
 
     # Get user confirmation about overwriting existing output file
     _check_output_file_exists(torrent, args)
