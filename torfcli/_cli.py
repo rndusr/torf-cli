@@ -84,10 +84,12 @@ def _get_args(argv):
 
     argp.add_argument('PATH', nargs='?')
     argp.add_argument('--exclude', '-e', action='append', default=[])
+    argp.add_argument('--noexclude', '-E', action='store_true')
     argp.add_argument('--in', '-i')
     argp.add_argument('--out', '-o')
     argp.add_argument('--yes', '-y', action='store_true')
     argp.add_argument('--magnet', '-m', action='store_true')
+    argp.add_argument('--nomagnet', '-M', action='store_true')
 
     argp.add_argument('--name', '-n')
     argp.add_argument('--tracker', '-t', action='append')
