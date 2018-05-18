@@ -3,7 +3,18 @@ import contextlib
 import os
 import torf
 import functools
+import shutil
 from types import SimpleNamespace, GeneratorType
+
+
+@pytest.fixture(autouse=True)
+def change_cwd(tmpdir):
+    os.chdir(str(tmpdir))
+    print('Running tests in %r' % str(tmpdir))
+    print(os.getcwd())
+    yield
+    print('Cleaning up tmpdir %r' % str(tmpdir))
+    shutil.rmtree(str(tmpdir))
 
 
 def _assert_torrents_equal(orig, new, ignore=(), **new_attrs):
@@ -35,20 +46,6 @@ def _mock_tty(monkeypatch, is_tty):
 @pytest.fixture
 def mock_tty(monkeypatch):
     return functools.partial(_mock_tty, monkeypatch)
-
-
-@contextlib.contextmanager
-def _autoremove(*files):
-    try:
-        yield
-    finally:
-        for f in files:
-            if os.path.exists(f):
-                os.remove(f)
-
-@pytest.fixture()
-def autoremove():
-    return _autoremove
 
 
 @pytest.fixture
