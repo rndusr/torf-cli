@@ -16,11 +16,41 @@ can create torrent files, display information about existing torrent files, and
 edit existing torrent files (e.g. to remove a comment or change the tracker)
 without re\-hashing the payload.
 .SH OPTIONS
+.IP \(bu 2
+The order of arguments does not matter.
+.IP \(bu 2
+Options starting with
+.B \-\-no
+take precedence.
+.PP
 .I PATH
 .RS
 The path to the torrent's content.
 .RE
 .PP
+.BR \-\-exclude ,
+.B \-e
+.I EXCLUDE
+.RS
+Exclude files from
+.I PATH
+that match the pattern
+.IR EXCLUDE .
+This option may be given multiple times.  It is ignored if
+.I PATH
+is not a directory.  See
+.BR EXCLUDING\ FILES .
+.RE
+.PP
+.BR \-\-noexclude ,
+.B \-E
+.RS
+Ignore all
+.B \-\-exclude
+parameters.
+.RE
+.PP
+.RE
 .BR \-\-in ,
 .B \-i
 .I TORRENT
@@ -55,19 +85,10 @@ without asking.
 Create magnet link.
 .RE
 .PP
-.BR \-\-exclude ,
-.B \-e
-.I EXCLUDE
+.BR \-\-nomagnet ,
+.B \-M
 .RS
-Exclude files from
-.I PATH
-that match the pattern
-.IR EXCLUDE .
-This option may be given multiple times.  It is ignored if
-.I PATH
-is not a directory.  See
-.B EXCLUDING FILES
-for more information.
+Do not create magnet link.
 .RE
 .PP
 .BR \-\-name ,
@@ -87,6 +108,12 @@ Default: Basename of
 The announce URL of a tracker.  This option may be given multiple times.
 .RE
 .PP
+.BR \-\-notracker ,
+.B \-T
+.RS
+Don't use any trackers.
+.RE
+.PP
 .BR \-\-webseed ,
 .B \-w
 .I WEBSEED
@@ -94,10 +121,22 @@ The announce URL of a tracker.  This option may be given multiple times.
 A webseed URL (BEP19).  This option may be given multiple times.
 .RE
 .PP
+.BR \-\-nowebseed ,
+.B \-W
+.RS
+Don't use any webseeds.
+.RE
+.PP
 .BR \-\-private ,
 .B \-p
 .RS
-Only use tracker(s) for peer discovery (don't use DHT or PEX).
+Tell clients to use tracker(s) exclusively for peer discovery.
+.RE
+.PP
+.BR \-\-noprivate ,
+.B \-P
+.RS
+Allow clients to use DHT and PEX for peer discovery.
 .RE
 .PP
 .BR \-\-comment ,
@@ -105,6 +144,12 @@ Only use tracker(s) for peer discovery (don't use DHT or PEX).
 .I COMMENT
 .RS
 A comment that is stored in the torrent file.
+.RE
+.PP
+.BR \-\-nocomment ,
+.B \-C
+.RS
+Remove the comment.
 .RE
 .PP
 .BR \-\-date ,
@@ -118,47 +163,25 @@ The creation date as
 Default: "today"
 .RE
 .PP
+.BR \-\-nodate ,
+.B \-D
+.RS
+Remove the creation date.
+.RE
+.PP
 .BR \-\-xseed ,
 .B \-x
 .RS
-Randomize the info hash to help with cross\-seeding.  This simply adds a random
-integer to the "info" section of the metainfo to make the info hash random.
-.RE
-.PP
-.BR \-\-notracker ,
-.B \-T
-.RS
-Remove any trackers from an existing torrent.
-.RE
-.PP
-.BR \-\-nowebseed ,
-.B \-W
-.RS
-Remove any webseeds from an existing torrent.
-.RE
-.PP
-.BR \-\-noprivate ,
-.B \-P
-.RS
-Allow an existing torrent to use DHT and PEX.
+Randomize the info hash to help with cross\-seeding.  This simply adds an
+"entropy" field to the "info" section of the metainfo and sets it to a random
+integer.
 .RE
 .PP
 .BR \-\-noxseed ,
 .B \-X
 .RS
-De\-randomize a previously randomized info hash of an existing torrent.
-.RE
-.PP
-.BR \-\-nodate ,
-.B \-D
-.RS
-Remove the creation date from an existing torrent.
-.RE
-.PP
-.BR \-\-nocomment ,
-.B \-C
-.RS
-Remove the comment from an existing torrent.
+De\-randomize a previously randomized info hash of an existing torrent.  This
+removes the "entropy" field from the "info" section of the metainfo.
 .RE
 .PP
 .BR \-\-nocreator ,
@@ -206,7 +229,7 @@ Create "foo.torrent" with two trackers and don't store the creation date:
 \fBtorf path/to/foo \\
      \-t http://example.org:6881/announce \\
      \-t http://example.com:6881/announce \\
-     \--nodate\fP
+     \-\-nodate\fP
 .PP
 Read "foo.torrent" and print its metainfo:
 .PP
