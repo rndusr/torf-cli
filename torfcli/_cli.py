@@ -52,15 +52,13 @@ ARGUMENTS
     --in, -i TORRENT       Read metainfo from TORRENT
     --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
     --magnet, -m           Create magnet link
-
     --exclude, -e EXCLUDE  File matching pattern that is used to exclude
                            files in PATH
-    --yes, -y              Answer all yes/no prompts with "yes"
 
     --name, -n NAME        Torrent name (default: basename of PATH)
     --tracker, -t TRACKER  Announce URL
     --webseed, -w WEBSEED  Webseed URL
-    --private, -p          Disable DHT and PEX
+    --private, -p          Forbid clients to use DHT and PEX
     --xseed, -x            Randomize info hash
     --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now'
                            or 'today' (default: 'today')
@@ -68,12 +66,18 @@ ARGUMENTS
 
     --notracker, -T        Remove trackers from TORRENT
     --nowebseed, -W        Remove webseeds from TORRENT
-    --noprivate, -P        Make TORRENT public
+    --noprivate, -P        Allow clients to use DHT and PEX
     --noxseed, -X          De-randomize info hash of TORRENT
     --nodate, -D           Remove date from TORRENT
     --nocomment, -C        Remove comment from TORRENT
-    --nocreator, -R        Don't store application/version in TORRENT
+    --nocreator, -R        Remove creator from TORRENT
+    --noexclude, -E        Don't exlude any files
+    --nomagnet, -M         Don't create magnet link
 
+    --profile, -f PROFILE  Use configuration of PROFILE
+    --config, -F CONFIG    Read configuration from CONFIG file
+
+    --yes, -y              Answer all yes/no prompts with "yes"
     --help,-h              Show this help screen and exit
     --version              Show version number and exit
 """.strip()
@@ -93,22 +97,23 @@ def _get_cfg(argv):
     argp.add_argument('--in', '-i', default='')
     argp.add_argument('--out', '-o', default='')
     argp.add_argument('--yes', '-y', default=False, action='store_true')
+
     argp.add_argument('--magnet', '-m', default=False, action='store_true')
     argp.add_argument('--nomagnet', '-M', default=False, action='store_true')
-
     argp.add_argument('--tracker', '-t', default=[], action='append')
     argp.add_argument('--notracker', '-T', default=False, action='store_true')
     argp.add_argument('--webseed', '-w', default=[], action='append')
     argp.add_argument('--nowebseed', '-W', default=False, action='store_true')
+
     argp.add_argument('--private', '-p', default=False, action='store_true')
     argp.add_argument('--noprivate', '-P', default=False, action='store_true')
-    argp.add_argument('--xseed', '-x', default=False, action='store_true')
-    argp.add_argument('--noxseed', '-X', default=False, action='store_true')
     argp.add_argument('--date', '-d', default='')
     argp.add_argument('--nodate', '-D', default=False, action='store_true')
     argp.add_argument('--comment', '-c', default='')
     argp.add_argument('--nocomment', '-C', default=False, action='store_true')
     argp.add_argument('--nocreator', '-R', default=False, action='store_true')
+    argp.add_argument('--xseed', '-x', default=False, action='store_true')
+    argp.add_argument('--noxseed', '-X', default=False, action='store_true')
 
     argp.add_argument('--config', '-F', default=_DEFAULT_PROFILE_FILE)
     argp.add_argument('--profile', '-f', default=[], action='append')
