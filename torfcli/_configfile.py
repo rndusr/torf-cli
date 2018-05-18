@@ -107,19 +107,19 @@ def validate(cfgfile, defaults):
     return result
 
 
-def combine(args, cfgfile, defaults):
+def combine(cli, cfgfile, defaults):
     # Return combined values from CLI args, cfgfile and defaults
     result = {}
     for name in defaults:
-        if name in args:
-            result[name] = args[name]
+        if name in cli:
+            result[name] = cli[name]
         elif name in cfgfile:
             result[name] = cfgfile[name]
         else:
             result[name] = defaults[name]
 
-    # Update args with values from specified profile
-    profile_names = args.get('profile', ())
+    # Update result with values from specified profile
+    profile_names = cli.get('profile', ())
     for profile_name in profile_names:
         try:
             profile = cfgfile[profile_name]
@@ -127,7 +127,7 @@ def combine(args, cfgfile, defaults):
             raise ConfigError(profile_name, msg='No such profile')
 
         for name,value in profile.items():
-            if name in args and args[name] != defaults[name]:
+            if name in cli and cli[name] != defaults[name]:
                 continue
             else:
                 result[name] = value

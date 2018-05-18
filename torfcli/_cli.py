@@ -83,7 +83,7 @@ ARGUMENTS
 """.strip()
 
 
-def _get_cfg(argv):
+def _get_args(argv):
     # Read CLI arguments
     argp = argparse.ArgumentParser(add_help=False)
 
@@ -132,11 +132,11 @@ def _get_cfg(argv):
 
         # Separate defaults from given CLI arguments
         defaults = {k:argp.get_default(k) for k in cfg}
-        args = {name:value for name,value in cfg.items()
-                if cfg[name] != defaults[name]}
+        cli = {name:value for name,value in cfg.items()
+               if cfg[name] != defaults[name]}
         try:
             cfgfile = _configfile.validate(cfgfile, defaults)
-            cfg = _configfile.combine(args, cfgfile, defaults)
+            cfg = _configfile.combine(cli, cfgfile, defaults)
         except _configfile.ConfigError as e:
             raise CLIError(f'{configfile}: {e}', error_code=errno.EINVAL)
 
@@ -144,7 +144,7 @@ def _get_cfg(argv):
 
 
 def run(argv=sys.argv[1:]):
-    args = _get_cfg(argv)
+    args = _get_args(argv)
     if args['help']:
         print(_HELP)
     elif args['version']:
