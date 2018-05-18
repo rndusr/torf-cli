@@ -1,4 +1,5 @@
 import pytest
+from unittest import mock
 import contextlib
 import os
 import torf
@@ -15,6 +16,15 @@ def change_cwd(tmpdir):
     yield
     print('Cleaning up tmpdir %r' % str(tmpdir))
     shutil.rmtree(str(tmpdir))
+
+
+@pytest.fixture(autouse=True)
+def cfgfile(tmpdir, monkeypatch):
+    cfgdir = tmpdir.mkdir('configdir')
+    cfgfile = cfgdir.join('config')
+    from torfcli import _cli
+    monkeypatch.setattr(_cli, '_DEFAULT_PROFILE_FILE', str(cfgfile))
+    return cfgfile
 
 
 def _assert_torrents_equal(orig, new, ignore=(), **new_attrs):
@@ -57,6 +67,14 @@ def mock_content(tmpdir):
     for f in (file1, file2, file3):
         f.write('some data')
     return base
+
+
+@pytest.fixture
+def mock_create_mode(monkeypatch):
+    from torfcli import _cli
+    mock_create_mode = mock.MagicMock()
+    monkeypatch.setattr(_cli, '_create_mode', mock_create_mode)
+    return mock_create_mode
 
 
 @contextlib.contextmanager
