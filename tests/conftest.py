@@ -11,10 +11,7 @@ from types import SimpleNamespace, GeneratorType
 @pytest.fixture(autouse=True)
 def change_cwd(tmpdir):
     os.chdir(str(tmpdir))
-    print('Running tests in %r' % str(tmpdir))
-    print(os.getcwd())
     yield
-    print('Cleaning up tmpdir %r' % str(tmpdir))
     shutil.rmtree(str(tmpdir))
 
 
