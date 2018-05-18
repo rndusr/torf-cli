@@ -118,18 +118,23 @@ def combine(cli, cfgfile, defaults):
         else:
             result[name] = defaults[name]
 
+    def apply_profile(profile):
+        for name,value in profile.items():
+            # CLI argument takes precedence over config file
+            if name not in cli or cli[name] == defaults[name]:
+                result[name] = value
+            elif name == 'profile':
+                for profile_name in value:
+                    apply_profile(cfgfile[profile_name])
+        return result
+
     # Update result with values from specified profile
     profile_names = cli.get('profile', ())
     for profile_name in profile_names:
-        try:
-            profile = cfgfile[profile_name]
-        except KeyError:
+        profile = cfgfile.get(profile_name)
+        if profile is None:
             raise ConfigError(profile_name, msg='No such profile')
-
-        for name,value in profile.items():
-            if name in cli and cli[name] != defaults[name]:
-                continue
-            else:
-                result[name] = value
+        else:
+            apply_profile(cfgfile[profile_name])
 
     return result

@@ -244,6 +244,43 @@ def test_multiple_profiles(cfgfile, mock_content, mock_create_mode):
     assert mock_create_mode_args['nocreator'] == True
 
 
+def test_referencing_profile_in_profile(cfgfile, mock_content, mock_create_mode):
+    cfgfile.write(textwrap.dedent('''
+    date = 1970-01-01
+
+    [foo]
+    profile = noimg
+
+    [bar]
+    profile = friendly
+    profile = noimg
+    private
+
+    [noimg]
+    exclude = *.jpg
+    exclude = *.png
+
+    [friendly]
+    comment = 'I like you.'
+    noprivate
+    '''))
+    run(['--profile', 'foo', str(mock_content)])
+    mock_create_mode_args = mock_create_mode.call_args[0][0]
+    assert mock_create_mode_args['date'] == '1970-01-01'
+    assert mock_create_mode_args['exclude'] == ['*.jpg', '*.png']
+    assert mock_create_mode_args['private'] == False
+    assert mock_create_mode_args['noprivate'] == False
+    assert mock_create_mode_args['comment'] == ''
+
+    run(['--profile', 'bar', str(mock_content)])
+    mock_create_mode_args = mock_create_mode.call_args[0][0]
+    assert mock_create_mode_args['date'] == '1970-01-01'
+    assert mock_create_mode_args['exclude'] == ['*.jpg', '*.png']
+    assert mock_create_mode_args['private'] == True
+    assert mock_create_mode_args['noprivate'] == True
+    assert mock_create_mode_args['comment'] == 'I like you.'
+
+
 def test_unknown_profile(cfgfile, mock_content, mock_create_mode):
     cfgfile.write(textwrap.dedent('''
     [foo]
