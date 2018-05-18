@@ -17,9 +17,11 @@ import os
 import time
 import datetime
 from collections import abc
+from xdg import BaseDirectory
 
 from . import __vars__ as _vars
 from . import _util as _util
+from . import _configfile as _configfile
 
 
 class CLIError(Exception):
@@ -34,6 +36,7 @@ class CLIError(Exception):
 
 _DEFAULT_CREATOR = f'{_vars.__appname__}/{_vars.__version__}'
 _VERSION_INFO = f'{_vars.__appname__} {_vars.__version__} <{_vars.__url__}>'
+_DEFAULT_PROFILE_FILE = os.path.join(BaseDirectory.load_first_config(_vars.__appname__), 'config')
 _HELP = f"""
 {_VERSION_INFO}
 
@@ -76,41 +79,67 @@ ARGUMENTS
 """.strip()
 
 
-def _get_args(argv):
+def _get_cfg(argv):
+    # Read CLI arguments
     argp = argparse.ArgumentParser(add_help=False)
 
     argp.add_argument('--help', '-h', action='store_true')
     argp.add_argument('--version', action='store_true')
 
     argp.add_argument('PATH', nargs='?')
-    argp.add_argument('--exclude', '-e', action='append', default=[])
-    argp.add_argument('--noexclude', '-E', action='store_true')
-    argp.add_argument('--in', '-i')
-    argp.add_argument('--out', '-o')
-    argp.add_argument('--yes', '-y', action='store_true')
-    argp.add_argument('--magnet', '-m', action='store_true')
-    argp.add_argument('--nomagnet', '-M', action='store_true')
+    argp.add_argument('--name', '-n', default='')
+    argp.add_argument('--exclude', '-e', default=[], action='append')
+    argp.add_argument('--noexclude', '-E', default=False, action='store_true')
+    argp.add_argument('--in', '-i', default='')
+    argp.add_argument('--out', '-o', default='')
+    argp.add_argument('--yes', '-y', default=False, action='store_true')
+    argp.add_argument('--magnet', '-m', default=False, action='store_true')
+    argp.add_argument('--nomagnet', '-M', default=False, action='store_true')
 
-    argp.add_argument('--name', '-n')
-    argp.add_argument('--tracker', '-t', action='append')
-    argp.add_argument('--notracker', '-T', action='store_true')
-    argp.add_argument('--webseed', '-w', action='append')
-    argp.add_argument('--nowebseed', '-W', action='store_true')
-    argp.add_argument('--private', '-p', action='store_true')
-    argp.add_argument('--noprivate', '-P', action='store_true')
-    argp.add_argument('--xseed', '-x', action='store_true')
-    argp.add_argument('--noxseed', '-X', action='store_true')
-    argp.add_argument('--date', '-d')
-    argp.add_argument('--nodate', '-D', action='store_true')
-    argp.add_argument('--comment', '-c')
-    argp.add_argument('--nocomment', '-C', action='store_true')
-    argp.add_argument('--nocreator', '-R', action='store_true')
+    argp.add_argument('--tracker', '-t', default=[], action='append')
+    argp.add_argument('--notracker', '-T', default=False, action='store_true')
+    argp.add_argument('--webseed', '-w', default=[], action='append')
+    argp.add_argument('--nowebseed', '-W', default=False, action='store_true')
+    argp.add_argument('--private', '-p', default=False, action='store_true')
+    argp.add_argument('--noprivate', '-P', default=False, action='store_true')
+    argp.add_argument('--xseed', '-x', default=False, action='store_true')
+    argp.add_argument('--noxseed', '-X', default=False, action='store_true')
+    argp.add_argument('--date', '-d', default='')
+    argp.add_argument('--nodate', '-D', default=False, action='store_true')
+    argp.add_argument('--comment', '-c', default='')
+    argp.add_argument('--nocomment', '-C', default=False, action='store_true')
+    argp.add_argument('--nocreator', '-R', default=False, action='store_true')
 
-    return vars(argp.parse_args(argv))
+    argp.add_argument('--config', '-F', default=_DEFAULT_PROFILE_FILE)
+    argp.add_argument('--profile', '-f', default=[], action='append')
+
+    cfg = vars(argp.parse_args(argv))
+
+    # Read config file if specified by user or if it exists
+    if cfg['config'] != _DEFAULT_PROFILE_FILE or os.path.exists(cfg['config']):
+        configfile = cfg['config']
+
+        try:
+            cfgfile = _configfile.read(cfg['config'])
+        except OSError as e:
+            raise CLIError(f'{configfile}: {os.strerror(e.errno)}',
+                           error_code=e.errno)
+
+        # Separate defaults from given CLI arguments
+        defaults = {k:argp.get_default(k) for k in cfg}
+        args = {name:value for name,value in cfg.items()
+                if cfg[name] != defaults[name]}
+        try:
+            cfgfile = _configfile.validate(cfgfile, defaults)
+            cfg = _configfile.combine(args, cfgfile, defaults)
+        except _configfile.ConfigError as e:
+            raise CLIError(f'{configfile}: {e}', error_code=errno.EINVAL)
+
+    return cfg
 
 
 def run(argv=sys.argv[1:]):
-    args = _get_args(argv)
+    args = _get_cfg(argv)
     if args['help']:
         print(_HELP)
     elif args['version']:
@@ -141,7 +170,7 @@ def _info_mode(args):
 def _create_mode(args):
     try:
         torrent = torf.Torrent(path=args['PATH'],
-                               name=args['name'],
+                               name=args['name'] or None,
                                exclude=args['exclude'] if not args['noexclude'] else (),
                                trackers=args['tracker'] if not args['notracker'] else None,
                                webseeds=args['webseed'] if not args['nowebseed'] else None,
