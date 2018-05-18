@@ -1,3 +1,9 @@
+2018-05-?? 1.2
+  - Support for custom defaults and special profiles in
+    $XDG_CONFIG_HOME/torf/config
+  - New options: --config/-F, --profile/-f, --noexclude/-E, --nomagnet/-M
+
+
 2018-04-08 1.1
   - Major rewrite with lots of tests that should fix the most obvious bugs
   - The options --source and --nosource have been removed
