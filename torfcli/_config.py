@@ -74,8 +74,7 @@ def validate(cfgfile, defaults):
     # Return validated values from cfgfile
     result = {}
     for name,value_cfgfile in tuple(cfgfile.items()):
-        # Dictionaries are profiles and will raise errors
-        # when they're evaluated below
+        # Dictionaries are profiles
         if isinstance(value_cfgfile, dict):
             result[name] = validate(value_cfgfile, defaults)
             continue
