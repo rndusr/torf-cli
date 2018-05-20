@@ -36,7 +36,7 @@ class CLIError(Exception):
 
 _DEFAULT_CREATOR = f'{_vars.__appname__}/{_vars.__version__}'
 _VERSION_INFO = f'{_vars.__appname__} {_vars.__version__} <{_vars.__url__}>'
-_DEFAULT_PROFILE_FILE = os.path.join(BaseDirectory.load_first_config(_vars.__appname__), 'config')
+_DEFAULT_PROFILE_FILE = os.path.join(BaseDirectory.xdg_config_home, _vars.__appname__, 'config')
 _HELP = f"""
 {_VERSION_INFO}
 
