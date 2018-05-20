@@ -196,7 +196,7 @@ def test_single_profile(cfgfile, mock_content, mock_create_mode):
     assert mock_create_mode_args['date'] == '1970-01-01'
     assert mock_create_mode_args['tracker'] == ['http://some.tracker/foo']
     assert mock_create_mode_args['private'] == True
-    assert mock_create_mode_args['comment'] == 'arf'
+    assert mock_create_mode_args['comment'] == ''
     assert mock_create_mode_args['nocomment'] == True
 
     run(['--profile', 'bar', str(mock_content)])
@@ -216,7 +216,6 @@ def test_multiple_profiles(cfgfile, mock_content, mock_create_mode):
 
     [foo]
     private
-    tracker = http://some.tracker/foo
     nocomment
 
     [bar]
@@ -230,18 +229,29 @@ def test_multiple_profiles(cfgfile, mock_content, mock_create_mode):
     assert mock_create_mode_args['date'] == '2000-01-01'
     assert mock_create_mode_args['tracker'] == ['http://some.other.tracker/bar', 'http://some.other.tracker/baz']
     assert mock_create_mode_args['private'] == True
-    assert mock_create_mode_args['comment'] == 'arf'
+    assert mock_create_mode_args['comment'] == ''
     assert mock_create_mode_args['nocomment'] == True
     assert mock_create_mode_args['nocreator'] == True
 
     run(['--profile', 'bar', '--profile', 'foo', str(mock_content)])
     mock_create_mode_args = mock_create_mode.call_args[0][0]
     assert mock_create_mode_args['date'] == '2000-01-01'
-    assert mock_create_mode_args['tracker'] == ['http://some.tracker/foo']
+    assert mock_create_mode_args['tracker'] == ['http://some.other.tracker/bar', 'http://some.other.tracker/baz']
     assert mock_create_mode_args['private'] == True
-    assert mock_create_mode_args['comment'] == 'arf'
+    assert mock_create_mode_args['comment'] == ''
     assert mock_create_mode_args['nocomment'] == True
     assert mock_create_mode_args['nocreator'] == True
+
+
+def test_unknown_profile(cfgfile, mock_content, mock_create_mode):
+    cfgfile.write(textwrap.dedent('''
+    [foo]
+
+    [bar]
+    '''))
+    with pytest.raises(CLIError,
+                       match=f"^torf: {str(cfgfile)}: 'baz': No such profile$"):
+        run(['--profile', 'baz', str(mock_content)])
 
 
 def test_referencing_profile_in_profile(cfgfile, mock_content, mock_create_mode):
@@ -254,7 +264,6 @@ def test_referencing_profile_in_profile(cfgfile, mock_content, mock_create_mode)
     [bar]
     profile = friendly
     profile = noimg
-    private
 
     [noimg]
     exclude = *.jpg
@@ -262,31 +271,90 @@ def test_referencing_profile_in_profile(cfgfile, mock_content, mock_create_mode)
 
     [friendly]
     comment = 'I like you.'
-    noprivate
     '''))
     run(['--profile', 'foo', str(mock_content)])
     mock_create_mode_args = mock_create_mode.call_args[0][0]
     assert mock_create_mode_args['date'] == '1970-01-01'
     assert mock_create_mode_args['exclude'] == ['*.jpg', '*.png']
-    assert mock_create_mode_args['private'] == False
-    assert mock_create_mode_args['noprivate'] == False
     assert mock_create_mode_args['comment'] == ''
 
     run(['--profile', 'bar', str(mock_content)])
     mock_create_mode_args = mock_create_mode.call_args[0][0]
     assert mock_create_mode_args['date'] == '1970-01-01'
     assert mock_create_mode_args['exclude'] == ['*.jpg', '*.png']
-    assert mock_create_mode_args['private'] == True
-    assert mock_create_mode_args['noprivate'] == True
     assert mock_create_mode_args['comment'] == 'I like you.'
 
 
-def test_unknown_profile(cfgfile, mock_content, mock_create_mode):
+def test_adjusting_exclude_of_referenced_profile_in_profile(cfgfile, mock_content, mock_create_mode):
     cfgfile.write(textwrap.dedent('''
     [foo]
+    profile = x
+    exclude = *.txt
 
     [bar]
+    profile = x
+    noexclude
+    exclude = *.txt
+
+    [x]
+    exclude = *.jpg
     '''))
-    with pytest.raises(CLIError,
-                       match=f"^torf: {str(cfgfile)}: 'baz': No such profile$"):
-        run(['--profile', 'baz', str(mock_content)])
+    run(['--profile', 'foo', str(mock_content)])
+    mock_create_mode_args = mock_create_mode.call_args[0][0]
+    assert mock_create_mode_args['exclude'] == ['*.jpg', '*.txt']
+
+    run(['--profile', 'bar', str(mock_content)])
+    mock_create_mode_args = mock_create_mode.call_args[0][0]
+    assert mock_create_mode_args['exclude'] == ['*.txt']
+
+
+def test_adjusting_trackers_of_referenced_profile_in_profile(cfgfile, mock_content, mock_create_mode):
+    cfgfile.write(textwrap.dedent('''
+    [foo]
+    profile = x
+    tracker = http://additional.tracker
+
+    [bar]
+    profile = x
+    notracker
+    tracker = http://only.tracker
+
+    [x]
+    tracker = http://first.tracker
+    tracker = http://second.tracker
+    '''))
+    run(['--profile', 'foo', str(mock_content)])
+    mock_create_mode_args = mock_create_mode.call_args[0][0]
+    assert mock_create_mode_args['tracker'] == ['http://first.tracker', 'http://second.tracker',
+                                                'http://additional.tracker']
+
+    run(['--profile', 'bar', str(mock_content)])
+    mock_create_mode_args = mock_create_mode.call_args[0][0]
+    assert mock_create_mode_args['tracker'] == ['http://only.tracker']
+
+
+def test_adjusting_private_of_referenced_profile_in_profile(cfgfile, mock_content, mock_create_mode):
+    cfgfile.write(textwrap.dedent('''
+    [foo]
+    profile = np
+    private
+
+    [bar]
+    profile = p
+    noprivate
+
+    [p]
+    private
+
+    [np]
+    noprivate
+    '''))
+    run(['--profile', 'foo', str(mock_content)])
+    mock_create_mode_args = mock_create_mode.call_args[0][0]
+    assert mock_create_mode_args['private'] == True
+    assert mock_create_mode_args['noprivate'] == False
+
+    run(['--profile', 'bar', str(mock_content)])
+    mock_create_mode_args = mock_create_mode.call_args[0][0]
+    assert mock_create_mode_args['private'] == False
+    assert mock_create_mode_args['noprivate'] == True
