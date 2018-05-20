@@ -121,6 +121,12 @@ def combine(cli, cfgfile, defaults):
         for name,value in profile.items():
             # CLI argument takes precedence over config file
             if name not in cli or cli[name] == defaults[name]:
+                if 'no'+name in defaults:
+                    # Options that have a 'no*' counterpart reset it
+                    result['no'+name] = False
+                elif name.startswith('no') and name[2:] in defaults:
+                    # 'no*' options reset their counterpart option to its default
+                    result[name[2:]] = defaults[name[2:]]
                 result[name] = value
             elif name == 'profile':
                 for profile_name in value:
