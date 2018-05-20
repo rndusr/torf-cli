@@ -127,6 +127,14 @@ def combine(cli, cfgfile, defaults):
                 elif name.startswith('no') and name[2:] in defaults:
                     # 'no*' options reset their counterpart option to its default
                     result[name[2:]] = defaults[name[2:]]
+
+                # Append to lists instead of overwriting the previous value
+                if isinstance(result[name], list):
+                    if isinstance(value, list):
+                        value = result[name] + value
+                    else:
+                        value = result[name] + [value]
+
                 result[name] = value
             elif name == 'profile':
                 for profile_name in value:
