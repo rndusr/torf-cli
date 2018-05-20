@@ -83,7 +83,7 @@ ARGUMENTS
 """.strip()
 
 
-def _get_args(argv):
+def _get_cfg(argv):
     # Read CLI arguments
     argp = argparse.ArgumentParser(add_help=False)
 
@@ -144,80 +144,80 @@ def _get_args(argv):
 
 
 def run(argv=sys.argv[1:]):
-    args = _get_args(argv)
-    if args['help']:
+    cfg = _get_cfg(argv)
+    if cfg['help']:
         print(_HELP)
-    elif args['version']:
+    elif cfg['version']:
         print(_VERSION_INFO)
     else:
         # Figure out our modus operandi
-        if args['in']:
-            if args['out'] or args['magnet']:
-                _edit_mode(args)
+        if cfg['in']:
+            if cfg['out'] or cfg['magnet']:
+                _edit_mode(cfg)
             else:
-                _info_mode(args)
-        elif args['PATH']:
-            _create_mode(args)
+                _info_mode(cfg)
+        elif cfg['PATH']:
+            _create_mode(cfg)
         else:
             raise CLIError(f'Missing PATH or --in argument (see `{_vars.__appname__} -h`)',
                            error_code=errno.EINVAL)
 
 
-def _info_mode(args):
+def _info_mode(cfg):
     try:
-        torrent = torf.Torrent.read(args['in'])
+        torrent = torf.Torrent.read(cfg['in'])
     except torf.TorfError as e:
         raise CLIError(e, error_code=e.errno)
     else:
         _show_torrent_info(torrent)
 
 
-def _create_mode(args):
+def _create_mode(cfg):
     try:
-        torrent = torf.Torrent(path=args['PATH'],
-                               name=args['name'] or None,
-                               exclude=args['exclude'] if not args['noexclude'] else (),
-                               trackers=args['tracker'] if not args['notracker'] else None,
-                               webseeds=args['webseed'] if not args['nowebseed'] else None,
-                               private=args['private'] if not args['noprivate'] else False,
-                               randomize_infohash=args['xseed'] if not args['noxseed'] else False,
-                               comment=args['comment'] if not args['nocomment'] else None,
-                               created_by=None if args['nocreator'] else _DEFAULT_CREATOR)
+        torrent = torf.Torrent(path=cfg['PATH'],
+                               name=cfg['name'] or None,
+                               exclude=cfg['exclude'] if not cfg['noexclude'] else (),
+                               trackers=cfg['tracker'] if not cfg['notracker'] else None,
+                               webseeds=cfg['webseed'] if not cfg['nowebseed'] else None,
+                               private=cfg['private'] if not cfg['noprivate'] else False,
+                               randomize_infohash=cfg['xseed'] if not cfg['noxseed'] else False,
+                               comment=cfg['comment'] if not cfg['nocomment'] else None,
+                               created_by=None if cfg['nocreator'] else _DEFAULT_CREATOR)
     except torf.TorfError as e:
         raise CLIError(e, error_code=e.errno)
 
-    if not args['nodate']:
-        if args['date']:
+    if not cfg['nodate']:
+        if cfg['date']:
             try:
-                torrent.creation_date = _util.parse_date(args['date'])
+                torrent.creation_date = _util.parse_date(cfg['date'])
             except ValueError:
-                raise CLIError(f'{args["date"]}: Invalid date', error_code=errno.EINVAL)
+                raise CLIError(f'{cfg["date"]}: Invalid date', error_code=errno.EINVAL)
         else:
             torrent.creation_date = _util.parse_date('today')
 
     # Get user confirmation about overwriting existing output file
-    _check_output_file_exists(torrent, args)
+    _check_output_file_exists(torrent, cfg)
     _show_torrent_info(torrent)
     _hash_pieces(torrent)
-    _write_torrent(torrent, args)
+    _write_torrent(torrent, cfg)
 
 
-def _edit_mode(args):
+def _edit_mode(cfg):
     try:
-        torrent = torf.Torrent.read(args['in'])
+        torrent = torf.Torrent.read(cfg['in'])
     except torf.TorfError as e:
         raise CLIError(e, error_code=e.errno)
 
     def set_or_remove(arg_name, attr_name):
         arg_noname = 'no' + arg_name
-        if args[arg_name] and args[arg_noname]:
+        if cfg[arg_name] and cfg[arg_noname]:
             raise CLIError(f'Conflicting arguments: --{arg_name}, --{arg_noname}',
                            error_code=errno.EINVAL)
-        elif args[arg_noname]:
+        elif cfg[arg_noname]:
             setattr(torrent, attr_name, None)
-        elif args[arg_name]:
+        elif cfg[arg_name]:
             try:
-                setattr(torrent, attr_name, args[arg_name])
+                setattr(torrent, attr_name, cfg[arg_name])
             except torf.TorfError as e:
                 raise CLIError(e, error_code=e.errno)
 
@@ -227,11 +227,11 @@ def _edit_mode(args):
 
     def list_set_or_remove(arg_name, attr_name):
         arg_noname = 'no' + arg_name
-        if args[arg_noname]:
+        if cfg[arg_noname]:
             setattr(torrent, attr_name, None)
-        if args[arg_name]:
+        if cfg[arg_name]:
             old_list = getattr(torrent, attr_name) or []
-            new_list = old_list + args[arg_name]
+            new_list = old_list + cfg[arg_name]
             try:
                 setattr(torrent, attr_name, new_list)
             except torf.TorfError as e:
@@ -240,30 +240,30 @@ def _edit_mode(args):
     list_set_or_remove('tracker', 'trackers')
     list_set_or_remove('webseed', 'webseeds')
 
-    if args['nocreator']:
+    if cfg['nocreator']:
         torrent.created_by = None
 
-    if args['nodate']:
+    if cfg['nodate']:
         torrent.creation_date = None
-    elif args['date']:
+    elif cfg['date']:
         try:
-            torrent.creation_date = _util.parse_date(args['date'])
+            torrent.creation_date = _util.parse_date(cfg['date'])
         except ValueError:
-            raise CLIError(f'{args["date"]}: Invalid date', error_code=errno.EINVAL)
+            raise CLIError(f'{cfg["date"]}: Invalid date', error_code=errno.EINVAL)
 
-    if args['PATH']:
+    if cfg['PATH']:
         try:
-            torrent.path = args['PATH']
+            torrent.path = cfg['PATH']
         except torf.TorfError as e:
             raise CLIError(e, error_code=e.errno)
         else:
             _hash_pieces(torrent)
 
-    if args['name']:
-        torrent.name = args['name']
+    if cfg['name']:
+        torrent.name = cfg['name']
 
     _show_torrent_info(torrent)
-    _write_torrent(torrent, args)
+    _write_torrent(torrent, cfg)
 
 
 def _show_torrent_info(torrent):
@@ -357,34 +357,34 @@ def _info(label, value, newline=True):
         print(f'{label}{sep}{value}', end='', flush=True)
 
 
-def _get_torrent_filepath(torrent, args):
-    if args['magnet'] and not args['out']:
+def _get_torrent_filepath(torrent, cfg):
+    if cfg['magnet'] and not cfg['out']:
         # Create only magnet link
         return None
-    elif args['out']:
+    elif cfg['out']:
         # User-given torrent file path
-        torrent_filepath = args['out']
+        torrent_filepath = cfg['out']
     else:
         # Default to torrent's name in cwd
         torrent_filepath = torrent.name + '.torrent'
     return torrent_filepath
 
 
-def _check_output_file_exists(torrent, args):
-    torrent_filepath = _get_torrent_filepath(torrent, args)
+def _check_output_file_exists(torrent, cfg):
+    torrent_filepath = _get_torrent_filepath(torrent, cfg)
     if torrent_filepath and os.path.exists(torrent_filepath):
         if os.path.isdir(torrent_filepath):
             raise CLIError(f'{torrent_filepath}: {os.strerror(errno.EISDIR)}',
                            error_code=errno.EISDIR)
-        elif not args['yes'] and not _util.ask_yes_no(f'{torrent_filepath}: Overwrite file?', default='n'):
+        elif not cfg['yes'] and not _util.ask_yes_no(f'{torrent_filepath}: Overwrite file?', default='n'):
             raise CLIError(f'{torrent_filepath}: {os.strerror(errno.EEXIST)}',
                            error_code=errno.EEXIST)
 
 
-def _write_torrent(torrent, args):
-    torrent_filepath = _get_torrent_filepath(torrent, args)
+def _write_torrent(torrent, cfg):
+    torrent_filepath = _get_torrent_filepath(torrent, cfg)
 
-    if args['magnet'] or not torrent_filepath:
+    if cfg['magnet'] or not torrent_filepath:
         _info('Magnet URI', torrent.magnet())
 
     if torrent_filepath:
