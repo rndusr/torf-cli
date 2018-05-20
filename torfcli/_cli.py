@@ -20,8 +20,8 @@ from collections import abc
 from xdg import BaseDirectory
 
 from . import __vars__ as _vars
-from . import _util as _util
-from . import _configfile as _configfile
+from . import _util
+from . import _config
 
 
 class CLIError(Exception):
@@ -125,7 +125,7 @@ def _get_args(argv):
         configfile = cfg['config']
 
         try:
-            cfgfile = _configfile.read(cfg['config'])
+            cfgfile = _config.read(cfg['config'])
         except OSError as e:
             raise CLIError(f'{configfile}: {os.strerror(e.errno)}',
                            error_code=e.errno)
@@ -135,9 +135,9 @@ def _get_args(argv):
         cli = {name:value for name,value in cfg.items()
                if cfg[name] != defaults[name]}
         try:
-            cfgfile = _configfile.validate(cfgfile, defaults)
-            cfg = _configfile.combine(cli, cfgfile, defaults)
-        except _configfile.ConfigError as e:
+            cfgfile = _config.validate(cfgfile, defaults)
+            cfg = _config.combine(cli, cfgfile, defaults)
+        except _config.ConfigError as e:
             raise CLIError(f'{configfile}: {e}', error_code=errno.EINVAL)
 
     return cfg
