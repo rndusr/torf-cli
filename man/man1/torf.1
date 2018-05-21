@@ -73,7 +73,7 @@ Default:
 .BR \-\-yes ,
 .B \-y
 .RS
-Answer all yes/no prompts with "yes".  At the moment, all this does is
+Answer all yes/no prompts with \*(lqyes\*(rq.  At the moment, all this does is
 overwrite
 .I TORRENT
 without asking.
@@ -158,9 +158,9 @@ Remove the comment.
 .RS
 The creation date as
 .IR YYYY\-MM\-DD[\ HH:MM[:SS]] ,
-"now" for local time or "today" for local time at midnight.
+\*(lqnow\*(rq for local time or \*(lqtoday\*(rq for local time at midnight.
 .br
-Default: "today"
+Default: \*(lqtoday\*(rq
 .RE
 .PP
 .BR \-\-nodate ,
@@ -173,21 +173,52 @@ Remove the creation date.
 .B \-x
 .RS
 Randomize the info hash to help with cross\-seeding.  This simply adds an
-"entropy" field to the "info" section of the metainfo and sets it to a random
-integer.
+\*(lqentropy\*(rq field to the \*(lqinfo\*(rq section of the metainfo and sets
+it to a random integer.
 .RE
 .PP
 .BR \-\-noxseed ,
 .B \-X
 .RS
 De\-randomize a previously randomized info hash of an existing torrent.  This
-removes the "entropy" field from the "info" section of the metainfo.
+removes the \*(lqentropy\*(rq field from the \*(lqinfo\*(rq section of the
+metainfo.
 .RE
 .PP
 .BR \-\-nocreator ,
 .B \-R
 .RS
 Don't store the name and version of this application in the generated torrent.
+.RE
+.PP
+.BR \-\-config ,
+.B \-f
+.I FILE
+.RS
+Read command line arguments from configuration FILE.  See
+.BR CONFIGURATION\ FILE .
+.br
+Default:
+.IR $XDG_CONFIG_HOME \fB/torf/config\fP
+where
+.B $XDG_CONFIG_HOME
+defaults to
+.IR $HOME \fB/.config\fP.
+.RE
+.PP
+.BR \-\-noconfig ,
+.B \-F
+.RS
+Do not use any configuration file.
+.RE
+.PP
+.BR \-\-profile ,
+.B \-z
+.I PROFILE
+.RS
+Use predefined arguments specified in PROFILE.  This option may be given
+multiple times.  See
+.BR CONFIGURATION\ FILE .
 .RE
 .PP
 .BR \-\-help ,
@@ -200,30 +231,9 @@ Display a short help text.
 .RS
 Display the version number.
 .RE
-.SH EXCLUDING FILES
-The \-\-exclude option takes a pattern that is matched against file names in
-.IR PATH .
-Any matching files are not included in the torrent.  Patterns use these
-special characters:
-.PP
-.in +4n
-.nf
-     \fB*\fP  matches everything
-     \fB?\fP  matches any single character
- \fB[\fP\fISEQ\fP\fB]\fP  matches any character in \fISEQ\fP
-\fB[!\fP\fISEQ\fP\fB]\fP  matches any character not in \fISEQ\fP
-.SH PIPING OUTPUT
-If stdout is not a TTY (i.e. when output is piped or redirected), the format is
-slightly different:
-.IP \(bu 2
-Leading spaces are removed.
-.IP \(bu 2
-The delimiter between label and value as well as between multiple values (files,
-trackers, etc) is a tab character (\\t; ASCII 0x9).
-.IP \(bu 2
-Numbers are not scaled (e.g. "1024" instead of "1 KiB").
 .SH EXAMPLES
-Create "foo.torrent" with two trackers and don't store the creation date:
+Create \*(lqfoo.torrent\*(rq with two trackers and don't store the creation
+date:
 .PP
 .in +4n
 \fBtorf path/to/foo \\
@@ -231,7 +241,7 @@ Create "foo.torrent" with two trackers and don't store the creation date:
      \-t http://example.com:6881/announce \\
      \-\-nodate\fP
 .PP
-Read "foo.torrent" and print its metainfo:
+Read \*(lqfoo.torrent\*(rq and print its metainfo:
 .PP
 .in +4n
 .B torf \-i foo.torrent
@@ -241,15 +251,127 @@ Print only the name:
 .in +4n
 .B torf \-i foo.torrent | grep '^Name' | cut -f2
 .PP
-Change the comment and remove the date from "foo.torrent", write the result to
-"bar.torrent":
+Change the comment and remove the date from \*(lqfoo.torrent\*(rq, write the
+result to \*(lqbar.torrent\*(rq:
 .PP
 .in +4n
 .B torf \-i foo.torrent \-c 'New comment' \-D \-o bar.torrent
+.SH EXCLUDING FILES
+The
+.B \-\-exclude
+option takes a pattern that is matched against file names in
+.IR PATH .
+Any matching files are not included in the torrent.  Empty directories are not
+included because the torrent file format only knows files.
+
+Patterns use these special characters:
+.PP
+.in +4n
+.nf
+     \fB*\fP  matches everything
+     \fB?\fP  matches any single character
+ \fB[\fP\fISEQ\fP\fB]\fP  matches any character in \fISEQ\fP
+\fB[!\fP\fISEQ\fP\fB]\fP  matches any character not in \fISEQ\fP
+.SH CONFIGURATION FILE
+Configuration files list command line options with all leading \*(lq-\*(rq
+characters removed.  If an option takes a parameter, \*(lq=\*(rq is used as a
+separator.  Spaces before and after the \*(lq=\*(rq are ignored.  The parameter
+may be quoted with single or double quotes.  Comments start with
+\*(lq#\*(rq. Any of the commands listed in the
+.B OPTIONS
+section are allowed except for
+.B config
+and
+.BR noconfig .
+.SS Profiles
+A profile is a set of options bound to a name that is accepted by the
+.B --profile
+option.  It is specified as
+.RI \*(lq[ PROFILE\ NAME ]\*(rq
+followed by a list of options.  All profiles inherit options specified globally.
+Profiles can also load other profiles via the
+.B profile
+option.
+.SS Example Configuration File
+.EX
+yes
+nodate
+exclude = *.txt
+
+[foo]
+tracker = https://foo1
+tracker = https://foo2
+private
+profile = noimg
+
+[bar]
+tracker = https://bar
+noexclude
+profile = noimg
+
+[noimg]
+exclude = *.jpg
+exclude = *.png
+.PP
+.EE
+With this configuration file,
+.B --profile\ foo
+expands to
+.PP
+.RS
+.EX
+--yes
+--nodate
+--exclude '*.txt'
+--tracker https://foo1 --tracker https://foo2
+--private
+--exclude '*.jpg' --exclude '*.png'
+.EE
+.RE
+.PP
+and
+.B --profile\ bar
+expands to
+.PP
+.RS
+.EX
+--yes
+--nodate
+--tracker https://bar
+--exclude '*.jpg' --exclude '*.png'
+.EE
+.RE
+.PP
+Note that
+.B --exclude\ '*.txt'
+is inherited by
+.B foo
+but not by
+.B bar
+because
+.B bar
+clears the exclude list first with
+.B noexclude
+before appending the image filters via the
+.B noimg
+profile.
+.SH PIPING OUTPUT
+If stdout is not a TTY (i.e. when output is piped or redirected), the format is
+slightly different:
+.IP \(bu 2
+Leading spaces are removed.
+.IP \(bu 2
+The delimiter between label and value as well as between multiple values (files,
+trackers, etc) is a tab character (\\t; ASCII 0x9).
+.IP \(bu 2
+Numbers are not scaled (e.g. \*(lq1024\*(rq instead of \*(lq1 KiB\*(rq).
 .SH EXIT STATUS
 torf returns zero on success and non-zero on failure.  Run
 .B errno \-l
 for a list of potential error codes.
 .PP
 .SH REPORTING BUGS
-https://github.com/rndusr/torf\-cli/issues
+Bug reports, feature requests and poems about hedgehogs are welcome on the
+.UR https\://github.com/rndusr/torf\-cli/issues
+issue tracker
+.UE .
