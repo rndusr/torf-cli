@@ -28,7 +28,8 @@ _re_bool = re.compile(r'^(\S+)$')
 _re_assign = re.compile(r'^(\S+)\s*=\s*(.*)\s*$')
 
 def read(filepath):
-    # Read INI-style file into dictionary
+    """Read INI-style file into dictionary"""
+
     cfg = subcfg = {}
     with open(filepath, 'r') as f:
         for line in (l.strip() for l in f.readlines()):
@@ -71,7 +72,7 @@ def read(filepath):
 
 
 def validate(cfgfile, defaults):
-    # Return validated values from cfgfile
+    """Return validated values from cfgfile"""
     result = {}
     for name,value_cfgfile in tuple(cfgfile.items()):
         # Dictionaries are profiles
@@ -107,7 +108,8 @@ def validate(cfgfile, defaults):
 
 
 def combine(cli, cfgfile, defaults):
-    # Return combined values from CLI args, cfgfile and defaults
+    """Return combined values from CLI args, cfgfile and defaults"""
+
     result = {}
     for name in defaults:
         if name in cli:
