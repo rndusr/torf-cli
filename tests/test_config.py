@@ -366,3 +366,13 @@ def test_adjusting_private_of_referenced_profile_in_profile(cfgfile, mock_conten
     mock_create_mode_args = mock_create_mode.call_args[0][0]
     assert mock_create_mode_args['private'] == False
     assert mock_create_mode_args['noprivate'] == True
+
+
+def test_selfreferencing_profile(cfgfile, mock_content, mock_create_mode):
+    cfgfile.write(textwrap.dedent('''
+    [foo]
+    profile = foo
+    '''))
+    with pytest.raises(CLIError,
+                       match=f"^torf: {str(cfgfile)}: profile = foo: Profile references itself$"):
+        run(['--profile', 'foo', str(mock_content)])

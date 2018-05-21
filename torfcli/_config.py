@@ -144,7 +144,11 @@ def combine(cli, cfgfile, defaults):
                 result[name] = value
             elif name == 'profile':
                 for profile_name in value:
-                    apply_profile(cfgfile[profile_name])
+                    if profile is cfgfile[profile_name]:
+                        raise ConfigError(name='profile', value=profile_name,
+                                          msg='Profile references itself')
+                    else:
+                        apply_profile(cfgfile[profile_name])
         return result
 
     # Update result with values from specified profile
