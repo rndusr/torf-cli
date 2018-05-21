@@ -20,7 +20,7 @@ class ConfigError(Exception):
             super().__init__(f'{name} = {value}: {msg}')
         else:
             if not msg:
-                msg = 'Invalid argument'
+                msg = 'Invalid option'
             super().__init__(f'{name!r}: {msg}')
 
 
@@ -50,7 +50,7 @@ def read(filepath):
                 subcfg[name] = True
                 continue
 
-            # Argument that takes a value
+            # Option takes a value
             assign_match = _re_assign.match(line)
             if assign_match:
                 name = assign_match.group(1)
@@ -94,13 +94,11 @@ def validate(cfgfile, defaults):
         value_default = defaults[name]
         if type(value_cfgfile) != type(value_default):
             if type(value_default) is list:
-                # We expect a list but value is not - there is only one
-                # assignment to an argument that can be given multiple times.
+                # We expect a list but value is not - a list option has just one value
                 result[name] = [value_cfgfile]
                 continue
             elif type(value_cfgfile) is list:
-                # We expect a non-list but value is a list - there are multiple
-                # assignments for an argument that can be given only once.
+                # We expect a non-list but value is a list
                 raise ConfigError(name, value=', '.join((repr(item) for item in value_cfgfile)),
                                   msg='Multiple values not allowed')
             elif type(value_default) is bool:
@@ -127,7 +125,7 @@ def combine(cli, cfgfile, defaults):
 
     def apply_profile(profile):
         for name,value in profile.items():
-            # CLI argument takes precedence over config file
+            # CLI option takes precedence over config file
             if name not in cli or cli[name] == defaults[name]:
                 if 'no'+name in defaults:
                     # Options that have a 'no*' counterpart reset it

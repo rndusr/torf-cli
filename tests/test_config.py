@@ -57,7 +57,7 @@ def test_invalid_boolean_name_globally(cfgfile, mock_content):
     foo
     '''))
     with pytest.raises(CLIError,
-                       match=f"^torf: {str(cfgfile)}: 'foo': Invalid argument$"):
+                       match=f"^torf: {str(cfgfile)}: 'foo': Invalid option$"):
         run([str(mock_content)])
 
 
@@ -67,7 +67,7 @@ def test_invalid_boolean_name_in_profile(cfgfile, mock_content):
     bar
     '''))
     with pytest.raises(CLIError,
-                       match=f"^torf: {str(cfgfile)}: 'bar': Invalid argument$"):
+                       match=f"^torf: {str(cfgfile)}: 'bar': Invalid option$"):
         run([str(mock_content)])
 
 
@@ -76,7 +76,7 @@ def test_invalid_assignment_name_globally(cfgfile, mock_content):
     foo = 123
     '''))
     with pytest.raises(CLIError,
-                       match=f"^torf: {str(cfgfile)}: 'foo': Invalid argument$"):
+                       match=f"^torf: {str(cfgfile)}: 'foo': Invalid option$"):
         run([str(mock_content)])
 
 
@@ -86,7 +86,7 @@ def test_invalid_assignment_name_in_profile(cfgfile, mock_content):
     bar = 123
     '''))
     with pytest.raises(CLIError,
-                       match=f"^torf: {str(cfgfile)}: 'bar': Invalid argument$"):
+                       match=f"^torf: {str(cfgfile)}: 'bar': Invalid option$"):
         run([str(mock_content)])
 
 
