@@ -71,8 +71,14 @@ def read(filepath):
     return cfg
 
 
+_invalid_options = ('config', 'noconfig')
 def validate(cfgfile, defaults):
     """Return validated values from cfgfile"""
+
+    for opt in _invalid_options:
+        if opt in cfgfile:
+            raise ConfigError(opt)
+
     result = {}
     for name,value_cfgfile in tuple(cfgfile.items()):
         # Dictionaries are profiles
