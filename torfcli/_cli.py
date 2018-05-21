@@ -74,8 +74,10 @@ ARGUMENTS
     --noexclude, -E        Don't exlude any files
     --nomagnet, -M         Don't create magnet link
 
-    --profile, -f PROFILE  Use configuration of PROFILE
-    --config, -F CONFIG    Read configuration from CONFIG file
+    --config, -f FILE      Read configuration from FILE
+                           (default: ${{XDG_CONFIG_HOME:-$HOME/.config}}/{_vars.__appname__}/config
+    --noconfig, -F         Ignore configuration file
+    --profile, -z PROFILE  Use options from PROFILE
 
     --yes, -y              Answer all yes/no prompts with "yes"
     --help,-h              Show this help screen and exit
@@ -115,13 +117,15 @@ def _get_cfg(argv):
     argp.add_argument('--xseed', '-x', default=False, action='store_true')
     argp.add_argument('--noxseed', '-X', default=False, action='store_true')
 
-    argp.add_argument('--config', '-F', default=_DEFAULT_PROFILE_FILE)
-    argp.add_argument('--profile', '-f', default=[], action='append')
+    argp.add_argument('--config', '-f', default=_DEFAULT_PROFILE_FILE)
+    argp.add_argument('--noconfig', '-F', default=False, action='store_true')
+    argp.add_argument('--profile', '-z', default=[], action='append')
 
     cfg = vars(argp.parse_args(argv))
 
     # Read config file if specified by user or if it exists
-    if cfg['config'] != _DEFAULT_PROFILE_FILE or os.path.exists(cfg['config']):
+    if (cfg['config'] != _DEFAULT_PROFILE_FILE or
+        (not cfg['noconfig'] and os.path.exists(cfg['config']))):
         configfile = cfg['config']
 
         try:

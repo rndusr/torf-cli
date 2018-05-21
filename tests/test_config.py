@@ -34,6 +34,14 @@ def test_nondefault_nonexisting_configfile_path(tmpdir, mock_content, mock_creat
         run(['--config', str(cfgfile), str(mock_content)])
 
 
+def test_noconfig_option(cfgfile, mock_content, mock_create_mode):
+    cfgfile.write('private\ncomment = Nobody shall see this!\n')
+    run([str(mock_content), '--noconfig'])
+    mock_create_mode_args = mock_create_mode.call_args[0][0]
+    assert mock_create_mode_args['private'] == False
+    assert mock_create_mode_args['comment'] == ''
+
+
 def test_cli_args_take_precedence(cfgfile, mock_content, mock_create_mode):
     cfgfile.write(textwrap.dedent('''
     xseed
@@ -43,7 +51,7 @@ def test_cli_args_take_precedence(cfgfile, mock_content, mock_create_mode):
     date = 2000-01-01 15:00
     tracker = http://asdf
     '''))
-    run([str(mock_content), '--noxseed', '-f', 'foo', '--date', '2001-02-03 04:05'])
+    run([str(mock_content), '--noxseed', '-z', 'foo', '--date', '2001-02-03 04:05'])
     mock_create_mode_args = mock_create_mode.call_args[0][0]
     assert mock_create_mode_args['xseed'] == True
     assert mock_create_mode_args['noxseed'] == True
