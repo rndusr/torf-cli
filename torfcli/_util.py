@@ -136,7 +136,7 @@ def is_tty():
 
 
 def clear_line():
-    print('\x1b[2K\x1b[1`', end='', flush=True)
+    print('\x1b[2K\x1b[0E', end='', flush=True)
 
 
 def getch():
