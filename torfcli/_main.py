@@ -142,7 +142,6 @@ def _edit_mode(cfg):
         torrent.name = cfg['name']
 
     # Output file may have appeared while we were hashing; better check again
-    _check_output_file_exists(torrent, cfg)
     _show_torrent_info(torrent)
     _write_torrent(torrent, cfg)
 
