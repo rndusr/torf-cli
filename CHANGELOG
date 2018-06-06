@@ -1,7 +1,6 @@
 2018-05-?? 1.2
-  - Support for custom defaults and special profiles in
-    $XDG_CONFIG_HOME/torf/config
-  - New options: --config/-F, --profile/-f, --noexclude/-E, --nomagnet/-M
+  - Support for default arguments and special profiles in ~/.config/torf/config
+    or any file specified by --config or -f
 
 
 2018-04-08 1.1
