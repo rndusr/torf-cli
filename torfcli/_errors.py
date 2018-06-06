@@ -9,7 +9,24 @@
 # GNU General Public License for more details
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
-__version__     = '1.2'
-__appname__     = 'torf'
-__url__         = 'https://github.com/rndusr/torf-cli'
-__description__ = 'CLI tool to create, read and edit torrent files and produce magnet URIs'
+import os
+import errno
+
+
+class MainError(Exception):
+    def __init__(self, msg=None, errno=None):
+        self.errno = errno
+        if msg is None:
+            if errno is None:
+                raise RuntimeError('Both msg and errno are missing!')
+            msg = os.strerror(errno)
+        super().__init__(msg)
+
+
+class CLIError(MainError):
+    def __init__(self, msg=None):
+        super().__init__(msg, errno=errno.EINVAL)
+
+
+class ConfigError(MainError):
+    pass

@@ -9,5 +9,8 @@
 # GNU General Public License for more details
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
+# This file is evaluated when the torfcli module is loaded with
+# `python -m torfcli`.
+
 from . import run
 run()

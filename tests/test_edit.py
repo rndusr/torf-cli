@@ -1,34 +1,48 @@
-from torfcli._cli import run, CLIError
+from torfcli._main import run
+from torfcli._errors import MainError
 import pytest
 import errno
 import torf
 import os
 from datetime import datetime
 
-# 'comment', 'created_by', 'creation_date', 'exclude', 'filepaths', 'files',
-# 'filetree', 'httpseeds', 'include_md5', 'infohash', 'infohash_base32',
-# 'is_ready', 'magnet', 'metainfo', 'name', 'path', 'piece_size', 'pieces',
-# 'private', 'randomize_infohash', 'size', 'source', 'trackers', 'webseeds'
-
 
 def test_nonexisting_input():
-    nonexising_path = '/no/such/file'
-    with pytest.raises(CLIError, match=r'torf: %s: No such file or directory' % nonexising_path) as exc_info:
-        run(['-i', nonexising_path, '-o', 'out.torrent'])
+    nonexisting_path = '/no/such/file'
+    with pytest.raises(MainError, match=rf'^{nonexisting_path}: No such file or directory$') as exc_info:
+        run(['-i', nonexisting_path, '-o', 'out.torrent'])
     assert exc_info.value.errno == errno.ENOENT
+
+
+def test_existing_output(create_torrent, tmpdir):
+    outfile = tmpdir.join('out.torrent')
+    outfile.write('some existing file content')
+    with create_torrent() as infile:
+        with pytest.raises(MainError, match=rf'^{str(outfile)}: File exists$') as exc_info:
+            run(['-i', infile, '-o', str(outfile)])
+        assert exc_info.value.errno == errno.EEXIST
 
 
 def test_unwritable_output(create_torrent):
     unwritable_path = '/out.torrent'
     with create_torrent() as infile:
-        with pytest.raises(CLIError, match=r'torf: %s: Permission denied' % unwritable_path) as exc_info:
+        with pytest.raises(MainError, match=rf'^{unwritable_path}: Permission denied$') as exc_info:
             run(['-i', infile, '-o', unwritable_path])
         assert exc_info.value.errno == errno.EACCES
 
 
-def test_edit_comment(create_torrent, tmpdir, assert_torrents_equal):
+def test_no_changes(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent() as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile, '-o', outfile])
+        new = torf.Torrent.read(outfile)
+        assert_torrents_equal(orig, new)
+
+
+def test_edit_comment(create_torrent, tmpdir, assert_torrents_equal):
+    outfile = str(tmpdir.join('out.torrent'))
+    with create_torrent(comment='A comment') as infile:
         orig = torf.Torrent.read(infile)
         run(['-i', infile, '--comment', 'A different comment', '-o', outfile])
         new = torf.Torrent.read(outfile)
@@ -36,7 +50,7 @@ def test_edit_comment(create_torrent, tmpdir, assert_torrents_equal):
 
 def test_remove_comment(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
-    with create_torrent() as infile:
+    with create_torrent(comment='A comment') as infile:
         orig = torf.Torrent.read(infile)
         run(['-i', infile, '--nocomment', '-o', outfile])
         new = torf.Torrent.read(outfile)
@@ -45,37 +59,11 @@ def test_remove_comment(create_torrent, tmpdir, assert_torrents_equal):
 
 def test_remove_creator(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
-    with create_torrent() as infile:
+    with create_torrent(created_by='The creator') as infile:
         orig = torf.Torrent.read(infile)
         run(['-i', infile, '--nocreator', '-o', outfile])
         new = torf.Torrent.read(outfile)
         assert_torrents_equal(orig, new, created_by=None)
-
-
-def test_edit_creation_date(create_torrent, tmpdir, assert_torrents_equal):
-    outfile = str(tmpdir.join('out.torrent'))
-    with create_torrent() as infile:
-        orig = torf.Torrent.read(infile)
-        run(['-i', infile, '--date', '3000-05-30 15:03:01', '-o', outfile])
-        new = torf.Torrent.read(outfile)
-        assert_torrents_equal(orig, new, creation_date=datetime(3000, 5, 30, 15, 3, 1))
-
-def test_remove_creation_date(create_torrent, tmpdir, assert_torrents_equal):
-    outfile = str(tmpdir.join('out.torrent'))
-    with create_torrent() as infile:
-        orig = torf.Torrent.read(infile)
-        run(['-i', infile, '--nodate', '-o', outfile])
-        new = torf.Torrent.read(outfile)
-        assert_torrents_equal(orig, new, creation_date=None)
-
-def test_invalid_creation_date(create_torrent, tmpdir, assert_torrents_equal):
-    outfile = str(tmpdir.join('out.torrent'))
-    with create_torrent() as infile:
-        orig = torf.Torrent.read(infile)
-        with pytest.raises(CLIError, match=r'^torf: foo: Invalid date$') as exc_info:
-            run(['-i', infile, '--date', 'foo', '-o', outfile])
-        assert exc_info.value.errno == 22
-        assert not os.path.exists(outfile)
 
 
 def test_remove_private(create_torrent, tmpdir, assert_torrents_equal):
@@ -142,7 +130,7 @@ def test_invalid_tracker_url(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(trackers=['http://tracker1', 'http://tracker2']) as infile:
         orig = torf.Torrent.read(infile)
-        with pytest.raises(CLIError, match=r'^torf: not a url: Invalid URL$') as exc_info:
+        with pytest.raises(MainError, match=r'^not a url: Invalid URL$') as exc_info:
             run(['-i', infile, '--tracker', 'not a url', '-o', outfile])
         assert exc_info.value.errno == 22
         assert not os.path.exists(outfile)
@@ -176,8 +164,34 @@ def test_invalid_webseed_url(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(webseeds=['http://webseed1', 'http://webseed2']) as infile:
         orig = torf.Torrent.read(infile)
-        with pytest.raises(CLIError, match=r'^torf: not a url: Invalid URL$') as exc_info:
+        with pytest.raises(MainError, match=r'^not a url: Invalid URL$') as exc_info:
             run(['-i', infile, '--webseed', 'not a url', '-o', outfile])
+        assert exc_info.value.errno == 22
+        assert not os.path.exists(outfile)
+
+
+def test_edit_creation_date(create_torrent, tmpdir, assert_torrents_equal):
+    outfile = str(tmpdir.join('out.torrent'))
+    with create_torrent() as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile, '--date', '3000-05-30 15:03:01', '-o', outfile])
+        new = torf.Torrent.read(outfile)
+        assert_torrents_equal(orig, new, creation_date=datetime(3000, 5, 30, 15, 3, 1))
+
+def test_remove_creation_date(create_torrent, tmpdir, assert_torrents_equal):
+    outfile = str(tmpdir.join('out.torrent'))
+    with create_torrent() as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile, '--nodate', '-o', outfile])
+        new = torf.Torrent.read(outfile)
+        assert_torrents_equal(orig, new, creation_date=None)
+
+def test_invalid_creation_date(create_torrent, tmpdir, assert_torrents_equal):
+    outfile = str(tmpdir.join('out.torrent'))
+    with create_torrent() as infile:
+        orig = torf.Torrent.read(infile)
+        with pytest.raises(MainError, match=r'^foo: Invalid date$') as exc_info:
+            run(['-i', infile, '--date', 'foo', '-o', outfile])
         assert exc_info.value.errno == 22
         assert not os.path.exists(outfile)
 
@@ -193,10 +207,29 @@ def test_edit_path(create_torrent, tmpdir, assert_torrents_equal):
         new = torf.Torrent.read(outfile)
         assert_torrents_equal(orig, new, ignore=('files', 'filetree', 'name',
                                                  'piece_size', 'pieces', 'size'))
-        assert new.name == 'new content'
-        assert new.size == len('different data')
         assert tuple(new.files) == ('new content/some file',)
         assert new.filetree == {'new content': {'some file': None}}
+        assert new.name == 'new content'
+        assert new.size == len('different data')
+
+
+def test_edit_path_with_exclude_option(create_torrent, tmpdir, assert_torrents_equal):
+    outfile = str(tmpdir.join('out.torrent'))
+    new_content = tmpdir.mkdir('new content')
+    new_file1 = new_content.join('some image.jpg')
+    new_file1.write('image data')
+    new_file2 = new_content.join('some text.txt')
+    new_file2.write('text data')
+    with create_torrent() as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile, str(new_content), '--exclude', '*.txt', '-o', outfile])
+        new = torf.Torrent.read(outfile)
+        assert_torrents_equal(orig, new, ignore=('files', 'filetree', 'name',
+                                                 'piece_size', 'pieces', 'size'))
+        assert tuple(new.files) == ('new content/some image.jpg',)
+        assert new.filetree == {'new content': {'some image.jpg': None,}}
+        assert new.name == 'new content'
+        assert new.size == len('image data')
 
 
 def test_edit_name(create_torrent, tmpdir, assert_torrents_equal):

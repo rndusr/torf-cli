@@ -9,11 +9,14 @@
 # GNU General Public License for more details
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
+
 def run():
-    from ._cli import run, CLIError
+    from ._main import run
+    from ._errors import MainError
+    from ._vars import __appname__
     try:
         run()
-    except CLIError as e:
+    except MainError as e:
         import sys
-        print(str(e), file=sys.stderr)
+        print(f'{__appname__}: {e}', file=sys.stderr)
         sys.exit(e.errno or 1)

@@ -1,4 +1,5 @@
-from torfcli._cli import run, CLIError
+from torfcli._main import run
+from torfcli._errors import MainError
 import pytest
 import os
 import torf
@@ -22,7 +23,7 @@ def test_default_torrent_filepath(capsys, mock_content):
     assert t.created_by.startswith('torf/')
 
     cap = capsys.readouterr()
-    assert 'Torrent File\t%s' % exp_torrent_filename in cap.out
+    assert f'Torrent File\t{exp_torrent_filename}' in cap.out
     assert 'Name\tMy Torrent' in cap.out
     assert 'File Count\t3' in cap.out
     assert 'Info Hash' in cap.out
@@ -43,7 +44,7 @@ def test_user_given_torrent_filepath(capsys, mock_content):
     assert t.created_by.startswith('torf/')
 
     cap = capsys.readouterr()
-    assert 'Torrent File\t%s' % exp_torrent_filename in cap.out
+    assert f'Torrent File\t{exp_torrent_filename}' in cap.out
     assert 'Name\tMy Torrent' in cap.out
     assert 'File Count\t3' in cap.out
     assert 'Info Hash' in cap.out
@@ -83,7 +84,7 @@ def test_create_torrent_file_and_magnet_link(capsys, mock_content):
 
     cap = capsys.readouterr()
     assert 'Magnet URI\t' in cap.out
-    assert 'Torrent File\t%s' % exp_torrent_filename in cap.out
+    assert f'Torrent File\t{exp_torrent_filename}' in cap.out
     assert 'Name\tMy Torrent' in cap.out
     assert 'File Count\t3' in cap.out
     assert 'Info Hash' in cap.out
@@ -93,7 +94,7 @@ def test_create_torrent_file_and_magnet_link(capsys, mock_content):
 ### Error cases
 
 def test_content_path_doesnt_exist(capsys):
-    with pytest.raises(CLIError, match=r'torf: /path/doesnt/exist: No such file or directory') as exc_info:
+    with pytest.raises(MainError, match=r'^/path/doesnt/exist: No such file or directory$') as exc_info:
         run(['/path/doesnt/exist'])
     assert exc_info.value.errno == errno.ENOENT
 
@@ -106,7 +107,7 @@ def test_torrent_filepath_exists(capsys, mock_content):
     with open(exp_torrent_filepath, 'wb') as f:
         f.write(b'<torrent data>')
 
-    with pytest.raises(CLIError, match=r'torf: %s: File exists' % exp_torrent_filepath) as exc_info:
+    with pytest.raises(MainError, match=rf'^{exp_torrent_filepath}: File exists$') as exc_info:
         run([content_path, '--out', exp_torrent_filepath])
     assert exc_info.value.errno == errno.EEXIST
 
@@ -128,7 +129,7 @@ def test_yes_option(capsys, mock_content):
     assert t.name == 'My Torrent'
 
     cap = capsys.readouterr()
-    assert ('Torrent File\t%s' % exp_torrent_filename) in cap.out
+    assert f'Torrent File\t{exp_torrent_filename}' in cap.out
 
 
 def test_single_exclude(capsys, mock_content):
@@ -166,30 +167,30 @@ def test_exclude_everything(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    with pytest.raises(CLIError, match=r'torf: %s: Empty directory' % content_path) as exc_info:
+    with pytest.raises(MainError, match=rf'^{content_path}: Empty directory$') as exc_info:
         run([content_path, '--exclude', '*'])
     assert exc_info.value.errno == errno.ENODATA
 
 
-def test_noexclude_option(capsys, mock_content):
-    content_path = str(mock_content)
-    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
-    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+# def test_noexclude_option(capsys, mock_content):
+#     content_path = str(mock_content)
+#     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+#     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    run([content_path, '--exclude', '*.jpg', '--noexclude'])
+#     run([content_path, '--exclude', '*.jpg', '--noexclude'])
 
-    t = torf.Torrent.read(exp_torrent_filepath)
-    assert len(tuple(t.files)) == 3
+#     t = torf.Torrent.read(exp_torrent_filepath)
+#     assert len(tuple(t.files)) == 3
 
-    cap = capsys.readouterr()
-    assert 'Exclude\t' not in cap.out
-    assert 'File Count\t3' in cap.out
+#     cap = capsys.readouterr()
+#     assert 'Exclude\t' not in cap.out
+#     assert 'File Count\t3' in cap.out
 
 
 def test_name_option(capsys, mock_content):
     content_path = str(mock_content)
     name = 'Your Torrent'
-    exp_torrent_filename = '%s.torrent' % name
+    exp_torrent_filename = f'{name}.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
     wrong_torrent_filename = os.path.basename(content_path) + '.torrent'
 
@@ -283,7 +284,23 @@ def test_default_date(capsys, mock_content):
     assert t.creation_date == datetime.combine(date.today(), time(0, 0, 0))
 
     cap = capsys.readouterr()
-    assert 'Creation Date\t%s' % (date.today().isoformat() + ' 00:00:00') in cap.out
+    exp_date = date.today().isoformat() + ' 00:00:00'
+    assert f'Creation Date\t{exp_date}' in cap.out
+
+
+def test_date_today(capsys, mock_content):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    run([content_path, '--date', 'today'])
+
+    t = torf.Torrent.read(exp_torrent_filepath)
+    assert t.creation_date == datetime.combine(date.today(), time(0, 0, 0))
+
+    cap = capsys.readouterr()
+    exp_date = date.today().isoformat() + ' 00:00:00'
+    assert f'Creation Date\t{exp_date}' in cap.out
 
 
 def test_date_now(capsys, mock_content):
@@ -298,7 +315,8 @@ def test_date_now(capsys, mock_content):
     assert t.creation_date == datetime.today().replace(microsecond=0)
 
     cap = capsys.readouterr()
-    assert 'Creation Date\t%s' % date.isoformat(sep=' ', timespec='seconds') in cap.out
+    exp_date = date.isoformat(sep=' ', timespec='seconds')
+    assert f'Creation Date\t{exp_date}' in cap.out
 
 
 def test_user_given_date(capsys, mock_content):
@@ -312,7 +330,8 @@ def test_user_given_date(capsys, mock_content):
     assert t.creation_date == datetime.combine(date(2000, 1, 2), time(0, 0, 0))
 
     cap = capsys.readouterr()
-    assert 'Creation Date\t%s' % (date(2000, 1, 2).isoformat() + ' 00:00:00') in cap.out
+    exp_date = date(2000, 1, 2).isoformat() + ' 00:00:00'
+    assert f'Creation Date\t{exp_date}' in cap.out
 
 
 def test_user_given_date_and_time(capsys, mock_content):
@@ -326,7 +345,8 @@ def test_user_given_date_and_time(capsys, mock_content):
     assert t.creation_date == datetime(2000, 1, 2, 3, 4)
 
     cap = capsys.readouterr()
-    assert 'Creation Date\t%s' % datetime(2000, 1, 2, 3, 4).isoformat(sep=' ', timespec='seconds') in cap.out
+    exp_date = datetime(2000, 1, 2, 3, 4).isoformat(sep=' ', timespec='seconds')
+    assert f'Creation Date\t{exp_date}' in cap.out
 
 
 def test_user_given_date_and_time_with_seconds(capsys, mock_content):
@@ -340,7 +360,8 @@ def test_user_given_date_and_time_with_seconds(capsys, mock_content):
     assert t.creation_date == datetime(2000, 1, 2, 3, 4, 5)
 
     cap = capsys.readouterr()
-    assert 'Creation Date\t%s' % datetime(2000, 1, 2, 3, 4, 5).isoformat(sep=' ', timespec='seconds') in cap.out
+    exp_date = datetime(2000, 1, 2, 3, 4, 5).isoformat(sep=' ', timespec='seconds')
+    assert f'Creation Date\t{exp_date}' in cap.out
 
 
 def test_invalid_date(capsys, mock_content):
@@ -348,7 +369,7 @@ def test_invalid_date(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    with pytest.raises(CLIError, match=r'torf: foo: Invalid date') as exc_info:
+    with pytest.raises(MainError, match=r'^foo: Invalid date$') as exc_info:
         run([content_path, '--date', 'foo'])
     assert exc_info.value.errno == errno.EINVAL
 

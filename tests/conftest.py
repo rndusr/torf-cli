@@ -19,8 +19,8 @@ def change_cwd(tmpdir):
 def cfgfile(tmpdir, monkeypatch):
     cfgdir = tmpdir.mkdir('configdir')
     cfgfile = cfgdir.join('config')
-    from torfcli import _cli
-    monkeypatch.setattr(_cli, '_DEFAULT_PROFILE_FILE', str(cfgfile))
+    from torfcli import _vars
+    monkeypatch.setattr(_vars, 'DEFAULT_CONFIG_FILE', str(cfgfile))
     return cfgfile
 
 
@@ -68,9 +68,9 @@ def mock_content(tmpdir):
 
 @pytest.fixture
 def mock_create_mode(monkeypatch):
-    from torfcli import _cli
+    from torfcli import _main
     mock_create_mode = mock.MagicMock()
-    monkeypatch.setattr(_cli, '_create_mode', mock_create_mode)
+    monkeypatch.setattr(_main, '_create_mode', mock_create_mode)
     return mock_create_mode
 
 

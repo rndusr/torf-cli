@@ -1,4 +1,5 @@
-from torfcli._cli import run, CLIError
+from torfcli._main import run
+from torfcli._errors import MainError
 import pytest
 import os
 from datetime import datetime
@@ -8,7 +9,7 @@ import re
 
 def test_nonexisting_torrent_file(capsys):
     nonexising_path = '/no/such/file'
-    with pytest.raises(CLIError, match=r'torf: %s: No such file or directory' % nonexising_path) as exc_info:
+    with pytest.raises(MainError, match=rf'^{nonexising_path}: No such file or directory$') as exc_info:
         run(['-i', nonexising_path])
     assert exc_info.value.errno == errno.ENOENT
 
@@ -16,7 +17,7 @@ def test_nonexisting_torrent_file(capsys):
 def test_insufficient_permissions(capsys, create_torrent):
     with create_torrent() as torrent_file:
         os.chmod(torrent_file, 0o000)
-        with pytest.raises(CLIError, match=r'torf: %s: Permission denied' % torrent_file) as exc_info:
+        with pytest.raises(MainError, match=rf'^{torrent_file}: Permission denied$') as exc_info:
             run(['-i', torrent_file])
     assert exc_info.value.errno == errno.EACCES
 
@@ -174,7 +175,8 @@ def test_trackers___single_tracker_per_tier(capsys, create_torrent, mock_tty):
         with mock_tty(False):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(r'^Trackers\t%s$' % '\t'.join(trackers), cap.out, flags=re.MULTILINE)
+            tab = '\t'
+            assert re.search(rf'^Trackers\t{tab.join(trackers)}$', cap.out, flags=re.MULTILINE)
 
 def test_trackers___multiple_trackers_per_tier(capsys, create_torrent, mock_tty):
     trackers = ['http://tracker1.1',
@@ -196,7 +198,7 @@ def test_trackers___multiple_trackers_per_tier(capsys, create_torrent, mock_tty)
         with mock_tty(False):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(r'^Trackers\t%s$' % exp_trackers, cap.out, flags=re.MULTILINE)
+            assert re.search(rf'^Trackers\t{exp_trackers}$', cap.out, flags=re.MULTILINE)
 
 
 def test_webseeds(capsys, create_torrent, mock_tty):
@@ -210,7 +212,8 @@ def test_webseeds(capsys, create_torrent, mock_tty):
         with mock_tty(False):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(r'^Webseeds\t%s$' % '\t'.join(webseeds), cap.out, flags=re.MULTILINE)
+            tab = '\t'
+            assert re.search(rf'^Webseeds\t{tab.join(webseeds)}$', cap.out, flags=re.MULTILINE)
 
 
 def test_httpseeds(capsys, create_torrent, mock_tty):
@@ -226,23 +229,8 @@ def test_httpseeds(capsys, create_torrent, mock_tty):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
             print(cap.out)
-            assert re.search(r'^HTTP Seeds\t%s$' % '\t'.join(httpseeds), cap.out, flags=re.MULTILINE)
-
-
-def test_httpseeds(capsys, create_torrent, mock_tty):
-    httpseeds = ['http://httpseed1', 'http://httpseed2']
-    with create_torrent(httpseeds=httpseeds) as torrent_file:
-        with mock_tty(True):
-            run(['-i', torrent_file])
-            cap = capsys.readouterr()
-            print(cap.out)
-            assert re.search(f'^(\s*)HTTP Seeds  {httpseeds[0]}\n\\1            {httpseeds[1]}$', cap.out, flags=re.MULTILINE)
-
-        with mock_tty(False):
-            run(['-i', torrent_file])
-            cap = capsys.readouterr()
-            print(cap.out)
-            assert re.search(r'^HTTP Seeds\t%s$' % '\t'.join(httpseeds), cap.out, flags=re.MULTILINE)
+            tab = '\t'
+            assert re.search(rf'^HTTP Seeds\t{tab.join(httpseeds)}$', cap.out, flags=re.MULTILINE)
 
 
 def test_file_tree_and_file_count(capsys, create_torrent, mock_tty, tmpdir):
@@ -284,4 +272,5 @@ def test_file_tree_and_file_count(capsys, create_torrent, mock_tty, tmpdir):
 	             'root/subdir1/subsubdir1.0/file2',
 	             'root/subdir1/subsubdir1.0/subsubdir1.0.0/file3',
 	             'root/subdir2/file4')
-            assert re.search(r'^Files\t%s$' % '\t'.join(files), cap.out, flags=re.MULTILINE)
+            tab = '\t'
+            assert re.search(rf'^Files\t{tab.join(files)}$', cap.out, flags=re.MULTILINE)
