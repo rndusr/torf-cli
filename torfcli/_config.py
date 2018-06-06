@@ -13,9 +13,59 @@ import re
 import argparse
 import os
 import errno
+from xdg import BaseDirectory
 
 from . import _errors
 from . import _vars
+
+
+DEFAULT_CONFIG_FILE = os.path.join(BaseDirectory.xdg_config_home, _vars.__appname__, 'config')
+DEFAULT_CREATOR = f'{_vars.__appname__}/{_vars.__version__}'
+VERSION_TEXT = f'{_vars.__appname__} {_vars.__version__} <{_vars.__url__}>'
+HELP_TEXT = f"""
+{VERSION_TEXT}
+
+Create, display and edit torrents
+
+USAGE
+    {_vars.__appname__} PATH [OPTIONS] [-o TORRENT]
+    {_vars.__appname__} -i TORRENT
+    {_vars.__appname__} -i TORRENT [OPTIONS] -o NEW TORRENT
+
+ARGUMENTS
+    PATH                   Path to torrent's content
+    --in, -i TORRENT       Read metainfo from TORRENT
+    --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
+    --magnet, -m           Create magnet link
+    --exclude, -e EXCLUDE  File matching pattern that is used to exclude
+                           files in PATH
+
+    --name, -n NAME        Torrent name (default: basename of PATH)
+    --tracker, -t TRACKER  Announce URL
+    --webseed, -w WEBSEED  Webseed URL
+    --private, -p          Forbid clients to use DHT and PEX
+    --xseed, -x            Randomize info hash
+    --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now'
+                           or 'today' (default: 'today')
+    --comment, -c COMMENT  Comment that is stored in TORRENT
+
+    --notracker, -T        Remove trackers from TORRENT
+    --nowebseed, -W        Remove webseeds from TORRENT
+    --noprivate, -P        Remove private flag from TORRENT
+    --noxseed, -X          De-randomize info hash of TORRENT
+    --nodate, -D           Remove date from TORRENT
+    --nocomment, -C        Remove comment from TORRENT
+    --nocreator, -R        Remove creator from TORRENT
+
+    --config, -f FILE      Read configuration from FILE
+                           (default: ~/.config/{_vars.__appname__}/config
+    --noconfig, -F         Ignore configuration file
+    --profile, -z PROFILE  Use options from PROFILE
+
+    --yes, -y              Answer all yes/no prompts with "yes"
+    --help, -h             Show this help screen and exit
+    --version, -V          Show version number and exit
+""".strip()
 
 
 class CLIParser(argparse.ArgumentParser):
@@ -62,7 +112,7 @@ def get_cfg(cliargs):
     clicfg = parse_args(cliargs)
 
     # If we don't need to read a config file, return parsed CLI arguments
-    cfgfile = clicfg['config'] or _vars.DEFAULT_CONFIG_FILE
+    cfgfile = clicfg['config'] or DEFAULT_CONFIG_FILE
     if clicfg['noconfig'] or (not clicfg['config'] and not os.path.exists(cfgfile)):
         return clicfg
 

@@ -27,9 +27,9 @@ def run(args=sys.argv[1:]):
     cfg = _config.get_cfg(args)
 
     if cfg['help']:
-        print(_vars.HELP_TEXT)
+        print(_config.HELP_TEXT)
     elif cfg['version']:
-        print(_vars.VERSION_TEXT)
+        print(_config.VERSION_TEXT)
     else:
         # Figure out our modus operandi
         if cfg['in']:
@@ -63,7 +63,7 @@ def _create_mode(cfg):
             private=False if cfg['noprivate'] else cfg['private'],
             randomize_infohash=False if cfg['noxseed'] else cfg['xseed'],
             comment=None if cfg['nocomment'] else cfg['comment'],
-            created_by=None if cfg['nocreator'] else _vars.DEFAULT_CREATOR
+            created_by=None if cfg['nocreator'] else _config.DEFAULT_CREATOR
         )
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)

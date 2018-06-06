@@ -19,8 +19,8 @@ def change_cwd(tmpdir):
 def cfgfile(tmpdir, monkeypatch):
     cfgdir = tmpdir.mkdir('configdir')
     cfgfile = cfgdir.join('config')
-    from torfcli import _vars
-    monkeypatch.setattr(_vars, 'DEFAULT_CONFIG_FILE', str(cfgfile))
+    from torfcli import _config
+    monkeypatch.setattr(_config, 'DEFAULT_CONFIG_FILE', str(cfgfile))
     return cfgfile
 
 
