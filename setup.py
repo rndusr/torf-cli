@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-with open('torfcli/__vars__.py') as f:
+with open('torfcli/_vars.py') as f:
     exec(f.read())
 
 try:
