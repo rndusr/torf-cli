@@ -4,3 +4,6 @@ clean:
 	rm -rf dist
 	rm -rf .pytest_cache
 	rm -rf docs/_build
+
+test:
+	python3 -m pytest --tb no tests
