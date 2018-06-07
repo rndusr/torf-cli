@@ -136,14 +136,17 @@ def _edit_mode(cfg):
         except torf.TorfError as e:
             raise MainError(e, errno=e.errno)
         else:
+            # Setting torrent.path overwrites torrent.name, so it's important to
+            # do that after
+            if cfg['name']:
+                torrent.name = cfg['name']
+            _show_torrent_info(torrent)
             _hash_pieces(torrent)
 
-    # Setting torrent.path overwrites torrent.name, so it's important to do that
-    # after hashing
-    if cfg['name']:
-        torrent.name = cfg['name']
-
-    _show_torrent_info(torrent)
+    if not cfg['PATH']:
+        if cfg['name']:
+            torrent.name = cfg['name']
+        _show_torrent_info(torrent)
     _write_torrent(torrent, cfg)
 
 
