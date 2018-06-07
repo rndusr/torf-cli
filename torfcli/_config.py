@@ -235,16 +235,3 @@ def _cfg2args(cfg):
             for item in value:
                 args.extend((option, item))
     return args
-
-
-# def _check_circular_reference(filecfg, refs=()):
-#     """Ensure profile doesn't reference itself somehow"""
-#     for name,value in filecfg.items():
-#         if name == 'profile':
-#             profile_name = value
-#             profile = cfg['profiles'][profile_name]
-#             if profile_name in refs:
-#                 refs_str = ' -> '.join(refs[1:] + (profile_name,))
-#                 raise _errors.CLIError(f'{refs[0]}: Circular reference: {refs_str}')
-#             else:
-#                 _check_circular_reference(profile, refs=refs + (profile_name,))
