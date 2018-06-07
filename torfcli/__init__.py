@@ -14,9 +14,26 @@ def run():
     from ._main import run
     from ._errors import MainError
     from ._vars import __appname__
+    import sys
+    import errno
+
     try:
         run()
+
     except MainError as e:
-        import sys
         print(f'{__appname__}: {e}', file=sys.stderr)
         sys.exit(e.errno or 1)
+
+    except KeyboardInterrupt:
+        print(f'{__appname__}: Aborted', file=sys.stderr)
+
+        # Close stdout and stderr before the python interpreter tries it outside
+        # of our scope, which might fail if a pipe was broken, resuling in an
+        # ugly BrokePipeError message.
+        # https://stackoverflow.com/a/18954489
+        for fd in (sys.stdout, sys.stderr):
+            try:
+                fd.close()
+            except IOError:
+                pass
+        sys.exit(errno.ECANCELED)

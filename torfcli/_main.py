@@ -324,8 +324,6 @@ def _hash_pieces(torrent):
             print()
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)
-    except KeyboardInterrupt:
-        raise MainError('Aborted', errno=errno.ECANCELED)
     finally:
         if not canceled:
             _info('Info Hash', torrent.infohash)
