@@ -15,6 +15,8 @@ import os
 import errno
 import time
 import datetime
+import textwrap
+import itertools
 from collections import abc
 
 from . import _vars
@@ -153,7 +155,15 @@ def _show_torrent_info(torrent):
     size = _util.bytes2string(torrent.size) if _util.is_tty() else torrent.size
     lines.append(('Size', size))
     if torrent.comment:
-        lines.append(('Comment', torrent.comment.split('\n')))
+        if _util.is_tty():
+            # Split lines into paragraphs, then wrap each paragraph at max
+            # width. chain() is used to flatten the resulting list of lists.
+            comment = tuple(itertools.chain(*(
+                textwrap.wrap(line, width=75) or [''] # Preserve empty lines
+                for line in torrent.comment.splitlines())))
+        else:
+            comment = torrent.comment.splitlines()
+        lines.append(('Comment', comment))
 
     if torrent.creation_date:
         lines.append(('Creation Date', torrent.creation_date.isoformat(sep=' ', timespec='seconds')))
