@@ -14,27 +14,6 @@ import termios
 import tty
 import sys
 import time
-# from copy import deepcopy
-
-
-# class Config(dict):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self._defaults = deepcopy(self)
-
-#     def default(self, key):
-#         return self._defaults[key]
-
-#     def defaults(self):
-#         return self._defaults
-
-#     def reset(self):
-#         self.clear()
-#         self.update(deepcopy(self._defaults))
-
-#     def set_defaults(self, defaults):
-#         self._defaults.clear()
-#         self._defaults.update(defaults)
 
 
 class Average():
