@@ -101,40 +101,21 @@ def test_list_value(cfgfile, mock_content, mock_create_mode):
     assert cfg['nowebseed'] == True
 
 
-# def test_referencing_profile_in_profile(cfgfile, mock_content, mock_create_mode):
-#     cfgfile.write(textwrap.dedent('''
-#     [foo]
-#     webseed = https://foo
-#     profile = bar
-#     [bar]
-#     profile = baz
-#     webseed = https://bar
-#     [baz]
-#     nowebseed
-#     webseed = https://baz
-#     '''))
-#     run([str(mock_content), '--profile', 'foo'])
-#     cfg = mock_create_mode.call_args[0][0]
-#     assert cfg['webseed'] == ['https://baz', 'https://bar']
+def test_illegal_configfile_arguments(cfgfile, mock_content, mock_create_mode):
+    for arg in ('config', 'profile'):
+        cfgfile.write(textwrap.dedent(f'''
+        [foo]
+        {arg} = foo
+        '''))
+        with pytest.raises(ConfigError, match=f'^{str(cfgfile)}: Not allowed in config file: {arg}$'):
+            run(['--config', str(cfgfile), str(mock_content)])
+        assert mock_create_mode.call_args is None
 
-
-# def test_circular_reference(cfgfile, mock_content, mock_create_mode):
-#     cfgfile.write(textwrap.dedent('''
-#     [foo]
-#     profile = bar
-#     [bar]
-#     profile = baz
-#     [baz]
-#     profile = foo
-#     '''))
-#     with pytest.raises(MainError, match=r'^--profile: foo: Circular reference: bar -> baz -> foo$'):
-#         run([str(mock_content), '--profile', 'foo'])
-
-
-# def test_self_reference(cfgfile, mock_content, mock_create_mode):
-#     cfgfile.write(textwrap.dedent('''
-#     [foo]
-#     profile = foo
-#     '''))
-#     with pytest.raises(MainError, match=r'^--profile: foo: Circular reference: foo$'):
-#         run([str(mock_content), '--profile', 'foo'])
+    for arg in ('noconfig', 'help', 'version'):
+        cfgfile.write(textwrap.dedent(f'''
+        [foo]
+        {arg}
+        '''))
+        with pytest.raises(ConfigError, match=f'^{str(cfgfile)}: Not allowed in config file: {arg}$'):
+            run(['--config', str(cfgfile), str(mock_content)])
+        assert mock_create_mode.call_args is None

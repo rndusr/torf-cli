@@ -87,3 +87,21 @@ def test_invalid_boolean_name(cfgfile, mock_content, mock_create_mode):
     with pytest.raises(ConfigError, match=f"^{str(cfgfile)}: Unrecognized arguments: --foo$"):
         run([str(mock_content)])
     assert mock_create_mode.call_args is None
+
+
+def test_illegal_configfile_arguments(cfgfile, mock_content, mock_create_mode):
+    for arg in ('config', 'profile'):
+        cfgfile.write(textwrap.dedent(f'''
+        {arg} = foo
+        '''))
+        with pytest.raises(ConfigError, match=f'^{str(cfgfile)}: Not allowed in config file: {arg}$'):
+            run(['--config', str(cfgfile), str(mock_content)])
+        assert mock_create_mode.call_args is None
+
+    for arg in ('noconfig', 'help', 'version'):
+        cfgfile.write(textwrap.dedent(f'''
+        {arg}
+        '''))
+        with pytest.raises(ConfigError, match=f'^{str(cfgfile)}: Not allowed in config file: {arg}$'):
+            run(['--config', str(cfgfile), str(mock_content)])
+        assert mock_create_mode.call_args is None

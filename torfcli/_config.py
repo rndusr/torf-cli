@@ -119,6 +119,12 @@ def get_cfg(cliargs):
     # Read config file
     filecfg = _readfile(cfgfile)
 
+    # Check for illegal arguments
+    _check_illegal_configfile_arguments(filecfg, cfgfile)
+    for cfg in filecfg.values():
+        if isinstance(cfg, dict):
+            _check_illegal_configfile_arguments(cfg, cfgfile)
+
     # Prepend arguments from file to CLI arguments
     args = _cfg2args(filecfg) + cliargs
 
@@ -146,6 +152,13 @@ def get_cfg(cliargs):
         return parse_args(args)
     except _errors.CLIError as e:
         raise _errors.ConfigError(f'{cfgfile}: {e}', errno=e.errno)
+
+def _check_illegal_configfile_arguments(cfg, cfgfile):
+    for arg in ('config', 'noconfig', 'profile', 'help', 'version'):
+        if arg in cfg:
+            raise _errors.ConfigError(f'{cfgfile}: Not allowed in config file: {arg}',
+                                      errno=errno.EINVAL)
+
 
 
 _re_bool = re.compile(r'^(\S+)$')
