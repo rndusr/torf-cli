@@ -291,11 +291,17 @@ def _write_torrent(torrent, cfg):
 def _hash_pieces(torrent):
     _info('Path', torrent.path)
 
+    is_tty = _util.is_tty()
+
     start_time = time.time()
     progress = _util.Average(samples=5)
     time_left = _util.Average(samples=3)
     def progress_callback(torrent, filepath, pieces_done, pieces_total):
-        msg = f'{pieces_done / pieces_total * 100:.2f} %'
+        if is_tty:
+            msg = f'{pieces_done / pieces_total * 100:.2f} %'
+        else:
+            msg = f'{pieces_done / pieces_total * 100}'
+
         if pieces_done < pieces_total:
             progress.add(pieces_done)
             if len(progress.values) >= 2:
@@ -307,21 +313,35 @@ def _hash_pieces(torrent):
                 time_left.add(bytes_left / bytes_per_sec)
                 time_left_avg = datetime.timedelta(seconds=int(time_left.avg))
                 eta = datetime.datetime.now() + time_left_avg
-                eta_str = '{0:%H}:{0:%M}:{0:%S}'.format(eta)
-                msg += f'  |  ETA: {eta_str}  |  {time_left_avg} left  |  {bytes_per_sec/1048576:.2f} MB/s'
+                if is_tty:
+                    eta_str = '{0:%H}:{0:%M}:{0:%S}'.format(eta)
+                    msg += f'  |  ETA: {eta_str}  |  {time_left_avg} left  |  {bytes_per_sec/1048576:.2f} MB/s'
+                else:
+                    msg += f'\t{eta.timestamp():.0f}\t{time_left_avg.total_seconds():.0f}\t{bytes_per_sec:.0f}'
+            elif not is_tty:
+                # Don't print the first line, which can't contain all fields
+                return
+
         else:
+            # Print final line
             total_time_diff = datetime.timedelta(seconds=round(time.time() - start_time))
             bytes_per_sec = torrent.size / total_time_diff.total_seconds()
-            msg += f'  |  {bytes_per_sec/1045876:.2f} MB/s  |  Time: {total_time_diff}'
+            if is_tty:
+                msg += f'  |  Time: {total_time_diff}  |  {bytes_per_sec/1045876:.2f} MB/s'
+            else:
+                msg += f'\t{total_time_diff.total_seconds():.0f}\t{bytes_per_sec:.0f}'
         _util.clear_line()
         _info('Progress', msg, newline=False)
+        if not is_tty:
+            print('', flush=True)
 
     canceled = True
     try:
         try:
             canceled = not torrent.generate(callback=progress_callback, interval=0.5)
         finally:
-            print()
+            if is_tty:
+                print()
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)
     finally:
