@@ -293,7 +293,7 @@ def _hash_pieces(torrent):
 
     start_time = time.time()
     progress = _util.Average(samples=5)
-    time_left = _util.Average(samples=10)
+    time_left = _util.Average(samples=3)
     def progress_callback(torrent, filepath, pieces_done, pieces_total):
         msg = f'{pieces_done / pieces_total * 100:.2f} %'
         if pieces_done < pieces_total:
@@ -305,13 +305,13 @@ def _hash_pieces(torrent):
                 bytes_per_sec = bytes_diff / time_diff
                 bytes_left = (pieces_total - pieces_done) * torrent.piece_size
                 time_left.add(bytes_left / bytes_per_sec)
-                time_left_avg = datetime.timedelta(seconds=int(time_left.avg) + 1)
+                time_left_avg = datetime.timedelta(seconds=int(time_left.avg))
                 eta = datetime.datetime.now() + time_left_avg
                 eta_str = '{0:%H}:{0:%M}:{0:%S}'.format(eta)
                 msg += f'  |  ETA: {eta_str}  |  {time_left_avg} left  |  {bytes_per_sec/1048576:.2f} MB/s'
         else:
             total_time_diff = datetime.timedelta(seconds=round(time.time() - start_time))
-            bytes_per_sec = torrent.size / (total_time_diff.total_seconds()+1)
+            bytes_per_sec = torrent.size / total_time_diff.total_seconds()
             msg += f'  |  {bytes_per_sec/1045876:.2f} MB/s  |  Time: {total_time_diff}'
         _util.clear_line()
         _info('Progress', msg, newline=False)
