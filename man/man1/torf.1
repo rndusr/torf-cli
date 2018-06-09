@@ -204,6 +204,20 @@ multiple times.  See
 .BR CONFIGURATION\ FILE .
 .RE
 .PP
+.BR \-\-human ,
+.B \-u
+.RS
+Display information in human-readable output even if STDOUT is not a TTY.  See
+.BR PIPING\ OUTPUT .
+.RE
+.PP
+.BR \-\-nohuman ,
+.B \-U
+.RS
+Display information in machine-readable output even if STDOUT is a TTY.  See
+.BR PIPING\ OUTPUT .
+.RE
+.PP
 .BR \-\-help ,
 .B \-h
 .RS
@@ -324,10 +338,11 @@ expands to
 .EE
 .RE
 .SH PIPING OUTPUT
-If stdout is not a TTY (i.e. when output is piped or redirected), the format is
-slightly different:
+If stdout is not a TTY (i.e. when output is piped) or if the
+.B \-\-nohuman
+option is provided, the output format is slightly different:
 .IP \(bu 2
-Leading spaces are removed.
+Leading spaces are removed from each line.
 .IP \(bu 2
 The delimiter between label and value as well as between multiple values (files,
 trackers, etc) is a tab character (\\t; ASCII 0x9).

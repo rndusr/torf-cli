@@ -118,25 +118,30 @@ _ANSWERS = {'y': True, 'n': False,
             '\x03': False,  # ctrl-c
             '\x07': False,  # ctrl-g
             '\x1b': False}  # escape
-def ask_yes_no(question, default='n'):
-    if not is_tty():
+def ask_yes_no(question, cfg, default='n'):
+    if not human_readable(cfg):
         return _ANSWERS.get(default)
 
     while True:
         print(question, end=' [y|n] ', flush=True)
         key = getch()
-        clear_line()
+        clear_line(cfg)
         answer = _ANSWERS.get(key, None)
         if answer is not None:
             return answer
 
 
-def is_tty():
-    return sys.stdout.isatty()
+def human_readable(cfg):
+    if cfg['nohuman']:
+        return False
+    elif cfg['human']:
+        return True
+    else:
+        return sys.stdout.isatty()
 
 
-def clear_line():
-    if is_tty():
+def clear_line(cfg):
+    if human_readable(cfg):
         print('\x1b[2K\x1b[0E', end='', flush=True)
 
 

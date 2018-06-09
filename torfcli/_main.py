@@ -51,7 +51,7 @@ def _info_mode(cfg):
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)
     else:
-        _show_torrent_info(torrent)
+        _show_torrent_info(torrent, cfg)
 
 
 def _create_mode(cfg):
@@ -77,8 +77,8 @@ def _create_mode(cfg):
             raise MainError(f'{cfg["date"]}: Invalid date', errno=errno.EINVAL)
 
     _check_output_file_exists(torrent, cfg)
-    _show_torrent_info(torrent)
-    _hash_pieces(torrent)
+    _show_torrent_info(torrent, cfg)
+    _hash_pieces(torrent, cfg)
     _write_torrent(torrent, cfg)
 
 
@@ -140,25 +140,26 @@ def _edit_mode(cfg):
             # do that after
             if cfg['name']:
                 torrent.name = cfg['name']
-            _show_torrent_info(torrent)
-            _hash_pieces(torrent)
+            _show_torrent_info(torrent, cfg)
+            _hash_pieces(torrent, cfg)
 
     if not cfg['PATH']:
         if cfg['name']:
             torrent.name = cfg['name']
-        _show_torrent_info(torrent)
+        _show_torrent_info(torrent, cfg)
     _write_torrent(torrent, cfg)
 
 
-def _show_torrent_info(torrent):
+def _show_torrent_info(torrent, cfg):
+    human_readable = _util.human_readable(cfg)
     lines = []
     lines.append(('Name', torrent.name))
     if torrent.is_ready:
         lines.append(('Info Hash', torrent.infohash))
-    size = _util.bytes2string(torrent.size) if _util.is_tty() else torrent.size
+    size = _util.bytes2string(torrent.size) if human_readable else torrent.size
     lines.append(('Size', size))
     if torrent.comment:
-        if _util.is_tty():
+        if human_readable:
             # Split lines into paragraphs, then wrap each paragraph at max
             # width. chain() is used to flatten the resulting list of lists.
             comment = tuple(itertools.chain(*(
@@ -183,7 +184,7 @@ def _show_torrent_info(torrent):
                     trackers.append(tier[0])
         else:
             # At least one tier has multiple trackers
-            if _util.is_tty():
+            if human_readable:
                 for i,tier in enumerate(torrent.trackers, 1):
                     if tier:
                         trackers.append(f'Tier {i}: {tier[0]}')
@@ -207,7 +208,7 @@ def _show_torrent_info(torrent):
         lines.append((label, torrent.httpseeds))
 
     if torrent.piece_size:
-        piece_size = _util.bytes2string(torrent.piece_size) if _util.is_tty() else torrent.piece_size
+        piece_size = _util.bytes2string(torrent.piece_size) if human_readable else torrent.piece_size
         lines.append(('Piece Size', piece_size))
     if torrent.piece_size:
         lines.append(('Piece Count', torrent.pieces))
@@ -216,18 +217,18 @@ def _show_torrent_info(torrent):
     lines.append(('File Count', len(files)))
     if torrent.exclude:
         lines.append(('Exclude', torrent.exclude))
-    if _util.is_tty():
+    if human_readable:
         lines.append(('Files', _util.make_filetree(torrent.filetree)))
     else:
         lines.append(('Files', files))
 
     for label,value in lines:
-        _info(label, value)
+        _info(label, value, human_readable)
 
 
 _INFO_LABEL_WIDTH = 13
-def _info(label, value, newline=True):
-    if _util.is_tty():
+def _info(label, value, human_readable, newline=True):
+    if human_readable:
         # Make output human-readable
         label = f'{label.rjust(_INFO_LABEL_WIDTH)}'
         sep = '  '
@@ -268,16 +269,17 @@ def _check_output_file_exists(torrent, cfg):
         if os.path.isdir(torrent_filepath):
             raise MainError(f'{torrent_filepath}: {os.strerror(errno.EISDIR)}',
                             errno=errno.EISDIR)
-        elif not cfg['yes'] and not _util.ask_yes_no(f'{torrent_filepath}: Overwrite file?', default='n'):
+        elif not cfg['yes'] and not _util.ask_yes_no(f'{torrent_filepath}: Overwrite file?', cfg, default='n'):
             raise MainError(f'{torrent_filepath}: {os.strerror(errno.EEXIST)}',
                             errno=errno.EEXIST)
 
 
 def _write_torrent(torrent, cfg):
     torrent_filepath = _get_torrent_filepath(torrent, cfg)
+    human_readable = _util.human_readable(cfg)
 
     if cfg['magnet'] or not torrent_filepath:
-        _info('Magnet URI', torrent.magnet())
+        _info('Magnet URI', torrent.magnet(), human_readable)
 
     if torrent_filepath:
         try:
@@ -285,19 +287,19 @@ def _write_torrent(torrent, cfg):
         except torf.TorfError as e:
             raise MainError(e, errno=e.errno)
         else:
-            _info('Torrent File', f'{torrent_filepath}')
+            _info('Torrent File', f'{torrent_filepath}', human_readable)
 
 
-def _hash_pieces(torrent):
-    _info('Path', torrent.path)
+def _hash_pieces(torrent, cfg):
+    human_readable = _util.human_readable(cfg)
 
-    is_tty = _util.is_tty()
+    _info('Path', torrent.path, human_readable)
 
     start_time = time.time()
     progress = _util.Average(samples=5)
     time_left = _util.Average(samples=3)
     def progress_callback(torrent, filepath, pieces_done, pieces_total):
-        if is_tty:
+        if human_readable:
             msg = f'{pieces_done / pieces_total * 100:.2f} %'
         else:
             msg = f'{pieces_done / pieces_total * 100}'
@@ -313,12 +315,12 @@ def _hash_pieces(torrent):
                 time_left.add(bytes_left / bytes_per_sec)
                 time_left_avg = datetime.timedelta(seconds=int(time_left.avg))
                 eta = datetime.datetime.now() + time_left_avg
-                if is_tty:
+                if human_readable:
                     eta_str = '{0:%H}:{0:%M}:{0:%S}'.format(eta)
                     msg += f'  |  ETA: {eta_str}  |  {time_left_avg} left  |  {bytes_per_sec/1048576:.2f} MB/s'
                 else:
                     msg += f'\t{eta.timestamp():.0f}\t{time_left_avg.total_seconds():.0f}\t{bytes_per_sec:.0f}'
-            elif not is_tty:
+            elif not human_readable:
                 # Don't print the first line, which can't contain all fields
                 return
 
@@ -326,13 +328,13 @@ def _hash_pieces(torrent):
             # Print final line
             total_time_diff = datetime.timedelta(seconds=round(time.time() - start_time))
             bytes_per_sec = torrent.size / (total_time_diff.total_seconds() + 0.001)  # Prevent ZeroDivisionError
-            if is_tty:
+            if human_readable:
                 msg += f'  |  Time: {total_time_diff}  |  {bytes_per_sec/1045876:.2f} MB/s'
             else:
                 msg += f'\t{total_time_diff.total_seconds():.0f}\t{bytes_per_sec:.0f}'
-        _util.clear_line()
-        _info('Progress', msg, newline=False)
-        if not is_tty:
+        _util.clear_line(cfg)
+        _info('Progress', msg, human_readable, newline=False)
+        if not human_readable:
             print('', flush=True)
 
     canceled = True
@@ -340,10 +342,10 @@ def _hash_pieces(torrent):
         try:
             canceled = not torrent.generate(callback=progress_callback, interval=0.5)
         finally:
-            if is_tty:
+            if human_readable:
                 print()
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)
     finally:
         if not canceled:
-            _info('Info Hash', torrent.infohash)
+            _info('Info Hash', torrent.infohash, human_readable)

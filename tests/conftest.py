@@ -45,14 +45,14 @@ def assert_torrents_equal():
 
 
 @contextlib.contextmanager
-def _mock_tty(monkeypatch, is_tty):
+def _human_readable(monkeypatch, human_readable):
     from torfcli import _util
-    monkeypatch.setattr(_util, 'is_tty', lambda: bool(is_tty))
+    monkeypatch.setattr(_util, 'human_readable', lambda _: bool(human_readable))
     yield
 
 @pytest.fixture
-def mock_tty(monkeypatch):
-    return functools.partial(_mock_tty, monkeypatch)
+def human_readable(monkeypatch):
+    return functools.partial(_human_readable, monkeypatch)
 
 
 @pytest.fixture
