@@ -273,22 +273,23 @@ Patterns use these special characters:
 Configuration files list command line options with all leading \*(lq-\*(rq
 characters removed.  If an option takes a parameter, \*(lq=\*(rq is used as a
 separator.  Spaces before and after the \*(lq=\*(rq are ignored.  The parameter
-may be quoted with single or double quotes.  Comments start with
-\*(lq#\*(rq. Any of the commands listed in the
+may be quoted with single or double quotes.  Comments start with \*(lq#\*(rq.
+Any of the options listed in the
 .B OPTIONS
 section are allowed except for
-.B config
+.BR config ,
+.BR noconfig ,
+.BR profile ,
+.B help
 and
-.BR noconfig .
+.BR version .
 .SS Profiles
 A profile is a set of options bound to a name that is accepted by the
 .B --profile
-option.  It is specified as
+option.  In the configuration file it is specified as
 .RI \*(lq[ PROFILE\ NAME ]\*(rq
-followed by a list of options.  All profiles inherit options specified globally.
-Profiles can also load other profiles via the
-.B profile
-option.
+followed by a list of options.  Profiles inherit globally specified options, but
+they can overload them.
 .SS Example Configuration File
 .EX
 yes
@@ -299,15 +300,9 @@ exclude = *.txt
 tracker = https://foo1
 tracker = https://foo2
 private
-profile = noimg
 
 [bar]
 tracker = https://bar
-profile = noimg
-
-[noimg]
-exclude = *.jpg
-exclude = *.png
 .PP
 .EE
 With this configuration file,
@@ -321,7 +316,6 @@ expands to
 --exclude '*.txt'
 --tracker https://foo1 --tracker https://foo2
 --private
---exclude '*.jpg' --exclude '*.png'
 .EE
 .RE
 .PP
@@ -333,8 +327,8 @@ expands to
 .EX
 --yes
 --nodate
+--exclude '*.txt'
 --tracker https://bar
---exclude '*.txt' --exclude '*.jpg' --exclude '*.png'
 .EE
 .RE
 .SH PIPING OUTPUT
