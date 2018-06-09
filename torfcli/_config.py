@@ -34,35 +34,34 @@ USAGE
 
 ARGUMENTS
     PATH                   Path to torrent's content
+    --exclude, -e EXCLUDE  File matching pattern that is used to exclude
+                           files in PATH
     --in, -i TORRENT       Read metainfo from TORRENT
     --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
     --magnet, -m           Create magnet link
-    --exclude, -e EXCLUDE  File matching pattern that is used to exclude
-                           files in PATH
-
     --name, -n NAME        Torrent name (default: basename of PATH)
     --tracker, -t TRACKER  Announce URL
     --webseed, -w WEBSEED  Webseed URL
     --private, -p          Forbid clients to use DHT and PEX
-    --xseed, -x            Randomize info hash
+    --comment, -c COMMENT  Comment that is stored in TORRENT
     --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now'
                            or 'today' (default: 'today')
-    --comment, -c COMMENT  Comment that is stored in TORRENT
+    --xseed, -x            Randomize info hash
 
     --notracker, -T        Remove trackers from TORRENT
     --nowebseed, -W        Remove webseeds from TORRENT
     --noprivate, -P        Remove private flag from TORRENT
-    --noxseed, -X          De-randomize info hash of TORRENT
-    --nodate, -D           Remove date from TORRENT
     --nocomment, -C        Remove comment from TORRENT
+    --nodate, -D           Remove date from TORRENT
+    --noxseed, -X          De-randomize info hash of TORRENT
     --nocreator, -R        Remove creator from TORRENT
 
+    --yes, -y              Answer all yes/no prompts with "yes"
     --config, -f FILE      Read configuration from FILE
                            (default: ~/.config/{_vars.__appname__}/config
     --noconfig, -F         Ignore configuration file
     --profile, -z PROFILE  Use options from PROFILE
 
-    --yes, -y              Answer all yes/no prompts with "yes"
     --help, -h             Show this help screen and exit
     --version, -V          Show version number and exit
 """.strip()
@@ -78,28 +77,29 @@ _cliparser.add_argument('PATH', nargs='?')
 _cliparser.add_argument('--exclude', '-e', default=[], action='append')
 _cliparser.add_argument('--in', '-i', default='')
 _cliparser.add_argument('--out', '-o', default='')
-_cliparser.add_argument('--name', '-n', default='')
-_cliparser.add_argument('--yes', '-y', action='store_true')
-
 _cliparser.add_argument('--magnet', '-m', action='store_true')
-_cliparser.add_argument('--tracker', '-t', default=[], action='append')
-_cliparser.add_argument('--notracker', '-T', action='store_true')
-_cliparser.add_argument('--webseed', '-w', default=[], action='append')
-_cliparser.add_argument('--nowebseed', '-W', action='store_true')
 
+_cliparser.add_argument('--name', '-n', default='')
+_cliparser.add_argument('--tracker', '-t', default=[], action='append')
+_cliparser.add_argument('--webseed', '-w', default=[], action='append')
 _cliparser.add_argument('--private', '-p', action='store_true')
-_cliparser.add_argument('--noprivate', '-P', action='store_true')
 _cliparser.add_argument('--comment', '-c', default='')
-_cliparser.add_argument('--nocomment', '-C', action='store_true')
 _cliparser.add_argument('--date', '-d', default='')
-_cliparser.add_argument('--nodate', '-D', action='store_true')
 _cliparser.add_argument('--xseed', '-x', action='store_true')
+
+_cliparser.add_argument('--notracker', '-T', action='store_true')
+_cliparser.add_argument('--nowebseed', '-W', action='store_true')
+_cliparser.add_argument('--noprivate', '-P', action='store_true')
+_cliparser.add_argument('--nocomment', '-C', action='store_true')
+_cliparser.add_argument('--nodate', '-D', action='store_true')
 _cliparser.add_argument('--noxseed', '-X', action='store_true')
 _cliparser.add_argument('--nocreator', '-R', action='store_true')
 
 _cliparser.add_argument('--config', '-f')
 _cliparser.add_argument('--noconfig', '-F', action='store_true')
 _cliparser.add_argument('--profile', '-z', default=[], action='append')
+
+_cliparser.add_argument('--yes', '-y', action='store_true')
 _cliparser.add_argument('--help', '-h', action='store_true')
 _cliparser.add_argument('--version', '-V', action='store_true')
 

@@ -59,6 +59,12 @@ Default:
 .IR NAME \fB.torrent
 .RE
 .PP
+.BR \-\-magnet ,
+.B \-m
+.RS
+Create magnet link.
+.RE
+.PP
 .BR \-\-name ,
 .B \-n
 .I NAME
@@ -67,21 +73,6 @@ The name of the destination file or directory when the torrent is downloaded.
 .br
 Default: Basename of
 .I PATH
-.RE
-.PP
-.BR \-\-yes ,
-.B \-y
-.RS
-Answer all yes/no prompts with \*(lqyes\*(rq.  At the moment, all this does is
-overwrite
-.I TORRENT
-without asking.
-.RE
-.PP
-.BR \-\-magnet ,
-.B \-m
-.RS
-Create magnet link.
 .RE
 .PP
 .BR \-\-tracker ,
@@ -172,6 +163,15 @@ metainfo.
 .B \-R
 .RS
 Don't store the name and version of this application in the generated torrent.
+.RE
+.PP
+.BR \-\-yes ,
+.B \-y
+.RS
+Answer all yes/no prompts with \*(lqyes\*(rq.  At the moment, all this does is
+overwrite
+.I TORRENT
+without asking.
 .RE
 .PP
 .BR \-\-config ,
