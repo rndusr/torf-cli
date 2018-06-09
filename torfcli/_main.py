@@ -308,7 +308,7 @@ def _hash_pieces(torrent):
                 time_diff = progress.times[-1] - progress.times[0]
                 pieces_diff = progress.values[-1] - progress.values[0]
                 bytes_diff = pieces_diff * torrent.piece_size
-                bytes_per_sec = bytes_diff / time_diff
+                bytes_per_sec = bytes_diff / time_diff + 0.001  # Prevent ZeroDivisionError
                 bytes_left = (pieces_total - pieces_done) * torrent.piece_size
                 time_left.add(bytes_left / bytes_per_sec)
                 time_left_avg = datetime.timedelta(seconds=int(time_left.avg))
@@ -325,7 +325,7 @@ def _hash_pieces(torrent):
         else:
             # Print final line
             total_time_diff = datetime.timedelta(seconds=round(time.time() - start_time))
-            bytes_per_sec = torrent.size / total_time_diff.total_seconds()
+            bytes_per_sec = torrent.size / (total_time_diff.total_seconds() + 0.001)  # Prevent ZeroDivisionError
             if is_tty:
                 msg += f'  |  Time: {total_time_diff}  |  {bytes_per_sec/1045876:.2f} MB/s'
             else:
