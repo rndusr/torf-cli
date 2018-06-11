@@ -1,20 +1,35 @@
-.TH torf 1 "April 10, 2018" "USER COMMANDS"
+.TH torf 1 "June 11, 2018" "USER COMMANDS"
 .SH NAME
-torf \- Create, display and edit torrents
+torf \- Command line tool to create, display and edit torrents
 .SH SYNOPSIS
 .B torf
-PATH [OPTIONS] [\-o TORRENT]
-.br
-.B torf
-\-i TORRENT
-.br
-.B torf
-\-i TORRENT [OPTIONS] \-o TORRENT
+[\fIPATH\fP]
+[\fIOPTIONS\fP]
 .SH DESCRIPTION
+torf can create new torrents, display information about existing torrents, and
+edit torrents (e.g. to remove a comment or change the tracker) without
+re\-hashing the content.
+.PP
+.TS
+tab (|);
+r lx.
+Create|T{
 .B torf
-can create torrent files, display information about existing torrent files, and
-edit existing torrent files (e.g. to remove a comment or change the tracker)
-without re\-hashing the payload.
+.I PATH
+[\fIOPTIONS\fP]
+[\fB\-o\fP \fITORRENT\fP]
+T}
+Display|T{
+.B torf
+\fB-i\fP \fITORRENT\fP
+T}
+Edit|T{
+.B torf
+\fB-i\fP \fITORRENT\fP
+[\fIOPTIONS\fP]
+\fB-o\fP \fITORRENT\fP
+T}
+.TE
 .SH OPTIONS
 Options starting with
 .B \-\-no
@@ -54,7 +69,7 @@ Read metainfo from
 .RS
 Write torrent metadata to
 .IR TORRENT .
-.br
+.BR
 Default:
 .IR NAME \fB.torrent
 .RE
@@ -70,7 +85,7 @@ Create magnet link.
 .I NAME
 .RS
 The name of the destination file or directory when the torrent is downloaded.
-.br
+.BR
 Default: Basename of
 .I PATH
 .RE
@@ -133,7 +148,7 @@ Remove the comment.
 The creation date as
 .IR YYYY\-MM\-DD[\ HH:MM[:SS]] ,
 \*(lqnow\*(rq for local time or \*(lqtoday\*(rq for local time at midnight.
-.br
+.BR
 Default: \*(lqtoday\*(rq
 .RE
 .PP
@@ -180,7 +195,7 @@ without asking.
 .RS
 Read command line arguments from configuration FILE.  See
 .BR CONFIGURATION\ FILE .
-.br
+.BR
 Default:
 .IR $XDG_CONFIG_HOME \fB/torf/config\fP
 where
@@ -273,8 +288,8 @@ Patterns use these special characters:
 Configuration files list command line options with all leading \*(lq-\*(rq
 characters removed.  If an option takes a parameter, \*(lq=\*(rq is used as a
 separator.  Spaces before and after the \*(lq=\*(rq are ignored.  The parameter
-may be quoted with single or double quotes.  Comments start with \*(lq#\*(rq.
-Any of the options listed in the
+may be quoted with single or double quotes to preserve leading and/or trailing
+spaces.  Comments start with \*(lq#\*(rq.  Any of the options listed in the
 .B OPTIONS
 section are allowed except for
 .BR config ,
@@ -284,13 +299,17 @@ section are allowed except for
 and
 .BR version .
 .SS Profiles
-A profile is a set of options bound to a name that is accepted by the
+A profile is a set of options bound to a name that is given to the
 .B --profile
 option.  In the configuration file it is specified as
 .RI \*(lq[ PROFILE\ NAME ]\*(rq
-followed by a list of options.  Profiles inherit globally specified options, but
-they can overload them.
-.SS Example Configuration File
+followed by a list of options.  Profiles inherit any options specified globally
+at the top of the file, but they can overload them.
+.SS Example
+This is an example configuration file with some global custom defaults and the
+two profiles \*(lqfoo\*(rq and \*(lqbar\*(rq:
+.RS
+.PP
 .EX
 yes
 nodate
@@ -303,9 +322,20 @@ private
 
 [bar]
 tracker = https://bar
-.PP
 .EE
-With this configuration file,
+.RE
+.PP
+With this configuration file, the arguments
+.PP
+.RS
+.EX
+--yes
+--nodate
+--exclude '*.txt'
+.EE
+.RE
+.PP
+are always used,
 .B --profile\ foo
 expands to
 .PP
@@ -343,9 +373,9 @@ trackers, etc) is a tab character (\\t; ASCII 0x9).
 .IP \(bu 2
 Numbers are not scaled (e.g. \*(lq1024\*(rq instead of \*(lq1 KiB\*(rq).
 .SH EXIT STATUS
-torf returns zero on success and non-zero on failure.  Run
-.B errno \-l
-for a list of potential error codes.
+torf returns zero on success and non-zero on failure.  You can lookup error
+codes in the output of
+.BR errno\ \-l .
 .PP
 .SH REPORTING BUGS
 Bug reports, feature requests and poems about hedgehogs are welcome on the
