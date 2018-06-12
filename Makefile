@@ -17,7 +17,6 @@ test:
 man:
 	mkdir -p $(MANDIR)
 	pandoc --standalone $(MANPAGE_MD) --to=man --output=$(MANPAGE)
-	git diff --no-patch --exit-code $(MANPAGE) || git commit $(MANPAGE) -m 'Autogenerate man page'
 
 release: manpage
 	pyrelease CHANGELOG ./torfcli/_vars.py
