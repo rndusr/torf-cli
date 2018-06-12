@@ -150,11 +150,22 @@ result to bar.torrent:
 
 # EXCLUDING FILES
 
-The **--exclude** option takes a pattern that is matched against file names in
-_PATH_.  Any matching files are not included in the torrent.  Empty directories
-are not included because the torrent file format only supports files.
+The **--exclude** option takes a pattern that is matched against each file path
+beneath _PATH_.  Files that match are not included in the torrent.  Matching is
+case-insensitive.
 
-Patterns use these special characters:
+Each file path starts with the basename of _PATH_, e.g. if _PATH_ is
+"/home/foo/bar", each file path starts with "bar/".
+
+A file path matches if any of its directories or its file name match, e.g. the
+pattern "foo" matches the paths "foo/bar/baz", "bar/foo/baz" and "bar/baz/foo".
+
+A pattern must describe the full directory or file name, e.g. the pattern "bar"
+does not match the path "foo/barr", but the patterns "bar?" and "bar*" match.
+
+Empty directories and empty files are automatically excluded.
+
+Patterns support these wildcard characters:
 
 | | |
 | -----: | :------------------------------- |
