@@ -18,6 +18,8 @@ can `read it here
 Example
 -------
 
+Create 'foo.torrent' with two trackers
+
 .. code:: sh
 
     $ torf ./foo -t http://bar:123/announce -t http://baz:321/announce
