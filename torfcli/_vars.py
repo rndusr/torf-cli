@@ -12,4 +12,4 @@
 __version__     = '1.2'
 __appname__     = 'torf'
 __url__         = 'https://github.com/rndusr/torf-cli'
-__description__ = 'CLI tool to create, read and edit torrent files and produce magnet URIs'
+__description__ = 'CLI tool to create, read and edit torrent files'
