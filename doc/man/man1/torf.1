@@ -233,12 +233,25 @@ torf\ \-i\ foo.torrent\ \-c\ \[aq]New\ comment\[aq]\ \-D\ \-o\ bar.torrent
 .SH EXCLUDING FILES
 .PP
 The \f[B]\-\-exclude\f[] option takes a pattern that is matched against
-file names in \f[I]PATH\f[].
-Any matching files are not included in the torrent.
-Empty directories are not included because the torrent file format only
-supports files.
+each file path beneath \f[I]PATH\f[].
+Files that match are not included in the torrent.
+Matching is case\-insensitive.
 .PP
-Patterns use these special characters:
+Each file path starts with the basename of \f[I]PATH\f[], e.g.
+if \f[I]PATH\f[] is "/home/foo/bar", each file path starts with "bar/".
+.PP
+A file path matches if any of its directories or its file name match,
+e.g.
+the pattern "foo" matches the paths "foo/bar/baz", "bar/foo/baz" and
+"bar/baz/foo".
+.PP
+A pattern must describe the full directory or file name, e.g.
+the pattern "bar" does not match the path "foo/barr", but the patterns
+"bar?" and "bar*" match.
+.PP
+Empty directories and empty files are automatically excluded.
+.PP
+Patterns support these wildcard characters:
 .PP
 .TS
 tab(@);
