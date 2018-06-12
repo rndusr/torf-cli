@@ -1,62 +1,26 @@
 torf-cli
 ========
 
-torf-cli is a command line tool that can create new torrents and magnet URIs,
-dump the metainfo of a torrent in a readable and parsable format and edit
-existing torrents (e.g. to fix a typo or change the info hash to deal with
-cross-seeding issues without hashing the pieces again).
+torf-cli is a command line tool that can create torrents and magnet URIs, dump
+the metainfo of a torrent, and edit existing torrents (e.g. to fix a typo
+without having to hash all the pieces again).
 
-::
+The output is pleasant to read for humans and easy to parse with common CLI
+tools if stdout is not a TTY.
 
-    $ torf -h
-    torf 1.1 <https://github.com/rndusr/torf-cli>
+An optional configuration file specifies custom default options and profiles
+that give a name to a set of options.
 
-    Create, display and edit torrents
+Documentation should be available as a man page after the installation, or you
+can `read it here
+<https://github.com/rndusr/torf-cli/blob/master/doc/manpage.md>`_.
 
-    USAGE
-        torf PATH [OPTIONS] [-o TORRENT]
-        torf -i TORRENT
-        torf -i TORRENT [OPTIONS] -o NEW TORRENT
-
-    ARGUMENTS
-        PATH                   Path to torrent's content
-        --in, -i TORRENT       Read metainfo from TORRENT
-        --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
-        --magnet, -m           Create magnet link
-
-        --exclude, -e EXCLUDE  File matching pattern that is used to exclude
-                               files in PATH
-        --yes, -y              Answer all yes/no prompts with "yes"
-
-        --name, -n NAME        Torrent name (default: basename of PATH)
-        --tracker, -t TRACKER  Announce URL
-        --webseed, -w WEBSEED  Webseed URL
-        --private, -p          Disable DHT and PEX
-        --xseed, -x            Randomize info hash
-        --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now'
-                               or 'today' (default: 'today')
-        --comment, -c COMMENT  Comment that is stored in TORRENT
-
-        --notracker, -T        Remove trackers from TORRENT
-        --nowebseed, -W        Remove webseeds from TORRENT
-        --noprivate, -P        Make TORRENT public
-        --noxseed, -X          De-randomize info hash of TORRENT
-        --nodate, -D           Remove date from TORRENT
-        --nocomment, -C        Remove comment from TORRENT
-        --nocreator, -R        Don't store application/version in TORRENT
-
-        --help,-h              Show this help screen and exit
-        --version              Show version number and exit
-
-
-Examples
---------
-
-Create 'foo.torrent' with two trackers
+Example
+-------
 
 .. code:: sh
 
-    $ torf path/to/foo -t http://bar.example.org:6881/announce -t http://baz.something.com:6881/announce
+    $ torf . -t http://bar:123/announce -t http://baz:321/announce
 
 Read 'foo.torrent' and display its metainfo
 
