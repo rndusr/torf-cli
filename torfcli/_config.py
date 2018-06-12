@@ -23,9 +23,7 @@ DEFAULT_CONFIG_FILE = os.path.join(BaseDirectory.xdg_config_home, _vars.__appnam
 DEFAULT_CREATOR = f'{_vars.__appname__}/{_vars.__version__}'
 VERSION_TEXT = f'{_vars.__appname__} {_vars.__version__} <{_vars.__url__}>'
 HELP_TEXT = f"""
-{VERSION_TEXT}
-
-Create, display and edit torrents
+{_vars.__appname__} - {_vars.__description__}
 
 USAGE
     {_vars.__appname__} PATH [OPTIONS] [-o TORRENT]
