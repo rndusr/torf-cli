@@ -20,7 +20,7 @@ Example
 
 .. code:: sh
 
-    $ torf . -t http://bar:123/announce -t http://baz:321/announce
+    $ torf ./foo -t http://bar:123/announce -t http://baz:321/announce
 
 Read 'foo.torrent' and display its metainfo
 
