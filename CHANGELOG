@@ -7,6 +7,8 @@
     a newline character and the rest of the line is parsable like the other
     output.
   - Long or multiline comments are now properly indented.
+  - --exclude patterns are now matched against each directory or the file name
+    in each file path
 
 
 2018-04-08 1.1
