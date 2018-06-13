@@ -15,109 +15,69 @@ Documentation should be available as a man page after the installation, or you
 can `read it here
 <https://github.com/rndusr/torf-cli/blob/master/doc/manpage.md>`_.
 
-Example
--------
+Examples
+--------
 
 .. code:: sh
 
-    $ torf path/to/torf-cli --private --exclude tests \
-           -t http://foo:123/announce -t http://bar:321/announce
-             Name  torf-cli
-             Size  85.79 KiB
-    Creation Date  2018-06-13 00:00:00
-          Private  yes
-         Trackers  http://foo:123/announce
-                   http://bar:321/announce
-       Piece Size  16 KiB
-      Piece Count  6
-       File Count  14
-          Exclude  tests
-            Files  torf-cli
-                   ├─CHANGELOG
-                   ├─doc
-                   │ ├─man
-                   │ │ └─man1
-                   │ │   └─torf.1
-                   │ └─manpage.md
-                   ├─LICENSE
-                   ├─Makefile
-                   ├─README.rst
-                   ├─setup.py
-                   └─torfcli
-                     ├─__init__.py
-                     ├─__main__.py
-                     ├─_config.py
-                     ├─_errors.py
-                     ├─_main.py
-                     ├─_util.py
-                     └─_vars.py
-             Path  path/to/torf-cli
-         Progress  100.00 %  |  Time: 0:00:00  |  83.99 MB/s
-        Info Hash  976b030466fb89b265ddf7cab491995f35bd9a59
-     Torrent File  torf-cli.torrent
-    $ torf -i torf-cli.torrent
-             Name  torf-cli
-        Info Hash  976b030466fb89b265ddf7cab491995f35bd9a59
-             Size  85.07 KiB
+    $ torf ./doc -t http://bar:123/announce -t http://baz:321/announce --private
+             Name  doc
+             Size  15.77 KiB
     Creation Date  2018-06-13 00:00:00
           Private  yes
          Trackers  http://bar:123/announce
                    http://baz:321/announce
        Piece Size  16 KiB
-      Piece Count  6
-       File Count  14
-            Files  torf-cli
-                   ├─CHANGELOG
-                   ├─doc
-                   │ ├─man
-                   │ │ └─man1
-                   │ │   └─torf.1
-                   │ └─manpage.md
-                   ├─LICENSE
-                   ├─Makefile
-                   ├─README.rst
-                   ├─setup.py
-                   └─torfcli
-                     ├─__init__.py
-                     ├─__main__.py
-                     ├─_config.py
-                     ├─_errors.py
-                     ├─_main.py
-                     ├─_util.py
-                     └─_vars.py
+      Piece Count  1
+       File Count  2
+            Files  doc
+                   ├─man
+                   │ └─man1
+                   │   └─torf.1
+                   └─manpage.md
+             Path  doc
+         Progress  100.00 %  |  Time: 0:00:00  |  15.44 MB/s
+        Info Hash  f574f59b61d9b108b21cd5e4cc9036bcff55c11a
+     Torrent File  doc.torrent
 
-    $ torf -i torf-cli.torrent --comment 'Forgot to add this comment.' -o torf-cli.new.torrent
-             Name  torf-cli
-        Info Hash  976b030466fb89b265ddf7cab491995f35bd9a59
-             Size  85.07 KiB
+    $ torf -i doc.torrent
+             Name  doc
+        Info Hash  f574f59b61d9b108b21cd5e4cc9036bcff55c11a
+             Size  15.77 KiB
+    Creation Date  2018-06-13 00:00:00
+          Private  yes
+         Trackers  http://bar:123/announce
+                   http://baz:321/announce
+       Piece Size  16 KiB
+      Piece Count  1
+       File Count  2
+            Files  doc
+                   ├─man
+                   │ └─man1
+                   │   └─torf.1
+                   └─manpage.md
+
+    $ torf -i doc.torrent --comment 'Forgot to add this comment.' -o doc.revised.torrent
+             Name  doc
+        Info Hash  f574f59b61d9b108b21cd5e4cc9036bcff55c11a
+             Size  15.77 KiB
           Comment  Forgot to add this comment.
     Creation Date  2018-06-13 00:00:00
           Private  yes
          Trackers  http://bar:123/announce
                    http://baz:321/announce
        Piece Size  16 KiB
-      Piece Count  6
-       File Count  14
-            Files  torf-cli
-                   ├─CHANGELOG
-                   ├─doc
-                   │ ├─man
-                   │ │ └─man1
-                   │ │   └─torf.1
-                   │ └─manpage.md
-                   ├─LICENSE
-                   ├─Makefile
-                   ├─README.rst
-                   ├─setup.py
-                   └─torfcli
-                     ├─__init__.py
-                     ├─__main__.py
-                     ├─_config.py
-                     ├─_errors.py
-                     ├─_main.py
-                     ├─_util.py
-                     └─_vars.py
-     Torrent File  torf-cli.new.torrent
+      Piece Count  1
+       File Count  2
+            Files  doc
+                   ├─man
+                   │ └─man1
+                   │   └─torf.1
+                   └─manpage.md
+     Torrent File  doc.revised.torrent
+
+    $ torf -i doc.revised.torrent | grep '^Files'
+    Files   doc/man/man1/torf.1     doc/manpage.md
 
 Installation
 ------------
