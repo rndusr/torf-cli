@@ -18,24 +18,106 @@ can `read it here
 Example
 -------
 
-Create 'foo.torrent' with two trackers
-
 .. code:: sh
 
-    $ torf ./foo -t http://bar:123/announce -t http://baz:321/announce
+    $ torf path/to/torf-cli --private --exclude tests \
+           -t http://foo:123/announce -t http://bar:321/announce
+             Name  torf-cli
+             Size  85.79 KiB
+    Creation Date  2018-06-13 00:00:00
+          Private  yes
+         Trackers  http://foo:123/announce
+                   http://bar:321/announce
+       Piece Size  16 KiB
+      Piece Count  6
+       File Count  14
+          Exclude  tests
+            Files  torf-cli
+                   ├─CHANGELOG
+                   ├─doc
+                   │ ├─man
+                   │ │ └─man1
+                   │ │   └─torf.1
+                   │ └─manpage.md
+                   ├─LICENSE
+                   ├─Makefile
+                   ├─README.rst
+                   ├─setup.py
+                   └─torfcli
+                     ├─__init__.py
+                     ├─__main__.py
+                     ├─_config.py
+                     ├─_errors.py
+                     ├─_main.py
+                     ├─_util.py
+                     └─_vars.py
+             Path  path/to/torf-cli
+         Progress  100.00 %  |  Time: 0:00:00  |  83.99 MB/s
+        Info Hash  976b030466fb89b265ddf7cab491995f35bd9a59
+     Torrent File  torf-cli.torrent
+    $ torf -i torf-cli.torrent
+             Name  torf-cli
+        Info Hash  976b030466fb89b265ddf7cab491995f35bd9a59
+             Size  85.07 KiB
+    Creation Date  2018-06-13 00:00:00
+          Private  yes
+         Trackers  http://bar:123/announce
+                   http://baz:321/announce
+       Piece Size  16 KiB
+      Piece Count  6
+       File Count  14
+            Files  torf-cli
+                   ├─CHANGELOG
+                   ├─doc
+                   │ ├─man
+                   │ │ └─man1
+                   │ │   └─torf.1
+                   │ └─manpage.md
+                   ├─LICENSE
+                   ├─Makefile
+                   ├─README.rst
+                   ├─setup.py
+                   └─torfcli
+                     ├─__init__.py
+                     ├─__main__.py
+                     ├─_config.py
+                     ├─_errors.py
+                     ├─_main.py
+                     ├─_util.py
+                     └─_vars.py
 
-Read 'foo.torrent' and display its metainfo
-
-.. code:: sh
-
-    $ torf -i foo.torrent
-
-Read 'foo.torrent', edit its comment, remove the date and write the result to
-'bar.torrent'
-
-.. code:: sh
-
-    $ torf -i foo.torrent -c 'This torrent has changed' -D -o bar.torrent
+    $ torf -i torf-cli.torrent --comment 'Forgot to add this comment.' -o torf-cli.new.torrent
+             Name  torf-cli
+        Info Hash  976b030466fb89b265ddf7cab491995f35bd9a59
+             Size  85.07 KiB
+          Comment  Forgot to add this comment.
+    Creation Date  2018-06-13 00:00:00
+          Private  yes
+         Trackers  http://bar:123/announce
+                   http://baz:321/announce
+       Piece Size  16 KiB
+      Piece Count  6
+       File Count  14
+            Files  torf-cli
+                   ├─CHANGELOG
+                   ├─doc
+                   │ ├─man
+                   │ │ └─man1
+                   │ │   └─torf.1
+                   │ └─manpage.md
+                   ├─LICENSE
+                   ├─Makefile
+                   ├─README.rst
+                   ├─setup.py
+                   └─torfcli
+                     ├─__init__.py
+                     ├─__main__.py
+                     ├─_config.py
+                     ├─_errors.py
+                     ├─_main.py
+                     ├─_util.py
+                     └─_vars.py
+     Torrent File  torf-cli.new.torrent
 
 Installation
 ------------
