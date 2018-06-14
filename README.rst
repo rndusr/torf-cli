@@ -13,7 +13,7 @@ that give a name to a set of options.
 
 Documentation should be available as a man page after the installation, or you
 can `read it here
-<https://github.com/rndusr/torf-cli/blob/master/doc/manpage.md>`_.
+<https://github.com/rndusr/torf-cli/blob/master/doc/torf.1.asciidoc>`_.
 
 Examples
 --------
