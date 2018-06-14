@@ -97,7 +97,7 @@ _PATH_::
     hide it in display mode and don't add it in create mode.
 
 *--yes*, *-y*::
-    Answer all yes/no prompts with "``yes`".  At the moment, all this does is
+    Answer all yes/no prompts with "`yes`".  At the moment, all this does is
     overwrite _TORRENT_ without asking.
 
 *--config*, *-f* _FILE_::
