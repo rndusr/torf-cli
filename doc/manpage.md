@@ -176,7 +176,7 @@ Patterns support these wildcard characters:
 
 # CONFIGURATION FILE
 
-Configuration files list command line options with all leading "-" characters
+A configuration file lists command line options with all leading "-" characters
 removed.  If an option takes a parameter, "=" is used as a separator.  Spaces
 before and after the "=" are ignored.  The parameter may be quoted with single
 or double quotes to preserve leading and/or trailing spaces.  Lines that start
