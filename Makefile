@@ -1,6 +1,5 @@
-MANPAGE_MD ?= doc/manpage.md
-MANDIR ?= doc/man/man1
-MANPAGE ?= $(MANDIR)/torf.1
+MANPAGE_SRC ?= doc/torf.1.asciidoc
+MANPAGE ?= doc/torf.1
 
 .PHONY: clean test man release
 
@@ -15,8 +14,7 @@ test:
 	python3 -m pytest --tb no tests
 
 man:
-	mkdir -p $(MANDIR)
-	pandoc --standalone $(MANPAGE_MD) --to=man --output=$(MANPAGE)
+	asciidoctor $(MANPAGE_SRC) -o $(MANPAGE) --doctype=manpage --backend=manpage
 
 release: manpage
 	pyrelease CHANGELOG ./torfcli/_vars.py

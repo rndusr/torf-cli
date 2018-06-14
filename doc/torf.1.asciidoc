@@ -1,0 +1,264 @@
+= TORF(1)
+
+
+== NAME
+
+torf - command line tool to create, display and edit torrents
+
+
+== SYNOPSIS
+
+*torf* [_PATH_] [_OPTIONS_]
+
+
+== DESCRIPTION
+
+torf can create new torrents, display information about existing torrents, and
+edit torrents (e.g. to remove a comment or change the tracker) without
+re-hashing the content.
+
+Create: *torf* _PATH_ [_OPTIONS_] [*-o* _TORRENT_]
+
+Display: *torf* *-i* _TORRENT_
+
+Edit: *torf* *-i* _TORRENT_ [_OPTIONS_] *-o* _TORRENT_
+
+
+== OPTIONS
+
+Options that start with *--no* take precedence.
+
+_PATH_::
+    The path to the torrent's content.
+
+*--exclude*, *-e* _EXCLUDE_::
+    Exclude files from _PATH_ that match the pattern _EXCLUDE_.  This option may
+    be given multiple times.  It is ignored if _PATH_ is not a directory.  See
+    *EXCLUDING FILES*.
+
+*--in*, *-i* _TORRENT_::
+    Read metainfo from _TORRENT_.
+
+*--out*, *-o* _TORRENT_::
+    Write torrent to _TORRENT_. +
+    Default: __NAME__**.torrent**
+
+*--magnet*, *-m*::
+    Create magnet link.
+
+*--name*, *-n* _NAME_::
+    Destination file or directory when the torrent is downloaded. +
+    Default: Basename of _PATH_
+
+*--tracker*, *-t* _URL_::
+    The announce URL of a tracker.  This option may be given multiple times.
+
+*--notracker*, *-T*::
+    Remove any trackers in edit mode or hide them in display mode.
+
+*--webseed*, *-w* _URL_::
+    A webseed URL (BEP19).  This option may be given multiple times.
+
+*--nowebseed*, *-W*::
+    Remove any webseeds in edit mode or hide them in display mode.
+
+*--private*, *-p*::
+    Tell clients to use tracker(s) exclusively for peer discovery.
+
+*--noprivate*, *-P*::
+    Allow clients to use DHT and PEX for peer discovery.
+
+*--comment*, *-c* _COMMENT_::
+    A comment that is stored in the torrent file.
+
+*--nocomment*, *-C*::
+    Remove an existing comment in edit mode or hide it in display mode.
+
+*--date*, *-d* _DATE_::
+    The creation date as __YYYY__**-**__MM__**-**__DD__[
+    __HH__**:**__MM__[**:**__SS__]] *now* for local time or *today* for local
+    time at midnight. +
+    Default: *today*
+
+*--nodate*, *-D*::
+    Remove an existing creation date in edit mode or hide it in display mode.
+
+*--xseed*, *-x*::
+    Randomize the info hash to help with cross-seeding.  This simply adds an
+    *entropy* field to the *info* section of the metainfo and sets it to a
+    random integer.
+
+*--noxseed*, *-X*::
+    De-randomize a previously randomized info hash of an existing torrent.  This
+    removes the *entropy* field from the *info* section of the metainfo.
+
+*--nocreator*, *-R*::
+    Remove the name of the application that created the torrent in edit mode,
+    hide it in display mode and don't add it in create mode.
+
+*--yes*, *-y*::
+    Answer all yes/no prompts with "``yes`".  At the moment, all this does is
+    overwrite _TORRENT_ without asking.
+
+*--config*, *-f* _FILE_::
+    Read command line arguments from configuration FILE.  See *CONFIGURATION
+    FILE*. +
+    Default: __$XDG_CONFIG_HOME__**/torf/config** where _$XDG_CONFIG_HOME_
+    defaults to *~/.config*
+
+*--noconfig*, *-F*::
+    Do not use any configuration file.
+
+*--profile*, *-z* PROFILE::
+    Use predefined arguments specified in _PROFILE_.  This option may be given
+    multiple times.  See *CONFIGURATION FILE*.
+
+*--human*, *-u*::
+    Display information in human-readable output even if stdout is not a TTY.
+    See *PIPING OUTPUT*.
+
+*--nohuman*, *-U*::
+    Display information in machine-readable output even if stdout is a TTY.  See
+    *PIPING OUTPUT*.
+
+*--help*, *-h*::
+    Display a short help text and exit.
+
+*--version*, *-V*::
+    Display the version number and exit.
+
+
+== EXAMPLES
+
+Create "`foo.torrent`" with two trackers and don't store the creation date:
+
+    $ torf path/to/foo \
+           -t http://example.org:6881/announce \
+           -t http://example.com:6881/announce \
+           --nodate
+
+Read "`foo.torrent`" and print its metainfo:
+
+    $ torf -i foo.torrent
+
+Print only the name:
+
+    $ torf -i foo.torrent | grep '^Name' | cut -f2
+
+Change the comment and remove the date from "`foo.torrent`", write the result to
+"`bar.torrent`":
+
+    $ torf -i foo.torrent -c 'New comment' -D -o bar.torrent
+
+
+== EXCLUDING FILES
+
+The *--exclude* option takes a pattern that is matched against each file path
+beneath _PATH_.  Files that match are not included in the torrent.  Matching is
+case-insensitive.
+
+Each file path starts with the basename of _PATH_, e.g. if _PATH_ is
+"`/home/foo/bar`", each file path starts with "`bar/`".
+
+A file path matches if any of its directories or its file name match, e.g. the
+pattern "`foo`" matches the paths "`foo/bar/baz`", "`bar/foo/baz`" and
+"`bar/baz/foo`".
+
+A pattern must describe the full directory or file name, e.g. the pattern
+"`bar`" does not match the path "`foo/barr`", but the patterns "`bar?`" and
+"`bar*`" match.
+
+Empty directories and empty files are automatically excluded.
+
+Patterns support these wildcard characters:
+
+[cols=">,<"]
+|===
+|      *   | matches everything
+|      ?   | matches any single character
+|  [_SEQ_] | matches any character in _SEQ_
+| [!_SEQ_] | matches any character not in _SEQ_
+|===
+
+
+== CONFIGURATION FILE
+
+A configuration file lists long-form command line options with all leading "`-`"
+characters removed.  If an option takes a parameter, "`=`" is used as a
+separator.  Spaces before and after the "`=`" are ignored.  The parameter may be
+quoted with single or double quotes to preserve leading and/or trailing spaces.
+Lines that start with "`#`" are ignored.
+
+All of the options listed in the *OPTIONS* section are allowed except for
+_PATH_, *config*, *noconfig*, *profile*, *help* and *version*.
+
+
+=== Profiles
+
+A profile is a set of options bound to a name that is given to the *--profile*
+option.  In the configuration file it is specified as "`[_PROFILE NAME_]`"
+followed by a list of options.  Profiles inherit any options specified globally
+at the top of the file, but they can overload them.
+
+=== Example
+
+This is an example configuration file with some global custom defaults and the
+two profiles "`foo`" and "`bar`":
+
+----
+yes
+nodate
+exclude = *.txt
+
+[foo]
+tracker = https://foo1/announce
+tracker = https://foo2/announce
+private
+
+[bar]
+tracker = https://bar/announce
+comment = I love bar.
+----
+
+With this configuration file, these arguments are always used:
+
+    --yes
+    --nodate
+    --exclude '*.txt'
+
+If "`--profile foo`" is given, it also adds these arguments:
+
+    --tracker https://foo1/announce
+    --tracker https://foo2/announce
+    --private
+
+If "`--profile bar`" is given, it also adds these arguments:
+
+    --tracker https://bar/announce
+    --comment 'I love bar.'
+
+
+== PIPING OUTPUT
+
+If stdout is not a TTY (i.e. when output is piped) or if the *--nohuman* option
+is provided, the output format is slightly different:
+
+- Leading spaces are removed from each line.
+
+- The delimiter between label and value as well as between multiple values
+  (files, trackers, etc) is a tab character ("`\\t`" or ASCII code 0x9).
+
+- Numbers are not formatted (UNIX timestamps for times, seconds for time deltas,
+  raw bytes for sizes, etc).
+
+
+== EXIT STATUS
+
+torf returns zero on success and non-zero on failure.  You can lookup error
+codes in the output of *errno -l*.
+
+
+== REPORTING BUGS
+
+Bug reports, feature requests and poems about hedgehogs are welcome on the
+https://github.com/rndusr/torf-cli/issues[issue tracker].

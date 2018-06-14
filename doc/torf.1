@@ -1,0 +1,408 @@
+'\" t
+.\"     Title: torf
+.\"    Author: [see the "AUTHOR(S)" section]
+.\" Generator: Asciidoctor 1.5.7.1
+.\"      Date: 2018-06-14
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "TORF" "1" "2018-06-14" "\ \&" "\ \&"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.ss \n[.ss] 0
+.nh
+.ad l
+.de URL
+\fI\\$2\fP <\\$1>\\$3
+..
+.als MTO URL
+.if \n[.g] \{\
+.  mso www.tmac
+.  am URL
+.    ad l
+.  .
+.  am MTO
+.    ad l
+.  .
+.  LINKSTYLE blue R < >
+.\}
+.SH "NAME"
+torf \- command line tool to create, display and edit torrents
+.SH "SYNOPSIS"
+.sp
+\fBtorf\fP [\fIPATH\fP] [\fIOPTIONS\fP]
+.SH "DESCRIPTION"
+.sp
+torf can create new torrents, display information about existing torrents, and
+edit torrents (e.g. to remove a comment or change the tracker) without
+re\-hashing the content.
+.sp
+Create: \fBtorf\fP \fIPATH\fP [\fIOPTIONS\fP] [\fB\-o\fP \fITORRENT\fP]
+.sp
+Display: \fBtorf\fP \fB\-i\fP \fITORRENT\fP
+.sp
+Edit: \fBtorf\fP \fB\-i\fP \fITORRENT\fP [\fIOPTIONS\fP] \fB\-o\fP \fITORRENT\fP
+.SH "OPTIONS"
+.sp
+Options that start with \fB\-\-no\fP take precedence.
+.sp
+\fIPATH\fP
+.RS 4
+The path to the torrent\(cqs content.
+.RE
+.sp
+\fB\-\-exclude\fP, \fB\-e\fP \fIEXCLUDE\fP
+.RS 4
+Exclude files from \fIPATH\fP that match the pattern \fIEXCLUDE\fP.  This option may
+be given multiple times.  It is ignored if \fIPATH\fP is not a directory.  See
+\fBEXCLUDING FILES\fP.
+.RE
+.sp
+\fB\-\-in\fP, \fB\-i\fP \fITORRENT\fP
+.RS 4
+Read metainfo from \fITORRENT\fP.
+.RE
+.sp
+\fB\-\-out\fP, \fB\-o\fP \fITORRENT\fP
+.RS 4
+Write torrent to \fITORRENT\fP.
+.br
+Default: \fINAME\fP\fB.torrent\fP
+.RE
+.sp
+\fB\-\-magnet\fP, \fB\-m\fP
+.RS 4
+Create magnet link.
+.RE
+.sp
+\fB\-\-name\fP, \fB\-n\fP \fINAME\fP
+.RS 4
+Destination file or directory when the torrent is downloaded.
+.br
+Default: Basename of \fIPATH\fP
+.RE
+.sp
+\fB\-\-tracker\fP, \fB\-t\fP \fIURL\fP
+.RS 4
+The announce URL of a tracker.  This option may be given multiple times.
+.RE
+.sp
+\fB\-\-notracker\fP, \fB\-T\fP
+.RS 4
+Remove any trackers in edit mode or hide them in display mode.
+.RE
+.sp
+\fB\-\-webseed\fP, \fB\-w\fP \fIURL\fP
+.RS 4
+A webseed URL (BEP19).  This option may be given multiple times.
+.RE
+.sp
+\fB\-\-nowebseed\fP, \fB\-W\fP
+.RS 4
+Remove any webseeds in edit mode or hide them in display mode.
+.RE
+.sp
+\fB\-\-private\fP, \fB\-p\fP
+.RS 4
+Tell clients to use tracker(s) exclusively for peer discovery.
+.RE
+.sp
+\fB\-\-noprivate\fP, \fB\-P\fP
+.RS 4
+Allow clients to use DHT and PEX for peer discovery.
+.RE
+.sp
+\fB\-\-comment\fP, \fB\-c\fP \fICOMMENT\fP
+.RS 4
+A comment that is stored in the torrent file.
+.RE
+.sp
+\fB\-\-nocomment\fP, \fB\-C\fP
+.RS 4
+Remove an existing comment in edit mode or hide it in display mode.
+.RE
+.sp
+\fB\-\-date\fP, \fB\-d\fP \fIDATE\fP
+.RS 4
+The creation date as \fIYYYY\fP\fB\-\fP\fIMM\fP\fB\-\fP\fIDD\fP[
+\fIHH\fP\fB:\fP\fIMM\fP[\fB:\fP\fISS\fP]] \fBnow\fP for local time or \fBtoday\fP for local
+time at midnight.
+.br
+Default: \fBtoday\fP
+.RE
+.sp
+\fB\-\-nodate\fP, \fB\-D\fP
+.RS 4
+Remove an existing creation date in edit mode or hide it in display mode.
+.RE
+.sp
+\fB\-\-xseed\fP, \fB\-x\fP
+.RS 4
+Randomize the info hash to help with cross\-seeding.  This simply adds an
+\fBentropy\fP field to the \fBinfo\fP section of the metainfo and sets it to a
+random integer.
+.RE
+.sp
+\fB\-\-noxseed\fP, \fB\-X\fP
+.RS 4
+De\-randomize a previously randomized info hash of an existing torrent.  This
+removes the \fBentropy\fP field from the \fBinfo\fP section of the metainfo.
+.RE
+.sp
+\fB\-\-nocreator\fP, \fB\-R\fP
+.RS 4
+Remove the name of the application that created the torrent in edit mode,
+hide it in display mode and don\(cqt add it in create mode.
+.RE
+.sp
+\fB\-\-yes\fP, \fB\-y\fP
+.RS 4
+Answer all yes/no prompts with \(lq`yes\(rq.  At the moment, all this does is
+overwrite \fITORRENT\fP without asking.
+.RE
+.sp
+\fB\-\-config\fP, \fB\-f\fP \fIFILE\fP
+.RS 4
+Read command line arguments from configuration FILE.  See \fBCONFIGURATION
+FILE\fP.
+.br
+Default: \fI$XDG_CONFIG_HOME\fP\fB/torf/config\fP where \fI$XDG_CONFIG_HOME\fP
+defaults to \fB~/.config\fP
+.RE
+.sp
+\fB\-\-noconfig\fP, \fB\-F\fP
+.RS 4
+Do not use any configuration file.
+.RE
+.sp
+\fB\-\-profile\fP, \fB\-z\fP PROFILE
+.RS 4
+Use predefined arguments specified in \fIPROFILE\fP.  This option may be given
+multiple times.  See \fBCONFIGURATION FILE\fP.
+.RE
+.sp
+\fB\-\-human\fP, \fB\-u\fP
+.RS 4
+Display information in human\-readable output even if stdout is not a TTY.
+See \fBPIPING OUTPUT\fP.
+.RE
+.sp
+\fB\-\-nohuman\fP, \fB\-U\fP
+.RS 4
+Display information in machine\-readable output even if stdout is a TTY.  See
+\fBPIPING OUTPUT\fP.
+.RE
+.sp
+\fB\-\-help\fP, \fB\-h\fP
+.RS 4
+Display a short help text and exit.
+.RE
+.sp
+\fB\-\-version\fP, \fB\-V\fP
+.RS 4
+Display the version number and exit.
+.RE
+.SH "EXAMPLES"
+.sp
+Create \(lqfoo.torrent\(rq with two trackers and don\(cqt store the creation date:
+.sp
+.if n .RS 4
+.nf
+$ torf path/to/foo \(rs
+       \-t http://example.org:6881/announce \(rs
+       \-t http://example.com:6881/announce \(rs
+       \-\-nodate
+.fi
+.if n .RE
+.sp
+Read \(lqfoo.torrent\(rq and print its metainfo:
+.sp
+.if n .RS 4
+.nf
+$ torf \-i foo.torrent
+.fi
+.if n .RE
+.sp
+Print only the name:
+.sp
+.if n .RS 4
+.nf
+$ torf \-i foo.torrent | grep \(aq^Name\(aq | cut \-f2
+.fi
+.if n .RE
+.sp
+Change the comment and remove the date from \(lqfoo.torrent\(rq, write the result to
+\(lqbar.torrent\(rq:
+.sp
+.if n .RS 4
+.nf
+$ torf \-i foo.torrent \-c \(aqNew comment\(aq \-D \-o bar.torrent
+.fi
+.if n .RE
+.SH "EXCLUDING FILES"
+.sp
+The \fB\-\-exclude\fP option takes a pattern that is matched against each file path
+beneath \fIPATH\fP.  Files that match are not included in the torrent.  Matching is
+case\-insensitive.
+.sp
+Each file path starts with the basename of \fIPATH\fP, e.g. if \fIPATH\fP is
+\(lq/home/foo/bar\(rq, each file path starts with \(lqbar/\(rq.
+.sp
+A file path matches if any of its directories or its file name match, e.g. the
+pattern \(lqfoo\(rq matches the paths \(lqfoo/bar/baz\(rq, \(lqbar/foo/baz\(rq and
+\(lqbar/baz/foo\(rq.
+.sp
+A pattern must describe the full directory or file name, e.g. the pattern
+\(lqbar\(rq does not match the path \(lqfoo/barr\(rq, but the patterns \(lqbar?\(rq and
+\(lqbar*\(rq match.
+.sp
+Empty directories and empty files are automatically excluded.
+.sp
+Patterns support these wildcard characters:
+.TS
+allbox tab(:);
+lt lt.
+T{
+.sp
+*
+T}:T{
+.sp
+matches everything
+T}
+T{
+.sp
+?
+T}:T{
+.sp
+matches any single character
+T}
+T{
+.sp
+[\fISEQ\fP]
+T}:T{
+.sp
+matches any character in \fISEQ\fP
+T}
+T{
+.sp
+[!\fISEQ\fP]
+T}:T{
+.sp
+matches any character not in \fISEQ\fP
+T}
+.TE
+.sp
+.SH "CONFIGURATION FILE"
+.sp
+A configuration file lists long\-form command line options with all leading \(lq\-\(rq
+characters removed.  If an option takes a parameter, \(lq=\(rq is used as a
+separator.  Spaces before and after the \(lq=\(rq are ignored.  The parameter may be
+quoted with single or double quotes to preserve leading and/or trailing spaces.
+Lines that start with \(lq#\(rq are ignored.
+.sp
+All of the options listed in the \fBOPTIONS\fP section are allowed except for
+\fIPATH\fP, \fBconfig\fP, \fBnoconfig\fP, \fBprofile\fP, \fBhelp\fP and \fBversion\fP.
+.SS "Profiles"
+.sp
+A profile is a set of options bound to a name that is given to the \fB\-\-profile\fP
+option.  In the configuration file it is specified as \(lq[\fIPROFILE NAME\fP]\(rq
+followed by a list of options.  Profiles inherit any options specified globally
+at the top of the file, but they can overload them.
+.SS "Example"
+.sp
+This is an example configuration file with some global custom defaults and the
+two profiles \(lqfoo\(rq and \(lqbar\(rq:
+.sp
+.if n .RS 4
+.nf
+yes
+nodate
+exclude = *.txt
+
+[foo]
+tracker = https://foo1/announce
+tracker = https://foo2/announce
+private
+
+[bar]
+tracker = https://bar/announce
+comment = I love bar.
+.fi
+.if n .RE
+.sp
+With this configuration file, these arguments are always used:
+.sp
+.if n .RS 4
+.nf
+\-\-yes
+\-\-nodate
+\-\-exclude \(aq*.txt\(aq
+.fi
+.if n .RE
+.sp
+If \(lq\-\-profile foo\(rq is given, it also adds these arguments:
+.sp
+.if n .RS 4
+.nf
+\-\-tracker https://foo1/announce
+\-\-tracker https://foo2/announce
+\-\-private
+.fi
+.if n .RE
+.sp
+If \(lq\-\-profile bar\(rq is given, it also adds these arguments:
+.sp
+.if n .RS 4
+.nf
+\-\-tracker https://bar/announce
+\-\-comment \(aqI love bar.\(aq
+.fi
+.if n .RE
+.SH "PIPING OUTPUT"
+.sp
+If stdout is not a TTY (i.e. when output is piped) or if the \fB\-\-nohuman\fP option
+is provided, the output format is slightly different:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+Leading spaces are removed from each line.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+The delimiter between label and value as well as between multiple values
+(files, trackers, etc) is a tab character (\(lq\(rs\t\(rq or ASCII code 0x9).
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+Numbers are not formatted (UNIX timestamps for times, seconds for time deltas,
+raw bytes for sizes, etc).
+.RE
+.SH "EXIT STATUS"
+.sp
+torf returns zero on success and non\-zero on failure.  You can lookup error
+codes in the output of \fBerrno \-l\fP.
+.SH "REPORTING BUGS"
+.sp
+Bug reports, feature requests and poems about hedgehogs are welcome on the
+.URL "https://github.com/rndusr/torf\-cli/issues" "issue tracker" "."
