@@ -232,6 +232,14 @@ def test_edit_path_with_exclude_option(create_torrent, tmpdir, assert_torrents_e
         assert new.size == len('image data')
 
 
+def test_edit_excluded_files_without_path(create_torrent, tmpdir):
+    outfile = str(tmpdir.join('out.torrent'))
+    with create_torrent() as infile:
+        orig = torf.Torrent.read(infile)
+        with pytest.raises(MainError, match=r'^--exclude requires PATH$') as exc_info:
+            run(['-i', infile, '--exclude', 'something', '-o', outfile])
+
+
 def test_edit_name(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent() as infile:

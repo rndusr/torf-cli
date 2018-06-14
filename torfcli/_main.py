@@ -33,6 +33,10 @@ def run(args=sys.argv[1:]):
     elif cfg['version']:
         print(_config.VERSION_TEXT)
     else:
+        # Sanity checking
+        if cfg['exclude'] and not cfg['PATH']:
+            raise MainError('--exclude requires PATH', errno=errno.EINVAL)
+
         # Figure out our modus operandi
         if cfg['in']:
             if cfg['out'] or cfg['magnet']:
