@@ -172,12 +172,12 @@ Empty directories and empty files are automatically excluded.
 
 Patterns support these wildcard characters:
 
-[cols=">,<"]
+[%autowidth, frame=none, grid=none, cols=">,<"]
 |===
-|      *   | matches everything
-|      ?   | matches any single character
-|  [_SEQ_] | matches any character in _SEQ_
-| [!_SEQ_] | matches any character not in _SEQ_
+|        * |matches everything
+|        ? |matches any single character
+|  [_SEQ_] |matches any character in _SEQ_
+| [!_SEQ_] |matches any character not in _SEQ_
 |===
 
 
