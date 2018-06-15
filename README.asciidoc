@@ -10,8 +10,8 @@ tools if stdout is not a TTY.
 An optional configuration file specifies custom default options and profiles
 that give names to sets of options.
 
-Documentation is be available as a man page after (see <<Installation>>), or you
-can https://github.com/rndusr/torf-cli/blob/master/doc/torf.1.asciidoc[read it
+Documentation is available as a man page (see <<Installation>>), or you can
+https://github.com/rndusr/torf-cli/blob/master/doc/torf.1.asciidoc[read it
 here].
 
 The only depdencies are https://pypi.org/project/torf/[torf] and
