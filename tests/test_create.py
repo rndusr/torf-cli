@@ -172,21 +172,6 @@ def test_exclude_everything(capsys, mock_content):
     assert exc_info.value.errno == errno.ENODATA
 
 
-# def test_noexclude_option(capsys, mock_content):
-#     content_path = str(mock_content)
-#     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
-#     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
-
-#     run([content_path, '--exclude', '*.jpg', '--noexclude'])
-
-#     t = torf.Torrent.read(exp_torrent_filepath)
-#     assert len(tuple(t.files)) == 3
-
-#     cap = capsys.readouterr()
-#     assert 'Exclude\t' not in cap.out
-#     assert 'File Count\t3' in cap.out
-
-
 def test_name_option(capsys, mock_content):
     content_path = str(mock_content)
     name = 'Your Torrent'
