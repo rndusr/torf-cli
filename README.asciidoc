@@ -17,6 +17,7 @@ here].
 The only depdencies are https://pypi.org/project/torf/[torf] and
 https://pypi.org/project/pyxdg/[pyxdg].
 
+
 == Examples
 
 [source,sourceCode,sh]
@@ -84,10 +85,12 @@ $ torf -i doc.revised.torrent | grep '^Comment' | cut -f2
 Forgot to add this comment.
 ----
 
+
 == Installation
 
 The latest release is available on https://pypi.org/project/torf-cli[PyPI] and
 on https://aur.archlinux.org/packages/python-torf-cli/[AUR].
+
 
 === pipsi
 
@@ -107,6 +110,7 @@ page available.  But you can just
 https://github.com/rndusr/torf-cli/blob/master/doc/torf.1.asciidoc[read it in
 your browser].
 
+
 === pip
 
 The alternative is regular https://pypi.org/project/torf/[pip]:
@@ -125,10 +129,12 @@ on GitHub in the master branch.
 $ pip3 install [--user] git+https://github.com/rndusr/torf-cli.git
 ----
 
+
 == Contributing
 
 Bug reports and feature requests are welcome in the
 https://github.com/rndusr/torf-cli/issues[issue tracker].
+
 
 == License
 
