@@ -36,7 +36,6 @@ ARGUMENTS
                            files in PATH
     --in, -i TORRENT       Read metainfo from TORRENT
     --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
-    --magnet, -m           Create magnet link
     --name, -n NAME        Torrent name (default: basename of PATH)
     --tracker, -t TRACKER  Announce URL
     --webseed, -w WEBSEED  Webseed URL
@@ -53,6 +52,8 @@ ARGUMENTS
     --nodate, -D           Remove date from TORRENT
     --noxseed, -X          De-randomize info hash of TORRENT
     --nocreator, -R        Remove creator from TORRENT
+    --notorrent, -N        Don't create torrent file
+    --nomagnet, -M         Don't create magnet link
 
     --yes, -y              Answer all yes/no prompts with "yes"
     --config, -f FILE      Read configuration from FILE
@@ -77,7 +78,6 @@ _cliparser.add_argument('PATH', nargs='?')
 _cliparser.add_argument('--exclude', '-e', default=[], action='append')
 _cliparser.add_argument('--in', '-i', default='')
 _cliparser.add_argument('--out', '-o', default='')
-_cliparser.add_argument('--magnet', '-m', action='store_true')
 
 _cliparser.add_argument('--name', '-n', default='')
 _cliparser.add_argument('--tracker', '-t', default=[], action='append')
@@ -94,6 +94,8 @@ _cliparser.add_argument('--nocomment', '-C', action='store_true')
 _cliparser.add_argument('--nodate', '-D', action='store_true')
 _cliparser.add_argument('--noxseed', '-X', action='store_true')
 _cliparser.add_argument('--nocreator', '-R', action='store_true')
+_cliparser.add_argument('--notorrent', '-N', action='store_true')
+_cliparser.add_argument('--nomagnet', '-M', action='store_true')
 
 _cliparser.add_argument('--config', '-f')
 _cliparser.add_argument('--noconfig', '-F', action='store_true')

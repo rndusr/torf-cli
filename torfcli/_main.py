@@ -39,7 +39,7 @@ def run(args=sys.argv[1:]):
 
         # Figure out our modus operandi
         if cfg['in']:
-            if cfg['out'] or cfg['magnet']:
+            if cfg['out']:
                 _edit_mode(cfg)
             else:
                 _info_mode(cfg)
@@ -56,6 +56,8 @@ def _info_mode(cfg):
         raise MainError(e, errno=e.errno)
     else:
         _show_torrent_info(torrent, cfg)
+        if not cfg['nomagnet']:
+            _info('Magnet', torrent.magnet(), _util.human_readable(cfg))
 
 
 def _create_mode(cfg):
@@ -255,37 +257,34 @@ def _info(label, value, human_readable, newline=True):
 
 
 def _get_torrent_filepath(torrent, cfg):
-    if cfg['magnet'] and not cfg['out']:
-        # Create only magnet link
-        return None
-    elif cfg['out']:
+    if cfg['out']:
         # User-given torrent file path
-        torrent_filepath = cfg['out']
+        return cfg['out']
     else:
         # Default to torrent's name in cwd
-        torrent_filepath = torrent.name + '.torrent'
-    return torrent_filepath
+        return torrent.name + '.torrent'
 
 
 def _check_output_file_exists(torrent, cfg):
-    torrent_filepath = _get_torrent_filepath(torrent, cfg)
-    if torrent_filepath and os.path.exists(torrent_filepath):
-        if os.path.isdir(torrent_filepath):
-            raise MainError(f'{torrent_filepath}: {os.strerror(errno.EISDIR)}',
-                            errno=errno.EISDIR)
-        elif not cfg['yes'] and not _util.ask_yes_no(f'{torrent_filepath}: Overwrite file?', cfg, default='n'):
-            raise MainError(f'{torrent_filepath}: {os.strerror(errno.EEXIST)}',
-                            errno=errno.EEXIST)
+    if not cfg['notorrent']:
+        torrent_filepath = _get_torrent_filepath(torrent, cfg)
+        if os.path.exists(torrent_filepath):
+            if os.path.isdir(torrent_filepath):
+                raise MainError(f'{torrent_filepath}: {os.strerror(errno.EISDIR)}',
+                                errno=errno.EISDIR)
+            elif not cfg['yes'] and not _util.ask_yes_no(f'{torrent_filepath}: Overwrite file?', cfg, default='n'):
+                raise MainError(f'{torrent_filepath}: {os.strerror(errno.EEXIST)}',
+                                errno=errno.EEXIST)
 
 
 def _write_torrent(torrent, cfg):
-    torrent_filepath = _get_torrent_filepath(torrent, cfg)
     human_readable = _util.human_readable(cfg)
 
-    if cfg['magnet'] or not torrent_filepath:
+    if not cfg['nomagnet']:
         _info('Magnet', torrent.magnet(), human_readable)
 
-    if torrent_filepath:
+    if not cfg['notorrent']:
+        torrent_filepath = _get_torrent_filepath(torrent, cfg)
         try:
             torrent.write(torrent_filepath, overwrite=True)
         except torf.TorfError as e:
