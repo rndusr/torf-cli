@@ -246,7 +246,7 @@ is provided, the output format is slightly different:
 - Leading spaces are removed from each line.
 
 - The delimiter between label and value as well as between multiple values
-  (files, trackers, etc) is a tab character ("`\\t`" or ASCII code 0x9).
+  (files, trackers, etc) is a tab character ("`\t`" or ASCII code 0x9).
 
 - Numbers are not formatted (UNIX timestamps for times, seconds for time deltas,
   raw bytes for sizes, etc).
