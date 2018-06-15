@@ -50,13 +50,13 @@ _PATH_::
     The announce URL of a tracker.  This option may be given multiple times.
 
 *--notracker*, *-T*::
-    Remove any trackers in edit mode or hide them in display mode.
+    Remove trackers from an existing torrent.
 
 *--webseed*, *-w* _URL_::
     A webseed URL (BEP19).  This option may be given multiple times.
 
 *--nowebseed*, *-W*::
-    Remove any webseeds in edit mode or hide them in display mode.
+    Remove webseeds from an existing torrent.
 
 *--private*, *-p*::
     Tell clients to use tracker(s) exclusively for peer discovery.
@@ -68,7 +68,7 @@ _PATH_::
     A comment that is stored in the torrent file.
 
 *--nocomment*, *-C*::
-    Remove an existing comment in edit mode or hide it in display mode.
+    Remove the comment from an existing torrent.
 
 *--date*, *-d* _DATE_::
     The creation date as __YYYY__**-**__MM__**-**__DD__[
@@ -77,7 +77,7 @@ _PATH_::
     Default: *today*
 
 *--nodate*, *-D*::
-    Remove an existing creation date in edit mode or hide it in display mode.
+    Remove the creation date from an existing torrent.
 
 *--xseed*, *-x*::
     Randomize the info hash to help with cross-seeding.  This simply adds an
@@ -89,8 +89,8 @@ _PATH_::
     removes the *entropy* field from the *info* section of the metainfo.
 
 *--nocreator*, *-R*::
-    Remove the name of the application that created the torrent in edit mode,
-    hide it in display mode and don't add it in create mode.
+    Remove the name of the application that created the torrent from an existing
+    torrent.
 
 *--yes*, *-y*::
     Answer all yes/no prompts with "`yes`".  At the moment, all this does is
