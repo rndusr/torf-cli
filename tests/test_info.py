@@ -22,6 +22,19 @@ def test_insufficient_permissions(capsys, create_torrent):
     assert exc_info.value.errno == errno.EACCES
 
 
+def test_magnet(capsys, create_torrent, human_readable):
+    with create_torrent(name='foo') as torrent_file:
+        with human_readable(True):
+            run(['-i', torrent_file])
+            cap = capsys.readouterr()
+            assert re.search(r'^\s*Magnet  magnet:\?xt=urn:btih:[0-9a-z]{40}', cap.out, flags=re.MULTILINE)
+
+        with human_readable(False):
+            run(['-i', torrent_file])
+            cap = capsys.readouterr()
+            assert re.search(r'^Magnet\tmagnet:\?xt=urn:btih:[0-9a-z]{40}', cap.out, flags=re.MULTILINE)
+
+
 def test_name(capsys, create_torrent, human_readable):
     with create_torrent(name='foo') as torrent_file:
         with human_readable(True):
