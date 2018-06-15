@@ -252,14 +252,3 @@ def test_edit_name(create_torrent, tmpdir, assert_torrents_equal):
         assert tuple(new.files) == tuple(path.replace(orig.name, 'new name')
                                          for path in orig.files)
         assert new.filetree == {'new name': orig.filetree[orig.name]}
-
-
-def test_create_magnet(capsys, create_torrent, tmpdir, assert_torrents_equal):
-    outfile = str(tmpdir.join('out.torrent'))
-    with create_torrent() as infile:
-        orig = torf.Torrent.read(infile)
-        run(['-i', infile, '--magnet', '-o', outfile])
-        new = torf.Torrent.read(outfile)
-        assert_torrents_equal(orig, new)
-        cap = capsys.readouterr()
-        assert 'Magnet URI\tmagnet:?xt=urn:btih' in cap.out
