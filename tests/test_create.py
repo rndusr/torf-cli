@@ -271,7 +271,7 @@ def test_default_date(capsys, mock_content):
 
     cap = capsys.readouterr()
     exp_date = date.today().isoformat() + ' 00:00:00'
-    assert f'Creation Date\t{exp_date}' in cap.out
+    assert f'Created\t{exp_date}' in cap.out
 
 
 def test_date_today(capsys, mock_content):
@@ -286,7 +286,7 @@ def test_date_today(capsys, mock_content):
 
     cap = capsys.readouterr()
     exp_date = date.today().isoformat() + ' 00:00:00'
-    assert f'Creation Date\t{exp_date}' in cap.out
+    assert f'Created\t{exp_date}' in cap.out
 
 
 def test_date_now(capsys, mock_content):
@@ -302,7 +302,7 @@ def test_date_now(capsys, mock_content):
 
     cap = capsys.readouterr()
     exp_date = date.isoformat(sep=' ', timespec='seconds')
-    assert f'Creation Date\t{exp_date}' in cap.out
+    assert f'Created\t{exp_date}' in cap.out
 
 
 def test_user_given_date(capsys, mock_content):
@@ -317,7 +317,7 @@ def test_user_given_date(capsys, mock_content):
 
     cap = capsys.readouterr()
     exp_date = date(2000, 1, 2).isoformat() + ' 00:00:00'
-    assert f'Creation Date\t{exp_date}' in cap.out
+    assert f'Created\t{exp_date}' in cap.out
 
 
 def test_user_given_date_and_time(capsys, mock_content):
@@ -332,7 +332,7 @@ def test_user_given_date_and_time(capsys, mock_content):
 
     cap = capsys.readouterr()
     exp_date = datetime(2000, 1, 2, 3, 4).isoformat(sep=' ', timespec='seconds')
-    assert f'Creation Date\t{exp_date}' in cap.out
+    assert f'Created\t{exp_date}' in cap.out
 
 
 def test_user_given_date_and_time_with_seconds(capsys, mock_content):
@@ -347,7 +347,7 @@ def test_user_given_date_and_time_with_seconds(capsys, mock_content):
 
     cap = capsys.readouterr()
     exp_date = datetime(2000, 1, 2, 3, 4, 5).isoformat(sep=' ', timespec='seconds')
-    assert f'Creation Date\t{exp_date}' in cap.out
+    assert f'Created\t{exp_date}' in cap.out
 
 
 def test_invalid_date(capsys, mock_content):
@@ -371,7 +371,7 @@ def test_nodate_option(capsys, mock_content):
     assert t.creation_date == None
 
     cap = capsys.readouterr()
-    assert 'Creation Date\t' not in cap.out
+    assert 'Created\t' not in cap.out
 
 
 def test_comment_option(capsys, mock_content):

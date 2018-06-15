@@ -132,12 +132,12 @@ def test_creation_date(capsys, create_torrent, human_readable):
         with human_readable(True):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(r'^\s*Creation Date  2000-05-10 00:30:45$', cap.out, flags=re.MULTILINE)
+            assert re.search(r'^\s*Created  2000-05-10 00:30:45$', cap.out, flags=re.MULTILINE)
 
         with human_readable(False):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(r'^Creation Date\t2000-05-10 00:30:45$', cap.out, flags=re.MULTILINE)
+            assert re.search(r'^Created\t2000-05-10 00:30:45$', cap.out, flags=re.MULTILINE)
 
 
 def test_created_by(capsys, create_torrent, human_readable):
@@ -200,10 +200,10 @@ def test_trackers___multiple_trackers_per_tier(capsys, create_torrent, human_rea
             run(['-i', torrent_file])
             cap = capsys.readouterr()
             exp_trackers = '''
-     Trackers  Tier 1: http://tracker1.1
-               Tier 2: http://tracker2.1
-                       http://tracker2.2
-               Tier 3: http://tracker3.1'''
+   Trackers  Tier 1: http://tracker1.1
+             Tier 2: http://tracker2.1
+                     http://tracker2.2
+             Tier 3: http://tracker3.1'''
             assert exp_trackers in cap.out
 
         exp_trackers = ('http://tracker1.1\thttp://tracker2.1\t'
@@ -265,15 +265,15 @@ def test_file_tree_and_file_count(capsys, create_torrent, human_readable, tmpdir
             print(cap.out)
             assert re.search(f'^(\s*)File Count  4$', cap.out, flags=re.MULTILINE)
             filetree = '''
-        Files  root
-               ├─subdir1
-               │ ├─file1
-               │ └─subsubdir1.0
-               │   ├─file2
-               │   └─subsubdir1.0.0
-               │     └─file3
-               └─subdir2
-                 └─file4
+      Files  root
+             ├─subdir1
+             │ ├─file1
+             │ └─subsubdir1.0
+             │   ├─file2
+             │   └─subsubdir1.0.0
+             │     └─file3
+             └─subdir2
+               └─file4
 '''.strip()
             assert filetree in cap.out
 
