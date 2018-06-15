@@ -291,7 +291,7 @@ def _write_torrent(torrent, cfg):
         except torf.TorfError as e:
             raise MainError(e, errno=e.errno)
         else:
-            _info('Torrent File', f'{torrent_filepath}', human_readable)
+            _info('Torrent', f'{torrent_filepath}', human_readable)
 
 
 def _hash_pieces(torrent, cfg):
