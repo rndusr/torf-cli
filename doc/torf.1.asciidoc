@@ -39,8 +39,11 @@ _PATH_::
     Write torrent to _TORRENT_. +
     Default: __NAME__**.torrent**
 
-*--magnet*, *-m*::
-    Create magnet link.
+*--notorrent*, *-N*::
+    Do not create a torrent file.
+
+*--nomagnet*, *-M*::
+    Do not create a magnet link.
 
 *--name*, *-n* _NAME_::
     Destination file or directory when the torrent is downloaded. +

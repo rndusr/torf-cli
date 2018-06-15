@@ -2,12 +2,12 @@
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
 .\" Generator: Asciidoctor 1.5.7.1
-.\"      Date: 2018-06-14
+.\"      Date: 2018-06-15
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2018-06-14" "\ \&" "\ \&"
+.TH "TORF" "1" "2018-06-15" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -31,18 +31,17 @@
 torf \- command line tool to create, display and edit torrents
 .SH "SYNOPSIS"
 .sp
-\fBtorf\fP [\fIPATH\fP] [\fIOPTIONS\fP]
+\fBtorf\fP \fIPATH\fP [\fIOPTIONS\fP] [\fB\-o\fP \fITORRENT\fP]
+.br
+\fBtorf\fP \fB\-i\fP \fITORRENT\fP
+.br
+\fBtorf\fP \fB\-i\fP \fITORRENT\fP [\fIOPTIONS\fP] \fB\-o\fP \fITORRENT\fP
+.br
 .SH "DESCRIPTION"
 .sp
 torf can create new torrents, display information about existing torrents, and
 edit torrents (e.g. to remove a comment or change the tracker) without
 re\-hashing the content.
-.sp
-Create: \fBtorf\fP \fIPATH\fP [\fIOPTIONS\fP] [\fB\-o\fP \fITORRENT\fP]
-.sp
-Display: \fBtorf\fP \fB\-i\fP \fITORRENT\fP
-.sp
-Edit: \fBtorf\fP \fB\-i\fP \fITORRENT\fP [\fIOPTIONS\fP] \fB\-o\fP \fITORRENT\fP
 .SH "OPTIONS"
 .sp
 Options that start with \fB\-\-no\fP take precedence.
@@ -71,9 +70,14 @@ Write torrent to \fITORRENT\fP.
 Default: \fINAME\fP\fB.torrent\fP
 .RE
 .sp
-\fB\-\-magnet\fP, \fB\-m\fP
+\fB\-\-notorrent\fP, \fB\-N\fP
 .RS 4
-Create magnet link.
+Do not create a torrent file.
+.RE
+.sp
+\fB\-\-nomagnet\fP, \fB\-M\fP
+.RS 4
+Do not create a magnet link.
 .RE
 .sp
 \fB\-\-name\fP, \fB\-n\fP \fINAME\fP
@@ -90,7 +94,7 @@ The announce URL of a tracker.  This option may be given multiple times.
 .sp
 \fB\-\-notracker\fP, \fB\-T\fP
 .RS 4
-Remove any trackers in edit mode or hide them in display mode.
+Remove trackers from an existing torrent.
 .RE
 .sp
 \fB\-\-webseed\fP, \fB\-w\fP \fIURL\fP
@@ -100,7 +104,7 @@ A webseed URL (BEP19).  This option may be given multiple times.
 .sp
 \fB\-\-nowebseed\fP, \fB\-W\fP
 .RS 4
-Remove any webseeds in edit mode or hide them in display mode.
+Remove webseeds from an existing torrent.
 .RE
 .sp
 \fB\-\-private\fP, \fB\-p\fP
@@ -120,7 +124,7 @@ A comment that is stored in the torrent file.
 .sp
 \fB\-\-nocomment\fP, \fB\-C\fP
 .RS 4
-Remove an existing comment in edit mode or hide it in display mode.
+Remove the comment from an existing torrent.
 .RE
 .sp
 \fB\-\-date\fP, \fB\-d\fP \fIDATE\fP
@@ -134,7 +138,7 @@ Default: \fBtoday\fP
 .sp
 \fB\-\-nodate\fP, \fB\-D\fP
 .RS 4
-Remove an existing creation date in edit mode or hide it in display mode.
+Remove the creation date from an existing torrent.
 .RE
 .sp
 \fB\-\-xseed\fP, \fB\-x\fP
@@ -152,13 +156,13 @@ removes the \fBentropy\fP field from the \fBinfo\fP section of the metainfo.
 .sp
 \fB\-\-nocreator\fP, \fB\-R\fP
 .RS 4
-Remove the name of the application that created the torrent in edit mode,
-hide it in display mode and don\(cqt add it in create mode.
+Remove the name of the application that created the torrent from an existing
+torrent.
 .RE
 .sp
 \fB\-\-yes\fP, \fB\-y\fP
 .RS 4
-Answer all yes/no prompts with \(lq`yes\(rq.  At the moment, all this does is
+Answer all yes/no prompts with \(lqyes\(rq.  At the moment, all this does is
 overwrite \fITORRENT\fP without asking.
 .RE
 .sp
@@ -384,7 +388,7 @@ Leading spaces are removed from each line.
 .  IP \(bu 2.3
 .\}
 The delimiter between label and value as well as between multiple values
-(files, trackers, etc) is a tab character (\(lq\(rs\t\(rq or ASCII code 0x9).
+(files, trackers, etc) is a tab character (\(lq\(rst\(rq or ASCII code 0x9).
 .RE
 .sp
 .RS 4
