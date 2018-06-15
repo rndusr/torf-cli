@@ -6,9 +6,13 @@
   - If output is not a TTY, "Progress ..." lines are not cleared but followed by
     a newline character and the rest of the line is parsable like the other
     output.
-  - Long or multiline comments are now properly indented.
-  - --exclude patterns are now matched against each directory or the file name
-    in each file path
+  - Long or multiline torrent file comments are now properly indented.
+  - --exclude patterns are now matched against each directory/file name in a
+    path instead of just the file name.
+  - Torrent file and magnet link are now both created by default, and the
+    --magnet option was replaced by --nomagnet and --notorrent.
+  - In the output 'Magnet URI' was shortened to 'Magnet', 'Torrent File' was
+    shortened to 'Torrent' and 'Creation Date' was shortened to 'Created'.
 
 
 2018-04-08 1.1
