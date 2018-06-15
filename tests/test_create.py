@@ -23,7 +23,8 @@ def test_default_torrent_filepath(capsys, mock_content):
     assert t.created_by.startswith('torf/')
 
     cap = capsys.readouterr()
-    assert f'Torrent File\t{exp_torrent_filename}' in cap.out
+    assert f'Magnet\tmagnet:?xt=urn:btih:' in cap.out
+    assert f'Torrent\t{exp_torrent_filename}' in cap.out
     assert 'Name\tMy Torrent' in cap.out
     assert 'File Count\t3' in cap.out
     assert 'Info Hash' in cap.out
@@ -44,47 +45,8 @@ def test_user_given_torrent_filepath(capsys, mock_content):
     assert t.created_by.startswith('torf/')
 
     cap = capsys.readouterr()
-    assert f'Torrent File\t{exp_torrent_filename}' in cap.out
-    assert 'Name\tMy Torrent' in cap.out
-    assert 'File Count\t3' in cap.out
-    assert 'Info Hash' in cap.out
-    assert 'Created By\ttorf' in cap.out
-
-
-def test_create_only_magnet_link(capsys, mock_content):
-    content_path = str(mock_content)
-    run([content_path, '--magnet'])
-
-    unexp_torrent_filename = os.path.basename(content_path) + '.torrent'
-    unexp_torrent_filepath = os.path.join(os.getcwd(), unexp_torrent_filename)
-    assert not os.path.exists(unexp_torrent_filepath)
-
-    cap = capsys.readouterr()
-    assert 'Magnet URI\t' in cap.out
-    assert 'Torrent File\t' not in cap.out
-
-    assert 'Name\tMy Torrent' in cap.out
-    assert 'File Count\t3' in cap.out
-    assert 'Info Hash' in cap.out
-    assert 'Created By\ttorf' in cap.out
-
-
-def test_create_torrent_file_and_magnet_link(capsys, mock_content):
-    content_path = str(mock_content)
-    exp_torrent_filename = 'foo.torrent'
-    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
-
-    run([content_path, '--out', exp_torrent_filename, '--magnet'])
-
-    t = torf.Torrent.read(exp_torrent_filepath)
-    assert t.name == 'My Torrent'
-    assert len(tuple(t.files)) == 3
-    assert t.creation_date == datetime.combine(date.today(), time(0, 0, 0))
-    assert t.created_by.startswith('torf/')
-
-    cap = capsys.readouterr()
-    assert 'Magnet URI\t' in cap.out
-    assert f'Torrent File\t{exp_torrent_filename}' in cap.out
+    assert f'Magnet\tmagnet:?xt=urn:btih:' in cap.out
+    assert f'Torrent\t{exp_torrent_filename}' in cap.out
     assert 'Name\tMy Torrent' in cap.out
     assert 'File Count\t3' in cap.out
     assert 'Info Hash' in cap.out
@@ -114,6 +76,44 @@ def test_torrent_filepath_exists(capsys, mock_content):
 
 ### Options
 
+
+
+def test_nomagnet_option(capsys, mock_content):
+    content_path = str(mock_content)
+    run([content_path, '--nomagnet'])
+
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+    assert os.path.exists(exp_torrent_filepath)
+
+    cap = capsys.readouterr()
+    assert 'Magnet\t' not in cap.out
+    assert 'Torrent\t' in cap.out
+
+    assert 'Name\tMy Torrent' in cap.out
+    assert 'File Count\t3' in cap.out
+    assert 'Info Hash' in cap.out
+    assert 'Created By\ttorf' in cap.out
+
+
+def test_notorrent_option(capsys, mock_content):
+    content_path = str(mock_content)
+    run([content_path, '--notorrent'])
+
+    unexp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    unexp_torrent_filepath = os.path.join(os.getcwd(), unexp_torrent_filename)
+    assert not os.path.exists(unexp_torrent_filepath)
+
+    cap = capsys.readouterr()
+    assert 'Magnet\t' in cap.out
+    assert 'Torrent\t' not in cap.out
+
+    assert 'Name\tMy Torrent' in cap.out
+    assert 'File Count\t3' in cap.out
+    assert 'Info Hash' in cap.out
+    assert 'Created By\ttorf' in cap.out
+
+
 def test_yes_option(capsys, mock_content):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
@@ -129,7 +129,8 @@ def test_yes_option(capsys, mock_content):
     assert t.name == 'My Torrent'
 
     cap = capsys.readouterr()
-    assert f'Torrent File\t{exp_torrent_filename}' in cap.out
+    assert f'Magnet\tmagnet:?xt=urn:btih:' in cap.out
+    assert f'Torrent\t{exp_torrent_filename}' in cap.out
 
 
 def test_single_exclude(capsys, mock_content):
@@ -185,7 +186,7 @@ def test_name_option(capsys, mock_content):
     assert t.name == 'Your Torrent'
 
     cap = capsys.readouterr()
-    assert 'Torrent File\tYour Torrent.torrent' in cap.out
+    assert 'Torrent\tYour Torrent.torrent' in cap.out
 
 
 def test_private_option(capsys, mock_content):
