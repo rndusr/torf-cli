@@ -176,7 +176,7 @@ def _show_torrent_info(torrent, cfg):
         lines.append(('Comment', comment))
 
     if torrent.creation_date:
-        lines.append(('Creation Date', torrent.creation_date.isoformat(sep=' ', timespec='seconds')))
+        lines.append(('Created', torrent.creation_date.isoformat(sep=' ', timespec='seconds')))
     if torrent.created_by:
         lines.append(('Created By', torrent.created_by))
     lines.append(('Private', 'yes' if torrent.private else 'no'))
