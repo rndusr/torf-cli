@@ -8,7 +8,9 @@ torf - command line tool to create, display and edit torrents
 
 == SYNOPSIS
 
-*torf* [_PATH_] [_OPTIONS_]
+*torf* _PATH_ [_OPTIONS_] [*-o* _TORRENT_] +
+*torf* *-i* _TORRENT_ +
+*torf* *-i* _TORRENT_ [_OPTIONS_] *-o* _TORRENT_ +
 
 
 == DESCRIPTION
@@ -16,12 +18,6 @@ torf - command line tool to create, display and edit torrents
 torf can create new torrents, display information about existing torrents, and
 edit torrents (e.g. to remove a comment or change the tracker) without
 re-hashing the content.
-
-Create: *torf* _PATH_ [_OPTIONS_] [*-o* _TORRENT_]
-
-Display: *torf* *-i* _TORRENT_
-
-Edit: *torf* *-i* _TORRENT_ [_OPTIONS_] *-o* _TORRENT_
 
 
 == OPTIONS
