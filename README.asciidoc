@@ -20,69 +20,79 @@ https://pypi.org/project/pyxdg/[pyxdg].
 
 == Examples
 
+Create private torrent with two trackers::
+
 [source,sourceCode,sh]
 ----
 $ torf ./doc -t http://bar:123/announce -t http://baz:321/announce --private
-         Name  doc
-         Size  15.77 KiB
-Creation Date  2018-06-13 00:00:00
-      Private  yes
-     Trackers  http://bar:123/announce
-               http://baz:321/announce
-   Piece Size  16 KiB
-  Piece Count  1
-   File Count  2
-        Files  doc
-               ├─man
-               │ └─man1
-               │   └─torf.1
-               └─manpage.md
-         Path  doc
-     Progress  100.00 %  |  Time: 0:00:00  |  15.44 MB/s
-    Info Hash  f574f59b61d9b108b21cd5e4cc9036bcff55c11a
- Torrent File  doc.torrent
+       Name  doc
+       Size  16.08 KiB
+    Created  2018-06-15 00:00:00
+    Private  yes
+   Trackers  http://bar:123/announce
+             http://baz:321/announce
+ Piece Size  16 KiB
+Piece Count  2
+ File Count  2
+      Files  doc
+             ├─torf.1
+             └─torf.1.asciidoc
+       Path  doc
+   Progress  100.00 %  |  Time: 0:00:00  |  15.74 MB/s
+  Info Hash  90182f6b162d7f3b3dd0263be34d9f60dda133a8
+     Magnet  magnet:?xt=urn:btih:90182f6b162d7f3b3dd0263be34d9f60dda133a8&dn=doc&xl=16462&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
+----
 
+Display metainfo of an existing torrent::
+
+[source,sourceCode,sh]
+----
 $ torf -i doc.torrent
-         Name  doc
-    Info Hash  f574f59b61d9b108b21cd5e4cc9036bcff55c11a
-         Size  15.77 KiB
-Creation Date  2018-06-13 00:00:00
-      Private  yes
-     Trackers  http://bar:123/announce
-               http://baz:321/announce
-   Piece Size  16 KiB
-  Piece Count  1
-   File Count  2
-        Files  doc
-               ├─man
-               │ └─man1
-               │   └─torf.1
-               └─manpage.md
+       Name  doc
+  Info Hash  90182f6b162d7f3b3dd0263be34d9f60dda133a8
+       Size  16.08 KiB
+    Created  2018-06-15 00:00:00
+    Private  yes
+   Trackers  http://bar:123/announce
+             http://baz:321/announce
+ Piece Size  16 KiB
+Piece Count  2
+ File Count  2
+      Files  doc
+             ├─torf.1
+             └─torf.1.asciidoc
+     Magnet  magnet:?xt=urn:btih:90182f6b162d7f3b3dd0263be34d9f60dda133a8&dn=doc&xl=16462&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
+----
 
-$ torf -i doc.torrent | grep '^Files'
-Files   doc/man/man1/torf.1     doc/manpage.md
+Quickly add a comment to an existing torrent::
 
+[source,sourceCode,sh]
+----
 $ torf -i doc.torrent --comment 'Forgot to add this comment.' -o doc.revised.torrent
-         Name  doc
-    Info Hash  f574f59b61d9b108b21cd5e4cc9036bcff55c11a
-         Size  15.77 KiB
-      Comment  Forgot to add this comment.
-Creation Date  2018-06-13 00:00:00
-      Private  yes
-     Trackers  http://bar:123/announce
-               http://baz:321/announce
-   Piece Size  16 KiB
-  Piece Count  1
-   File Count  2
-        Files  doc
-               ├─man
-               │ └─man1
-               │   └─torf.1
-               └─manpage.md
- Torrent File  doc.revised.torrent
+       Name  doc
+  Info Hash  90182f6b162d7f3b3dd0263be34d9f60dda133a8
+       Size  16.08 KiB
+    Comment  Forgot to add this comment.
+    Created  2018-06-15 00:00:00
+    Private  yes
+   Trackers  http://bar:123/announce
+             http://baz:321/announce
+ Piece Size  16 KiB
+Piece Count  2
+ File Count  2
+      Files  doc
+             ├─torf.1
+             └─torf.1.asciidoc
+     Magnet  magnet:?xt=urn:btih:90182f6b162d7f3b3dd0263be34d9f60dda133a8&dn=doc&xl=16462&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
+    Torrent  doc.revised.torrent
+----
 
-$ torf -i doc.revised.torrent | grep '^Comment' | cut -f2
-Forgot to add this comment.
+Get a list of files::
+
+[source,sourceCode,sh]
+----
+$ torf -i doc.revised.torrent | grep '^Files' | cut -f2-
+doc/torf.1      doc/torf.1.asciidoc
 ----
 
 
