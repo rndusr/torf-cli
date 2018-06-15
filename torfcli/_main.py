@@ -283,7 +283,7 @@ def _write_torrent(torrent, cfg):
     human_readable = _util.human_readable(cfg)
 
     if cfg['magnet'] or not torrent_filepath:
-        _info('Magnet URI', torrent.magnet(), human_readable)
+        _info('Magnet', torrent.magnet(), human_readable)
 
     if torrent_filepath:
         try:
