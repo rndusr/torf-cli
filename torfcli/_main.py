@@ -232,7 +232,7 @@ def _show_torrent_info(torrent, cfg):
         _info(label, value, human_readable)
 
 
-_INFO_LABEL_WIDTH = 13
+_INFO_LABEL_WIDTH = 11
 def _info(label, value, human_readable, newline=True):
     if human_readable:
         # Make output human-readable
