@@ -191,6 +191,10 @@ Lines that start with "`#`" are ignored.
 All of the options listed in the *OPTIONS* section are allowed except for
 _PATH_, *config*, *noconfig*, *profile*, *help* and *version*.
 
+There is rudimental support for environment variables in parameters. As usual,
+"`$FOO`" or "`${FOO}`" will be replaced by the value of *FOO*, "`$`" is escaped
+with "`\`" and a literal "`\`" is represented by "`\\`".  More complex string
+manipulation syntax is not supported.
 
 === Profiles
 
