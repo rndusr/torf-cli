@@ -1,7 +1,9 @@
 from torfcli._main import run
 from torfcli._errors import ConfigError
 import pytest
+from unittest import mock
 import textwrap
+import os
 
 
 def test_default_configfile_doesnt_exist(cfgfile, mock_content, mock_create_mode):
@@ -105,3 +107,94 @@ def test_illegal_configfile_arguments(cfgfile, mock_content, mock_create_mode):
         with pytest.raises(ConfigError, match=f'^{str(cfgfile)}: Not allowed in config file: {arg}$'):
             run(['--config', str(cfgfile), str(mock_content)])
         assert mock_create_mode.call_args is None
+
+
+def test_environment_variable_resolution(cfgfile, mock_content, mock_create_mode):
+    cfgfile.write(textwrap.dedent('''
+    tracker = https://$DOMAIN:$PORT${PATH}
+    date = $DATE
+    comment = $UNDEFINED
+    '''))
+
+    with mock.patch.dict(os.environ, {'DOMAIN': 'tracker.example.org',
+                                      'PORT': '123',
+                                      'PATH': '/announce',
+                                      'DATE': '1999-12-31'}):
+        run([str(mock_content)])
+        cfg = mock_create_mode.call_args[0][0]
+        assert cfg['tracker'] == ['https://tracker.example.org:123/announce']
+        assert cfg['date'] == '1999-12-31'
+        assert cfg['comment'] == '$UNDEFINED'
+
+
+def test_environment_variable_resolution_in_profile(cfgfile, mock_content, mock_create_mode):
+    cfgfile.write(textwrap.dedent('''
+    [foo]
+    tracker = https://$DOMAIN:${PORT}/$PATH
+    date = $DATE
+    comment = $UNDEFINED
+    '''))
+
+    with mock.patch.dict(os.environ, {'DOMAIN': 'tracker.example.org',
+                                      'PORT': '123',
+                                      'PATH': 'announce',
+                                      'DATE': '1999-12-31'}):
+        run([str(mock_content), '--profile', 'foo'])
+        cfg = mock_create_mode.call_args[0][0]
+        assert cfg['tracker'] == ['https://tracker.example.org:123/announce']
+        assert cfg['date'] == '1999-12-31'
+        assert cfg['comment'] == '$UNDEFINED'
+
+
+def test_escaping_dollar(cfgfile, mock_content, mock_create_mode):
+    cfgfile.write(textwrap.dedent('''
+    [one]
+    comment = \\$COMMENT
+    [two]
+    comment = \\\\$COMMENT
+    [three]
+    comment = \\\\\\$COMMENT
+    [four]
+    comment = \\\\\\\\$COMMENT
+    [five]
+    comment = \\\\\\\\\\$COMMENT
+    [six]
+    comment = \\\\\\\\\\\\$COMMENT
+    [seven]
+    comment = \\\\\\\\\\\\\\$COMMENT
+    '''))
+
+    with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
+        run([str(mock_content), '--profile', 'one'])
+        cfg = mock_create_mode.call_args[0][0]
+        assert cfg['comment'] == '$COMMENT'
+
+    with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
+        run([str(mock_content), '--profile', 'two'])
+        cfg = mock_create_mode.call_args[0][0]
+        assert cfg['comment'] == '\\The comment.'
+
+    with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
+        run([str(mock_content), '--profile', 'three'])
+        cfg = mock_create_mode.call_args[0][0]
+        assert cfg['comment'] == '\\$COMMENT'
+
+    with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
+        run([str(mock_content), '--profile', 'four'])
+        cfg = mock_create_mode.call_args[0][0]
+        assert cfg['comment'] == '\\\\The comment.'
+
+    with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
+        run([str(mock_content), '--profile', 'five'])
+        cfg = mock_create_mode.call_args[0][0]
+        assert cfg['comment'] == '\\\\$COMMENT'
+
+    with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
+        run([str(mock_content), '--profile', 'six'])
+        cfg = mock_create_mode.call_args[0][0]
+        assert cfg['comment'] == '\\\\\\The comment.'
+
+    with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
+        run([str(mock_content), '--profile', 'seven'])
+        cfg = mock_create_mode.call_args[0][0]
+        assert cfg['comment'] == '\\\\\\$COMMENT'
