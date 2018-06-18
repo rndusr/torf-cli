@@ -129,12 +129,10 @@ def get_cfg(cliargs):
         if isinstance(cfg, dict):
             _check_illegal_configfile_arguments(cfg, cfgfile)
 
-    # Prepend arguments from file to CLI arguments
-    args = _cfg2args(filecfg) + cliargs
-
-    # Parse combined arguments from config file and CLI
+    # Parse combined arguments from config file and CLI to allow --profile in
+    # CLI and config file
     try:
-        cfg = parse_args(args)
+        cfg = parse_args(_cfg2args(filecfg) + cliargs)
     except _errors.CLIError as e:
         raise _errors.ConfigError(f'{cfgfile}: {e}', errno=e.errno)
 
@@ -151,7 +149,7 @@ def get_cfg(cliargs):
         apply_profile(profname)
 
     # Combine arguments from profiles with arguments from global config and CLI
-    args = profargs + args
+    args = _cfg2args(filecfg) + profargs + cliargs
     try:
         return parse_args(args)
     except _errors.CLIError as e:
