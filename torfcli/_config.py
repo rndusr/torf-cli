@@ -162,7 +162,6 @@ def _check_illegal_configfile_arguments(cfg, cfgfile):
                                       errno=errno.EINVAL)
 
 
-
 _re_bool = re.compile(r'^(\S+)$')
 _re_assign = re.compile(r'^(\S+)\s*=\s*(.*)\s*$')
 
@@ -207,6 +206,8 @@ def _readfile(filepath):
                 if value[0] == value[-1] == '"' or value[0] == value[-1] == "'":
                     value = value[1:-1]
 
+            value = _resolve_envvars(value)
+
             # Multiple occurences of the same name turn its value into a list
             if name in subcfg:
                 if not isinstance(subcfg[name], list):
@@ -218,6 +219,23 @@ def _readfile(filepath):
             continue
 
     return cfg
+
+
+def _resolve_envvars(string):
+    def resolve(m):
+        # The string of \ chars is halfed because every \ escapes the next \.
+        esc_count = len(m.group(1))
+        esc_str = int(esc_count / 2) * '\\'
+        varname = m.group(2) or m.group(3)
+        value =  os.environ.get(varname, '$'+varname)
+        # Uneven number of \ means $varname is escaped, even number of \ means
+        # it is not.
+        if esc_count and esc_count % 2 != 0:
+            return f'{esc_str}${varname}'
+        else:
+            return f'{esc_str}{value}'
+    regex = re.compile(r'(\\*)\$(?:(\w+)|\{(\w+)\})')
+    return regex.sub(resolve, string)
 
 
 def _cfg2args(cfg):
