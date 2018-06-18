@@ -108,7 +108,7 @@ _PATH_::
 *--noconfig*, *-F*::
     Do not use any configuration file.
 
-*--profile*, *-z* PROFILE::
+*--profile*, *-z* _PROFILE_::
     Use predefined arguments specified in _PROFILE_.  This option may be given
     multiple times.  See *CONFIGURATION FILE*.
 
