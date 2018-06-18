@@ -2,12 +2,12 @@
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
 .\" Generator: Asciidoctor 1.5.7.1
-.\"      Date: 2018-06-15
+.\"      Date: 2018-06-18
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2018-06-15" "\ \&" "\ \&"
+.TH "TORF" "1" "2018-06-18" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -180,7 +180,7 @@ defaults to \fB~/.config\fP
 Do not use any configuration file.
 .RE
 .sp
-\fB\-\-profile\fP, \fB\-z\fP PROFILE
+\fB\-\-profile\fP, \fB\-z\fP \fIPROFILE\fP
 .RS 4
 Use predefined arguments specified in \fIPROFILE\fP.  This option may be given
 multiple times.  See \fBCONFIGURATION FILE\fP.
@@ -307,6 +307,12 @@ Lines that start with \(lq#\(rq are ignored.
 .sp
 All of the options listed in the \fBOPTIONS\fP section are allowed except for
 \fIPATH\fP, \fBconfig\fP, \fBnoconfig\fP, \fBprofile\fP, \fBhelp\fP and \fBversion\fP.
+.sp
+There is rudimental support for environment variables in parameters. As usual,
+\(lq$FOO\(rq or \(lq${FOO}\(rq will be replaced with the value of \fBFOO\fP, \(lq$\(rq is
+escaped with \(lq\(rs\(rq and a literal \(lq\(rs\(rq is represented by \(lq\(rs\\(rq.  More complex
+string manipulation syntax (e.g. \(lq${FOO:3}\(rq to cut off the first three
+characters) is not supported.
 .SS "Profiles"
 .sp
 A profile is a set of options bound to a name that is given to the \fB\-\-profile\fP
