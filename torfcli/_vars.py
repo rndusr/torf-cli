@@ -9,7 +9,7 @@
 # GNU General Public License for more details
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
-__version__     = '1.2'
+__version__     = '2.0'
 __appname__     = 'torf'
 __url__         = 'https://github.com/rndusr/torf-cli'
 __description__ = 'CLI tool to create, read and edit torrent files'
