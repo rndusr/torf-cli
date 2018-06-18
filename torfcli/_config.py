@@ -198,15 +198,16 @@ def _readfile(filepath):
             subcfg[name] = True
             continue
 
-        # Option with a custom value
+        # String option
         assign_match = _re_assign.match(line)
         if assign_match:
             name = assign_match.group(1)
             value = assign_match.group(2).strip()
 
             # Strip off optional quotes
-            if value[0] == value[-1] == '"' or value[0] == value[-1] == "'":
-                value = value[1:-1]
+            if value:
+                if value[0] == value[-1] == '"' or value[0] == value[-1] == "'":
+                    value = value[1:-1]
 
             # Multiple occurences of the same name turn its value into a list
             if name in subcfg:

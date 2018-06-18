@@ -22,6 +22,14 @@ def test_options_with_single_values(cfgfile):
     assert cfg == {'foo': '1', 'bar': 'two'}
 
 
+def test_options_with_empty_value(cfgfile):
+    cfgfile.write(textwrap.dedent('''
+    foo =
+    '''))
+    cfg = _readfile(cfgfile)
+    assert cfg == {'foo': ''}
+
+
 def test_options_with_list_values(cfgfile):
     cfgfile.write(textwrap.dedent('''
     foo = 1
