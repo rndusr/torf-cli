@@ -193,7 +193,7 @@ _PATH_, *config*, *noconfig*, *profile*, *help* and *version*.
 
 There is rudimental support for environment variables in parameters. As usual,
 "`$FOO`" or "`${FOO}`" will be replaced with the value of *FOO*, "`$`" is
-escaped with "`\`" and a literal "`\`" is represented by "`\\`".  More complex
+escaped with "`\`" and a literal "`\`" is represented by two "`\`".  More complex
 string manipulation syntax (e.g. "`${FOO:3}`" to cut off the first three
 characters) is not supported.
 
