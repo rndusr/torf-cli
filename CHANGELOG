@@ -13,6 +13,7 @@
     --magnet option was replaced by --nomagnet and --notorrent.
   - In the output 'Magnet URI' was shortened to 'Magnet', 'Torrent File' was
     shortened to 'Torrent' and 'Creation Date' was shortened to 'Created'.
+  - The default for --date was changed from 'today' to 'now'.
 
 
 2018-04-08 1.1
