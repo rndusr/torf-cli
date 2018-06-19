@@ -42,7 +42,7 @@ ARGUMENTS
     --private, -p          Forbid clients to use DHT and PEX
     --comment, -c COMMENT  Comment that is stored in TORRENT
     --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now'
-                           or 'today' (default: 'today')
+                           or 'today' (default: 'now')
     --xseed, -x            Randomize info hash
 
     --notracker, -T        Remove trackers from TORRENT

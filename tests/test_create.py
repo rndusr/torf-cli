@@ -19,7 +19,7 @@ def test_default_torrent_filepath(capsys, mock_content):
     t = torf.Torrent.read(exp_torrent_filepath)
     assert t.name == 'My Torrent'
     assert len(tuple(t.files)) == 3
-    assert t.creation_date == datetime.combine(date.today(), time(0, 0, 0))
+    assert t.creation_date == datetime.today().replace(microsecond=0)
     assert t.created_by.startswith('torf/')
 
     cap = capsys.readouterr()
@@ -41,7 +41,7 @@ def test_user_given_torrent_filepath(capsys, mock_content):
     t = torf.Torrent.read(exp_torrent_filepath)
     assert t.name == 'My Torrent'
     assert len(tuple(t.files)) == 3
-    assert t.creation_date == datetime.combine(date.today(), time(0, 0, 0))
+    assert t.creation_date == datetime.today().replace(microsecond=0)
     assert t.created_by.startswith('torf/')
 
     cap = capsys.readouterr()
@@ -267,10 +267,10 @@ def test_default_date(capsys, mock_content):
     run([content_path])
 
     t = torf.Torrent.read(exp_torrent_filepath)
-    assert t.creation_date == datetime.combine(date.today(), time(0, 0, 0))
+    assert t.creation_date == datetime.today().replace(microsecond=0)
 
     cap = capsys.readouterr()
-    exp_date = date.today().isoformat() + ' 00:00:00'
+    exp_date = datetime.today().replace(microsecond=0).isoformat(sep=' ')
     assert f'Created\t{exp_date}' in cap.out
 
 

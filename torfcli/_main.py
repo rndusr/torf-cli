@@ -78,7 +78,7 @@ def _create_mode(cfg):
 
     if not cfg['nodate']:
         try:
-            torrent.creation_date = _util.parse_date(cfg['date'] or 'today')
+            torrent.creation_date = _util.parse_date(cfg['date'] or 'now')
         except ValueError:
             raise MainError(f'{cfg["date"]}: Invalid date', errno=errno.EINVAL)
 

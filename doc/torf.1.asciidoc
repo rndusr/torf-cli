@@ -74,9 +74,9 @@ _PATH_::
     Remove the comment from an existing torrent.
 
 *--date*, *-d* _DATE_::
-    The creation date as __YYYY__**-**__MM__**-**__DD__[
-    __HH__**:**__MM__[**:**__SS__]] *now* for local time or *today* for local
-    time at midnight. +
+    The creation date in the format __YYYY__**-**__MM__**-**__DD__[
+    __HH__**:**__MM__[**:**__SS__]], *now* for the current time or *today* for
+    the current time at midnight. +
     Default: *today*
 
 *--nodate*, *-D*::
