@@ -115,7 +115,8 @@ the executable to `~/.local/bin/`.
 [source,sourceCode,sh]
 ----
 $ pipsi install torf-cli
-$ pipsi uninstall torf-cli
+$ pipsi upgrade torf-cli
+$ pipsi uninstall torf-cli  # Also removes dependencies
 ----
 
 The only drawback is that, at the time of writing, pipsi doesn't make the man
@@ -125,7 +126,8 @@ https://rndusr.github.io/torf-cli/torf.1.html[read it in your browser].
 
 === pip
 
-The alternative is regular https://pypi.org/project/torf/[pip]:
+The alternative is regular https://pypi.org/project/torf/[pip], but if you
+decide to uninstall, you have to manually uninstall the dependencies.
 
 [source,sourceCode,sh]
 ----
