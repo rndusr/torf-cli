@@ -13,6 +13,7 @@ clean:
 
 test:
 	python3 -m pytest --tb no tests
+	python3 setup.py check -r -s >/dev/null
 
 man:
 	asciidoctor $(MANPAGE_SRC) -o $(MANPAGE) --doctype=manpage --backend=manpage
