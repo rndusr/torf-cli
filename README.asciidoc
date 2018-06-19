@@ -11,7 +11,7 @@ An optional configuration file specifies custom default options and profiles
 that give names to sets of options.
 
 Documentation is available as a man page (see <<Installation>>), or you can
-https://github.com/rndusr/torf-cli/blob/master/doc/torf.1.html[read it here].
+https://rndusr.github.io/torf-cli/torf.1.html[read it here].
 
 The only depdencies are https://pypi.org/project/torf/[torf] and
 https://pypi.org/project/pyxdg/[pyxdg].
@@ -23,75 +23,79 @@ Create private torrent with two trackers::
 
 [source,sourceCode,sh]
 ----
-$ torf ./doc -t http://bar:123/announce -t http://baz:321/announce --private
-       Name  doc
-       Size  16.08 KiB
-    Created  2018-06-15 00:00:00
+$ torf ./docs -t http://bar:123/announce -t http://baz:321/announce --private
+       Name  docs
+       Size  60.1 KiB
+    Created  2018-06-19 14:47:26
     Private  yes
    Trackers  http://bar:123/announce
              http://baz:321/announce
  Piece Size  16 KiB
-Piece Count  2
- File Count  2
-      Files  doc
+Piece Count  4
+ File Count  3
+      Files  docs
              ├─torf.1
-             └─torf.1.asciidoc
-       Path  doc
-   Progress  100.00 %  |  Time: 0:00:00  |  15.74 MB/s
-  Info Hash  90182f6b162d7f3b3dd0263be34d9f60dda133a8
-     Magnet  magnet:?xt=urn:btih:90182f6b162d7f3b3dd0263be34d9f60dda133a8&dn=doc&xl=16462&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
+             ├─torf.1.asciidoc
+             └─torf.1.html
+       Path  docs
+   Progress  100.00 %  |  Time: 0:00:00  |  58.84 MB/s
+  Info Hash  215f506179b6526b582e4fb78ebc24dd1f2a791f
+     Magnet  magnet:?xt=urn:btih:215f506179b6526b582e4fb78ebc24dd1f2a791f&dn=docs&xl=61542&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
+    Torrent  docs.torrent
 ----
 
 Display metainfo of an existing torrent::
 
 [source,sourceCode,sh]
 ----
-$ torf -i doc.torrent
-       Name  doc
-  Info Hash  90182f6b162d7f3b3dd0263be34d9f60dda133a8
-       Size  16.08 KiB
-    Created  2018-06-15 00:00:00
+$ torf -i docs.torrent
+       Name  docs
+  Info Hash  215f506179b6526b582e4fb78ebc24dd1f2a791f
+       Size  60.1 KiB
+    Created  2018-06-19 14:47:26
     Private  yes
    Trackers  http://bar:123/announce
              http://baz:321/announce
  Piece Size  16 KiB
-Piece Count  2
- File Count  2
-      Files  doc
+Piece Count  4
+ File Count  3
+      Files  docs
              ├─torf.1
-             └─torf.1.asciidoc
-     Magnet  magnet:?xt=urn:btih:90182f6b162d7f3b3dd0263be34d9f60dda133a8&dn=doc&xl=16462&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
+             ├─torf.1.asciidoc
+             └─torf.1.html
+     Magnet  magnet:?xt=urn:btih:215f506179b6526b582e4fb78ebc24dd1f2a791f&dn=docs&xl=61542&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
 ----
 
 Quickly add a comment to an existing torrent::
 
 [source,sourceCode,sh]
 ----
-$ torf -i doc.torrent --comment 'Forgot to add this comment.' -o doc.revised.torrent
-       Name  doc
-  Info Hash  90182f6b162d7f3b3dd0263be34d9f60dda133a8
-       Size  16.08 KiB
+$ torf -i docs.torrent --comment 'Forgot to add this comment.' -o docs.revised.torrent
+       Name  docs
+  Info Hash  215f506179b6526b582e4fb78ebc24dd1f2a791f
+       Size  60.1 KiB
     Comment  Forgot to add this comment.
-    Created  2018-06-15 00:00:00
+    Created  2018-06-19 14:47:26
     Private  yes
    Trackers  http://bar:123/announce
              http://baz:321/announce
  Piece Size  16 KiB
-Piece Count  2
- File Count  2
-      Files  doc
+Piece Count  4
+ File Count  3
+      Files  docs
              ├─torf.1
-             └─torf.1.asciidoc
-     Magnet  magnet:?xt=urn:btih:90182f6b162d7f3b3dd0263be34d9f60dda133a8&dn=doc&xl=16462&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
-    Torrent  doc.revised.torrent
+             ├─torf.1.asciidoc
+             └─torf.1.html
+     Magnet  magnet:?xt=urn:btih:215f506179b6526b582e4fb78ebc24dd1f2a791f&dn=docs&xl=61542&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
+    Torrent  docs.revised.torrent
 ----
 
 Get a list of files::
 
 [source,sourceCode,sh]
 ----
-$ torf -i doc.revised.torrent | grep '^Files' | cut -f2-
-doc/torf.1      doc/torf.1.asciidoc
+$ torf -i docs.revised.torrent | grep '^Files' | cut -f2-
+docs/torf.1     docs/torf.1.asciidoc    docs/torf.1.html
 ----
 
 
@@ -116,8 +120,7 @@ $ pipsi uninstall torf-cli
 
 The only drawback is that, at the time of writing, pipsi doesn't make the man
 page available.  But you can just
-https://github.com/rndusr/torf-cli/blob/master/doc/torf.1.html[read it in your
-browser].
+https://rndusr.github.io/torf-cli/torf.1.html[read it in your browser].
 
 
 === pip
