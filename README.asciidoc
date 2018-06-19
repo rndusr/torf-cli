@@ -11,8 +11,7 @@ An optional configuration file specifies custom default options and profiles
 that give names to sets of options.
 
 Documentation is available as a man page (see <<Installation>>), or you can
-https://github.com/rndusr/torf-cli/blob/master/doc/torf.1.asciidoc[read it
-here].
+https://github.com/rndusr/torf-cli/blob/master/doc/torf.1.html[read it here].
 
 The only depdencies are https://pypi.org/project/torf/[torf] and
 https://pypi.org/project/pyxdg/[pyxdg].
@@ -117,8 +116,8 @@ $ pipsi uninstall torf-cli
 
 The only drawback is that, at the time of writing, pipsi doesn't make the man
 page available.  But you can just
-https://github.com/rndusr/torf-cli/blob/master/doc/torf.1.asciidoc[read it in
-your browser].
+https://github.com/rndusr/torf-cli/blob/master/doc/torf.1.html[read it in your
+browser].
 
 
 === pip
