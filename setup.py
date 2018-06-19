@@ -25,7 +25,7 @@ setup(
     install_requires   = ['torf>=1.4', 'pyxdg'],
 
     entry_points       = { 'console_scripts': [ 'torf = torfcli:run' ] },
-    data_files         = [('share/man/man1', ['doc/torf.1'])],
+    data_files         = [('share/man/man1', ['docs/torf.1'])],
 
     classifiers        = [
         'Development Status :: 5 - Production/Stable',

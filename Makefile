@@ -1,6 +1,6 @@
-MANPAGE ?= doc/torf.1
-MANPAGE_HTML ?= doc/torf.1.html
-MANPAGE_SRC ?= doc/torf.1.asciidoc
+MANPAGE ?= docs/torf.1
+MANPAGE_HTML ?= docs/torf.1.html
+MANPAGE_SRC ?= docs/torf.1.asciidoc
 
 .PHONY: clean test man release
 
