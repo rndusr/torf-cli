@@ -1,4 +1,4 @@
-2018-05-?? 1.2
+2018-06-19 2.0
   - Support for default arguments and special profiles in ~/.config/torf/config
     or any file specified by --config or -f.
   - Use \e[0E instead of \e[1` to clear the line when showing progress.
