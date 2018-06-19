@@ -2,12 +2,12 @@
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
 .\" Generator: Asciidoctor 1.5.7.1
-.\"      Date: 2018-06-18
+.\"      Date: 2018-06-19
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2018-06-18" "\ \&" "\ \&"
+.TH "TORF" "1" "2018-06-19" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -129,9 +129,9 @@ Remove the comment from an existing torrent.
 .sp
 \fB\-\-date\fP, \fB\-d\fP \fIDATE\fP
 .RS 4
-The creation date as \fIYYYY\fP\fB\-\fP\fIMM\fP\fB\-\fP\fIDD\fP[
-\fIHH\fP\fB:\fP\fIMM\fP[\fB:\fP\fISS\fP]] \fBnow\fP for local time or \fBtoday\fP for local
-time at midnight.
+The creation date in the format \fIYYYY\fP\fB\-\fP\fIMM\fP\fB\-\fP\fIDD\fP[
+\fIHH\fP\fB:\fP\fIMM\fP[\fB:\fP\fISS\fP]], \fBnow\fP for the current time or \fBtoday\fP for
+the current time at midnight.
 .br
 Default: \fBtoday\fP
 .RE
@@ -309,10 +309,10 @@ All of the options listed in the \fBOPTIONS\fP section are allowed except for
 \fIPATH\fP, \fBconfig\fP, \fBnoconfig\fP, \fBprofile\fP, \fBhelp\fP and \fBversion\fP.
 .sp
 There is rudimental support for environment variables in parameters. As usual,
-\(lq$FOO\(rq or \(lq${FOO}\(rq will be replaced with the value of \fBFOO\fP, \(lq$\(rq is
-escaped with \(lq\(rs\(rq and a literal \(lq\(rs\(rq is represented by two \(lq\(rs\\(rq.  More complex
-string manipulation syntax (e.g. \(lq${FOO:3}\(rq to cut off the first three
-characters) is not supported.
+\(lq$FOO\(rq or \(lq${FOO}\(rq will be replaced with the value of the variable \fBFOO\fP,
+\(lq$\(rq is escaped with \(lq\(rs\(rq (backslash) and a literal \(lq\(rs\(rq is represented by
+two \(lq\(rs\(rq.  More complex string manipulation syntax (e.g. \(lq${FOO:3}\(rq) is not
+supported.
 .SS "Profiles"
 .sp
 A profile is a set of options bound to a name that is given to the \fB\-\-profile\fP
