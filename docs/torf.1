@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
-.\" Generator: Asciidoctor 1.5.7.1
-.\"      Date: 2018-06-19
+.\" Generator: Asciidoctor 1.5.8
+.\"      Date: 2019-02-09
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2018-06-19" "\ \&" "\ \&"
+.TH "TORF" "1" "2019-02-09" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -133,12 +133,23 @@ The creation date in the format \fIYYYY\fP\fB\-\fP\fIMM\fP\fB\-\fP\fIDD\fP[
 \fIHH\fP\fB:\fP\fIMM\fP[\fB:\fP\fISS\fP]], \fBnow\fP for the current time or \fBtoday\fP for
 the current time at midnight.
 .br
-Default: \fBtoday\fP
+Default: \fBnow\fP
 .RE
 .sp
 \fB\-\-nodate\fP, \fB\-D\fP
 .RS 4
 Remove the creation date from an existing torrent.
+.RE
+.sp
+\fB\-\-source\fP, \fB\-s\fP \fISOURCE\fP
+.RS 4
+Add a \fBsource\fP field to the torrent file.  This is usually used to make the
+torrent\(cqs info hash unique per tracker.
+.RE
+.sp
+\fB\-\-nosource\fP, \fB\-S\fP
+.RS 4
+Remove the "source" field from an existing torrent.
 .RE
 .sp
 \fB\-\-xseed\fP, \fB\-x\fP
