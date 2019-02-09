@@ -1,3 +1,10 @@
+2018-06-19 3.0
+  - Fixed "--exclude requires PATH" error when editing a torrent with global
+    "exclude" options in the config file.
+  - New options: --source to add a "source" field to the torrent and --nosource
+    to remove it from an existing torrent.
+
+
 2018-06-19 2.0
   - Support for default arguments and special profiles in ~/.config/torf/config
     or any file specified by --config or -f.
