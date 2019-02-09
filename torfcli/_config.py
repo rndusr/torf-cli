@@ -43,6 +43,7 @@ ARGUMENTS
     --comment, -c COMMENT  Comment that is stored in TORRENT
     --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now'
                            or 'today' (default: 'now')
+    --source, -s SOURCE    Add "source" field
     --xseed, -x            Randomize info hash
 
     --notracker, -T        Remove trackers from TORRENT
@@ -50,6 +51,7 @@ ARGUMENTS
     --noprivate, -P        Remove private flag from TORRENT
     --nocomment, -C        Remove comment from TORRENT
     --nodate, -D           Remove date from TORRENT
+    --nosource, -S         Remove "source" field from TORRENT
     --noxseed, -X          De-randomize info hash of TORRENT
     --nocreator, -R        Remove creator from TORRENT
     --notorrent, -N        Don't create torrent file
@@ -85,6 +87,7 @@ _cliparser.add_argument('--webseed', '-w', default=[], action='append')
 _cliparser.add_argument('--private', '-p', action='store_true')
 _cliparser.add_argument('--comment', '-c', default='')
 _cliparser.add_argument('--date', '-d', default='')
+_cliparser.add_argument('--source', '-s', default='')
 _cliparser.add_argument('--xseed', '-x', action='store_true')
 
 _cliparser.add_argument('--notracker', '-T', action='store_true')
@@ -92,6 +95,7 @@ _cliparser.add_argument('--nowebseed', '-W', action='store_true')
 _cliparser.add_argument('--noprivate', '-P', action='store_true')
 _cliparser.add_argument('--nocomment', '-C', action='store_true')
 _cliparser.add_argument('--nodate', '-D', action='store_true')
+_cliparser.add_argument('--nosource', '-S', action='store_true')
 _cliparser.add_argument('--noxseed', '-X', action='store_true')
 _cliparser.add_argument('--nocreator', '-R', action='store_true')
 _cliparser.add_argument('--notorrent', '-N', action='store_true')

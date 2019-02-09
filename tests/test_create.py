@@ -217,6 +217,34 @@ def test_noprivate_option(capsys, mock_content):
     assert 'Private\tno' in cap.out
 
 
+def test_source_option(capsys, mock_content):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    run([content_path, '--source', 'SOURCE'])
+
+    t = torf.Torrent.read(exp_torrent_filepath)
+    assert t.source == 'SOURCE'
+
+    cap = capsys.readouterr()
+    assert 'Source\tSOURCE' in cap.out
+
+
+def test_nosource_option(capsys, mock_content):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    run([content_path, '--source', 'SOURCE', '--nosource'])
+
+    t = torf.Torrent.read(exp_torrent_filepath)
+    assert t.source is None
+
+    cap = capsys.readouterr()
+    assert 'Source\t' not in cap.out
+
+
 def test_xseed_option(capsys, mock_content):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'

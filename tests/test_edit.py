@@ -83,6 +83,23 @@ def test_add_private(create_torrent, tmpdir, assert_torrents_equal):
         assert_torrents_equal(orig, new, private=True)
 
 
+def test_edit_source(create_torrent, tmpdir, assert_torrents_equal):
+    outfile = str(tmpdir.join('out.torrent'))
+    with create_torrent(source='the source') as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile, '--source', 'another source', '-o', outfile])
+        new = torf.Torrent.read(outfile)
+        assert_torrents_equal(orig, new, source='another source')
+
+def test_remove_source(create_torrent, tmpdir, assert_torrents_equal):
+    outfile = str(tmpdir.join('out.torrent'))
+    with create_torrent(source='the source') as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile, '--nosource', '-o', outfile])
+        new = torf.Torrent.read(outfile)
+        assert_torrents_equal(orig, new, source=None)
+
+
 def test_remove_xseed(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(randomize_infohash=True) as infile:

@@ -65,6 +65,7 @@ def _create_mode(cfg):
             trackers=() if cfg['notracker'] else cfg['tracker'],
             webseeds=() if cfg['nowebseed'] else cfg['webseed'],
             private=False if cfg['noprivate'] else cfg['private'],
+            source=None if cfg['nosource'] or not cfg['source'] else cfg['source'],
             randomize_infohash=False if cfg['noxseed'] else cfg['xseed'],
             comment=None if cfg['nocomment'] else cfg['comment'],
             created_by=None if cfg['nocreator'] else _config.DEFAULT_CREATOR
@@ -104,6 +105,7 @@ def _edit_mode(cfg):
 
     set_or_remove('comment', 'comment')
     set_or_remove('private', 'private')
+    set_or_remove('source', 'source')
     set_or_remove('xseed', 'randomize_infohash')
 
     def list_set_or_remove(arg_name, attr_name):
@@ -175,6 +177,8 @@ def _show_torrent_info(torrent, cfg):
         lines.append(('Created', torrent.creation_date.isoformat(sep=' ', timespec='seconds')))
     if torrent.created_by:
         lines.append(('Created By', torrent.created_by))
+    if torrent.source:
+        lines.append(('Source', torrent.source))
     lines.append(('Private', 'yes' if torrent.private else 'no'))
 
     trackers = []  # List of lines
