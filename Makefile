@@ -1,3 +1,4 @@
+VENV_PATH?=venv
 MANPAGE ?= docs/torf.1
 MANPAGE_HTML ?= docs/torf.1.html
 MANPAGE_SRC ?= docs/torf.1.asciidoc
@@ -10,9 +11,18 @@ clean:
 	rm -rf dist
 	rm -rf .pytest_cache .cache
 	rm -rf $(MANDIR)
+	rm -rf "$(VENV_PATH)"
 
-test:
-	python3 -m pytest --tb no tests
+venv:
+	python3 -m venv "$(VENV_PATH)"
+	# Docutils is needed for `setup.py check -r -s`
+	"$(VENV_PATH)"/bin/pip install --upgrade pytest wheel docutils
+	"$(VENV_PATH)"/bin/pip install --editable .
+
+test: venv
+	. "$(VENV_PATH)"/bin/activate ; \
+	"$(VENV_PATH)"/bin/pytest --exitfirst tests
+	# Check if README.org converts correctly to rst for PyPI
 	python3 setup.py check -r -s >/dev/null
 
 man:
