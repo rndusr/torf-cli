@@ -77,7 +77,7 @@ _PATH_::
     The creation date in the format __YYYY__**-**__MM__**-**__DD__[
     __HH__**:**__MM__[**:**__SS__]], *now* for the current time or *today* for
     the current time at midnight. +
-    Default: *today*
+    Default: *now*
 
 *--nodate*, *-D*::
     Remove the creation date from an existing torrent.
