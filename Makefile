@@ -27,5 +27,5 @@ man:
 	asciidoctor $(MANPAGE_SRC) -o $(MANPAGE) --doctype=manpage --backend=manpage
 	asciidoctor $(MANPAGE_SRC) -o $(MANPAGE_HTML) --doctype=manpage --backend=html
 
-release: manpage
+release: man
 	pyrelease CHANGELOG ./torfcli/_vars.py
