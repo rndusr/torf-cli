@@ -1,6 +1,7 @@
 from torfcli._main import run
 from torfcli._errors import MainError
 import pytest
+from unittest.mock import patch, DEFAULT
 import os
 import torf
 from datetime import (datetime, date, time)
@@ -285,6 +286,52 @@ def test_noxseed_option(capsys, mock_content):
 
     assert hash_line_1 == hash_line_2
     assert hash_1 == hash_2
+
+
+def test_max_piece_size_option_given(capsys, mock_content):
+    # Create large sparse file, i.e. a file that isn't actually written to disk
+    large_file = mock_content.join('large file')
+    with open(large_file, 'ab') as f:
+        f.truncate(2**40)
+    content_path = str(mock_content)
+
+    with patch.multiple('torfcli._main', _hash_pieces=DEFAULT, _write_torrent=DEFAULT):
+        run([content_path, '--max-piece-size', '2'])
+    cap = capsys.readouterr()
+    piece_size = [line for line in cap.out.split('\n')
+                  if 'Piece Size' in line][0].split('\t')[1]
+    assert piece_size == str(2 * 2**20)
+
+
+def test_max_piece_size_option_not_given(capsys, mock_content):
+    # Create large sparse file, i.e. a file that isn't actually written to disk
+    large_file = mock_content.join('large file')
+    with open(large_file, 'ab') as f:
+        f.truncate(2**40)
+    content_path = str(mock_content)
+
+    with patch.multiple('torfcli._main', _hash_pieces=DEFAULT, _write_torrent=DEFAULT):
+        run([content_path])
+    cap = capsys.readouterr()
+    piece_size = [line for line in cap.out.split('\n')
+                  if 'Piece Size' in line][0].split('\t')[1]
+    assert piece_size == str(64 * 2**20)
+
+
+def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
+    # Create large sparse file, i.e. a file that isn't actually written to disk
+    large_file = mock_content.join('large file')
+    with open(large_file, 'ab') as f:
+        f.truncate(2**40)
+    content_path = str(mock_content)
+
+    with patch.multiple('torfcli._main', _hash_pieces=DEFAULT, _write_torrent=DEFAULT):
+        factor = 1.234
+        exp_invalid_piece_size = int(factor*2**20)
+        exp_error = rf'^Piece size must be a power of two, {exp_invalid_piece_size} is not$'
+        with pytest.raises(MainError, match=exp_error) as exc_info:
+            run([content_path, '--max-piece-size', str(factor)])
+    assert exc_info.value.errno == errno.EINVAL
 
 
 def test_default_date(capsys, mock_content):
