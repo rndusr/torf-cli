@@ -1,8 +1,10 @@
-2018-06-19 3.0
+2019-04-04 3.0.0
+  - Use proper version number scheme.
   - Fixed "--exclude requires PATH" error when editing a torrent with global
     "exclude" options in the config file.
   - New options: --source to add a "source" field to the torrent and --nosource
     to remove it from an existing torrent.
+  - New option: --max-piece-size optionally limits the piece size.
 
 
 2018-06-19 2.0
