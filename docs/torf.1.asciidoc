@@ -83,11 +83,11 @@ _PATH_::
     Remove the creation date from an existing torrent.
 
 *--source*, *-s* _SOURCE_::
-    Add a "source" field to the torrent file.  This is usually used to make the
+    Add a "`source`" field to the torrent file.  This is usually used to make the
     torrent's info hash unique per tracker.
 
 *--nosource*, *-S*::
-    Remove the "source" field from an existing torrent.
+    Remove the "`source`" field from an existing torrent.
 
 *--xseed*, *-x*::
     Randomize the info hash to help with cross-seeding.  This simply adds an
