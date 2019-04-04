@@ -79,6 +79,14 @@ def _create_mode(cfg):
         except ValueError:
             raise MainError(f'{cfg["date"]}: Invalid date', errno=errno.EINVAL)
 
+    if cfg['max_piece_size']:
+        max_piece_size = cfg['max_piece_size'] * 1048576
+        if torrent.piece_size > max_piece_size:
+            try:
+                torrent.piece_size = max_piece_size
+            except torf.PieceSizeError as e:
+                raise MainError(e, errno=errno.EINVAL)
+
     _check_output_file_exists(torrent, cfg)
     _show_torrent_info(torrent, cfg)
     _hash_pieces(torrent, cfg)

@@ -98,6 +98,12 @@ _PATH_::
     De-randomize a previously randomized info hash of an existing torrent.  This
     removes the *entropy* field from the *info* section of the metainfo.
 
+*--max-piece-size* _SIZE_::
+    The maximum piece size when creating a torrent.  SIZE is multiplied by 1 MiB
+    (1048576 bytes).  The resulting number must be a power of two (2, 4, 8, 16,
+    etc.).  Numbers smaller than 1 are allowed, e.g. "`0.25`" sets the maximum
+    piece size to 256 KiB.
+
 *--nocreator*, *-R*::
     Remove the name of the application that created the torrent from an existing
     torrent.
