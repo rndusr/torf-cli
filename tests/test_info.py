@@ -183,7 +183,7 @@ def test_trackers___single_tracker_per_tier(capsys, create_torrent, human_readab
         with human_readable(True):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(f'^(\s*)Trackers  {trackers[0]}\n\\1          {trackers[1]}$', cap.out, flags=re.MULTILINE)
+            assert re.search(rf'^(\s*)Trackers  {trackers[0]}\n\1          {trackers[1]}$', cap.out, flags=re.MULTILINE)
 
         with human_readable(False):
             run(['-i', torrent_file])
@@ -220,7 +220,7 @@ def test_webseeds(capsys, create_torrent, human_readable):
         with human_readable(True):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(f'^(\s*)Webseeds  {webseeds[0]}\n\\1          {webseeds[1]}$', cap.out, flags=re.MULTILINE)
+            assert re.search(rf'^(\s*)Webseeds  {webseeds[0]}\n\1          {webseeds[1]}$', cap.out, flags=re.MULTILINE)
 
         with human_readable(False):
             run(['-i', torrent_file])
@@ -236,7 +236,7 @@ def test_httpseeds(capsys, create_torrent, human_readable):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
             print(cap.out)
-            assert re.search(f'^(\s*)HTTP Seeds  {httpseeds[0]}\n\\1            {httpseeds[1]}$', cap.out, flags=re.MULTILINE)
+            assert re.search(rf'^(\s*)HTTP Seeds  {httpseeds[0]}\n\1            {httpseeds[1]}$', cap.out, flags=re.MULTILINE)
 
         with human_readable(False):
             run(['-i', torrent_file])
@@ -263,7 +263,7 @@ def test_file_tree_and_file_count(capsys, create_torrent, human_readable, tmpdir
             run(['-i', torrent_file])
             cap = capsys.readouterr()
             print(cap.out)
-            assert re.search(f'^(\s*)File Count  4$', cap.out, flags=re.MULTILINE)
+            assert re.search(rf'^(\s*)File Count  4$', cap.out, flags=re.MULTILINE)
             filetree = '''
       Files  root
              ├─subdir1
@@ -280,7 +280,7 @@ def test_file_tree_and_file_count(capsys, create_torrent, human_readable, tmpdir
         with human_readable(False):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(f'^(\s*)File Count  4$', cap.out, flags=re.MULTILINE)
+            assert re.search(rf'^(\s*)File Count  4$', cap.out, flags=re.MULTILINE)
             files = ('root/subdir1/file1',
 	             'root/subdir1/subsubdir1.0/file2',
 	             'root/subdir1/subsubdir1.0/subsubdir1.0.0/file3',
