@@ -8,7 +8,7 @@ MANPAGE_SRC ?= docs/torf.1.asciidoc
 clean:
 	find . -name "*.pyc" -delete
 	find . -name "__pycache__" -delete
-	rm -rf dist
+	rm -rf dist build
 	rm -rf .pytest_cache .cache
 	rm -rf $(MANDIR)
 	rm -rf "$(VENV_PATH)"
