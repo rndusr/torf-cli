@@ -544,12 +544,12 @@ Default: <strong>now</strong></p>
 </dd>
 <dt class="hdlist1"><strong>--source</strong>, <strong>-s</strong> <em>SOURCE</em></dt>
 <dd>
-<p>Add a <strong>source</strong> field to the torrent file.  This is usually used to make the
+<p>Add a &#8220;source&#8221; field to the torrent file.  This is usually used to make the
 torrent&#8217;s info hash unique per tracker.</p>
 </dd>
 <dt class="hdlist1"><strong>--nosource</strong>, <strong>-S</strong></dt>
 <dd>
-<p>Remove the "source" field from an existing torrent.</p>
+<p>Remove the &#8220;source&#8221; field from an existing torrent.</p>
 </dd>
 <dt class="hdlist1"><strong>--xseed</strong>, <strong>-x</strong></dt>
 <dd>
@@ -561,6 +561,13 @@ random integer.</p>
 <dd>
 <p>De-randomize a previously randomized info hash of an existing torrent.  This
 removes the <strong>entropy</strong> field from the <strong>info</strong> section of the metainfo.</p>
+</dd>
+<dt class="hdlist1"><strong>--max-piece-size</strong> <em>SIZE</em></dt>
+<dd>
+<p>The maximum piece size when creating a torrent.  SIZE is multiplied by 1 MiB
+(1048576 bytes).  The resulting number must be a power of two (2, 4, 8, 16,
+etc.).  Numbers smaller than 1 are allowed, e.g. &#8220;0.25&#8221; sets the maximum
+piece size to 256 KiB.</p>
 </dd>
 <dt class="hdlist1"><strong>--nocreator</strong>, <strong>-R</strong></dt>
 <dd>
@@ -834,7 +841,7 @@ codes in the output of <strong>errno -l</strong>.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-09 14:43:12 +0100
+Last updated 2019-04-04 16:14:01 +0200
 </div>
 </div>
 </body>
