@@ -106,8 +106,10 @@ def bytes2string(b):
         if b >= minval:
             unit = _unit
             string = f'{b/minval:.02f}'
-            # Remove trailing zeros
-            while string[-1] in ('0', '.'):
+            # Remove trailing zeros after the point
+            while string[-1] == '0':
+                string = string[:-1]
+            if string[-1] == '.':
                 string = string[:-1]
             break
     return f'{string} {unit}B'
