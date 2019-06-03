@@ -1,3 +1,8 @@
+2019-06-03 3.0.1
+  - Fixed minor bug that caused trailing zeros to be removed from numbers, e.g.
+    "10 GiB" was displayed as "1 GiB"
+
+
 2019-04-04 3.0.0
   - Use proper version number scheme.
   - Fixed "--exclude requires PATH" error when editing a torrent with global
