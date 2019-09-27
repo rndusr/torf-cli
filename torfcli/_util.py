@@ -14,6 +14,7 @@ import termios
 import tty
 import sys
 import time
+import torf
 
 
 class Average():
@@ -43,7 +44,7 @@ def make_filetree(tree, parents_is_last=()):
     items = tuple(tree.items())
     max_i = len(items)-1
 
-    for i,(name,subtree) in enumerate(items):
+    for i,(name,node) in enumerate(items):
         is_last = i >= max_i
 
         # Assemble indentation string (`parents_is_last` being empty means
@@ -69,13 +70,15 @@ def make_filetree(tree, parents_is_last=()):
             else:
                 indent += f'{_C_DOWN_RIGHT}{_C_RIGHT}'
 
-        lines.append(f'{indent}{name}')
-
-        if subtree is not None:
+        if isinstance(node, torf.Torrent.File):
+            lines.append(f'{indent}{name} [{bytes2string(node.size, include_bytes=True)}]')
+        else:
+            lines.append(f'{indent}{name}')
             # Descend into child node
             sub_parents_is_last = parents_is_last + (is_last,)
             lines.extend(
-                make_filetree(subtree, parents_is_last=sub_parents_is_last))
+                make_filetree(node, parents_is_last=sub_parents_is_last))
+
     return lines
 
 
