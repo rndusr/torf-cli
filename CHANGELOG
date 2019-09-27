@@ -1,3 +1,8 @@
+2019-??-?? 3.1.0
+  - Show torrent size in bytes as well
+  - Show file size in file tree
+
+
 2019-06-03 3.0.1
   - Fixed minor bug that caused trailing zeros to be removed from numbers, e.g.
     "10 GiB" was displayed as "1 GiB"
