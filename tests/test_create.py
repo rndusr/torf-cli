@@ -315,7 +315,7 @@ def test_max_piece_size_option_not_given(capsys, mock_content):
     cap = capsys.readouterr()
     piece_size = [line for line in cap.out.split('\n')
                   if 'Piece Size' in line][0].split('\t')[1]
-    assert piece_size == str(64 * 2**20)
+    assert piece_size == str(16 * 2**20)
 
 
 def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
@@ -328,7 +328,7 @@ def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
     with patch.multiple('torfcli._main', _hash_pieces=DEFAULT, _write_torrent=DEFAULT):
         factor = 1.234
         exp_invalid_piece_size = int(factor*2**20)
-        exp_error = rf'^Piece size must be a power of two, {exp_invalid_piece_size} is not$'
+        exp_error = rf'^Piece size must be a power of 2, {exp_invalid_piece_size} is not$'
         with pytest.raises(MainError, match=exp_error) as exc_info:
             run([content_path, '--max-piece-size', str(factor)])
     assert exc_info.value.errno == errno.EINVAL
