@@ -168,8 +168,10 @@ def _show_torrent_info(torrent, cfg):
     lines.append(('Name', torrent.name))
     if torrent.is_ready:
         lines.append(('Info Hash', torrent.infohash))
-    size = _util.bytes2string(torrent.size) if human_readable else torrent.size
-    lines.append(('Size', size))
+    if human_readable:
+        size = lines.append(('Size', _util.bytes2string(torrent.size, include_bytes=True)))
+    else:
+        lines.append(('Size', torrent.size))
     if torrent.comment:
         if human_readable:
             # Split lines into paragraphs, then wrap each paragraph at max
