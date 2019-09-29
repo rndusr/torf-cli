@@ -267,13 +267,13 @@ def test_file_tree_and_file_count(capsys, create_torrent, human_readable, tmpdir
             filetree = '''
       Files  root
              ├─subdir1
-             │ ├─file1
+             │ ├─file1 [4 B]
              │ └─subsubdir1.0
-             │   ├─file2
+             │   ├─file2 [4 B]
              │   └─subsubdir1.0.0
-             │     └─file3
+             │     └─file3 [4 B]
              └─subdir2
-               └─file4
+               └─file4 [4 B]
 '''.strip()
             assert filetree in cap.out
 
