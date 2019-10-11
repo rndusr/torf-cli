@@ -92,7 +92,8 @@ def _create_torrent(tmpdir, mock_content, **kwargs):
         t.write(torrent_file)
         yield torrent_file
     finally:
-        os.remove(torrent_file)
+        if os.path.exists(torrent_file):
+            os.remove(torrent_file)
 
 @pytest.fixture
 def create_torrent(tmpdir, mock_content):
