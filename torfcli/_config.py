@@ -26,9 +26,10 @@ HELP_TEXT = f"""
 {_vars.__appname__} - {_vars.__description__}
 
 USAGE
-    {_vars.__appname__} PATH [OPTIONS] [-o TORRENT]
-    {_vars.__appname__} -i TORRENT
-    {_vars.__appname__} -i TORRENT [OPTIONS] -o NEW TORRENT
+    {_vars.__appname__} PATH [OPTIONS] [-o TORRENT]         # Create torrent
+    {_vars.__appname__} -i TORRENT                          # Display torrent
+    {_vars.__appname__} -i TORRENT [OPTIONS] -o NEWTORRENT  # Edit torrent
+    {_vars.__appname__} PATH -i TORRENT                     # Verify torrent
 
 ARGUMENTS
     PATH                   Path to torrent's content
