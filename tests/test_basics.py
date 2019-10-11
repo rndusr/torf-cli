@@ -1,11 +1,13 @@
 from torfcli._main import run
 from torfcli._errors import CLIError
+from torfcli import _vars
 import pytest
 
 
 def test_no_arguments():
     with pytest.raises(CLIError,
-                       match=r'^Missing PATH or --in \(see `torf -h`\)$'):
+                       match=('^Not sure what to do '
+                              fr'\(see USAGE in `{_vars.__appname__} -h`\)$')):
         run([])
 
 

@@ -34,15 +34,16 @@ def run(args=sys.argv[1:]):
         print(_config.VERSION_TEXT)
     else:
         # Figure out our modus operandi
-        if cfg['in']:
-            if cfg['out']:
-                _edit_mode(cfg)
-            else:
-                _info_mode(cfg)
-        elif cfg['PATH']:
+        if cfg['PATH'] and not cfg['in']:
             _create_mode(cfg)
+        elif not cfg['PATH'] and not cfg['out'] and cfg['in']:
+            _info_mode(cfg)
+        elif cfg['out'] and cfg['in']:
+            _edit_mode(cfg)
+        elif cfg['PATH'] and not cfg['out'] and cfg['in']:
+            _verify_mode(cfg)
         else:
-            raise CLIError(f'Missing PATH or --in (see `{_vars.__appname__} -h`)')
+            raise CLIError(f'Not sure what to do (see USAGE in `{_vars.__appname__} -h`)')
 
 
 def _info_mode(cfg):
