@@ -162,6 +162,65 @@ def _edit_mode(cfg):
     _write_torrent(torrent, cfg)
 
 
+def _verify_mode(cfg):
+    # Read existing torrent
+    try:
+        infile_torrent = torf.Torrent.read(cfg['in'])
+    except torf.TorfError as e:
+        raise MainError(e, errno=e.errno)
+
+    # Create torrent from PATH
+    try:
+        path_torrent = torf.Torrent(path=cfg['PATH'],
+                                    piece_size=infile_torrent.piece_size,
+                                    private=infile_torrent.private)
+    except torf.TorfError as e:
+        raise MainError(e, errno=e.errno)
+
+    if infile_torrent.mode is None:
+        raise MainError(f'{cfg["in"]}: Empty torrent', errno=errno.ENOENT)
+
+    # Instead of hashing the content on disk, we do some quick checks first.
+    elif infile_torrent.mode == 'singlefile':
+        # Single-file torrent
+        if not os.path.isfile(path_torrent.path):
+            raise MainError(f'{cfg["PATH"]}: {os.strerror(errno.EISDIR)}',
+                            errno=errno.EISDIR)
+
+        local_path_size = os.path.getsize(os.path.realpath(path_torrent.path))
+        if local_path_size != infile_torrent.size:
+            raise MainError(f'{cfg["PATH"]}: Mismatching size', errno=errno.EFBIG)
+
+    elif infile_torrent.mode == 'multifile':
+        # Multi-file torrent
+        if not os.path.isdir(path_torrent.path):
+            raise MainError(f'{cfg["PATH"]}: {os.strerror(errno.ENOTDIR)}',
+                            errno=errno.ENOTDIR)
+
+        for file in infile_torrent.files:
+            # Remove first directory in path to get path inside the torrent
+            path_in_torrent = os.path.join(*(file.split(os.path.sep)[1:]))
+            local_path = os.path.join(cfg['PATH'], path_in_torrent)
+
+            # Check if file exists
+            if not os.path.exists(local_path):
+                raise MainError(f'{local_path}: {os.strerror(errno.ENOENT)}',
+                                errno=errno.ENOENT)
+
+            # Check file sizes
+            path_in_torrent_size = infile_torrent.file_size(path_in_torrent)
+            local_path_size = os.path.getsize(local_path)
+            if local_path_size != path_in_torrent_size:
+                raise MainError(f'{local_path}: Mismatching size', errno=errno.EFBIG)
+
+    # Finally, compare the metainfo hashes
+    path_torrent.generate()
+    if infile_torrent.infohash != path_torrent.infohash:
+        raise MainError(f'{path_torrent.infohash}: Mismatching hash', errno=errno.EADV)
+
+    print('{cfg["PATH"]} contains everything described in {cfg["in"]}')
+
+
 def _show_torrent_info(torrent, cfg):
     human_readable = _util.human_readable(cfg)
     lines = []
