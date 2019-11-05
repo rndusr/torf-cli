@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import patch, DEFAULT
 import os
 import torf
-from datetime import (datetime, date, time)
+from datetime import datetime, date, time, timedelta
 import errno
 
 
@@ -42,7 +42,9 @@ def test_user_given_torrent_filepath(capsys, mock_content):
     t = torf.Torrent.read(exp_torrent_filepath)
     assert t.name == 'My Torrent'
     assert len(tuple(t.files)) == 3
-    assert t.creation_date == datetime.today().replace(microsecond=0)
+    exp_date_min = datetime.today() - timedelta(1)
+    exp_date_max = datetime.today()
+    assert exp_date_min <= t.creation_date <= exp_date_max
     assert t.created_by.startswith('torf/')
 
     cap = capsys.readouterr()
@@ -373,7 +375,9 @@ def test_date_now(capsys, mock_content):
     run([content_path, '--date', 'now'])
 
     t = torf.Torrent.read(exp_torrent_filepath)
-    assert t.creation_date == datetime.today().replace(microsecond=0)
+    exp_date_min = datetime.today() - timedelta(1)
+    exp_date_max = datetime.today()
+    assert exp_date_min <= t.creation_date <= exp_date_max
 
     cap = capsys.readouterr()
     exp_date = date.isoformat(sep=' ', timespec='seconds')
