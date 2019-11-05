@@ -5,7 +5,7 @@ import os
 import torf
 import functools
 import shutil
-from types import SimpleNamespace, GeneratorType
+from types import GeneratorType
 
 
 @pytest.fixture(autouse=True)
