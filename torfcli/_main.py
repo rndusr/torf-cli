@@ -304,7 +304,10 @@ def _show_torrent_info(torrent, cfg):
 
 _INFO_LABEL_WIDTH = 11
 def _info(label, value, human_readable, newline=True):
-    if human_readable:
+    if value is None:
+        return
+    elif human_readable:
+        print('\x1b[0E\x1b[2K', end='')
         # Make output human-readable
         label = f'{label.rjust(_INFO_LABEL_WIDTH)}'
         sep = '  '
@@ -365,60 +368,138 @@ def _write_torrent(torrent, cfg):
 
 def _hash_pieces(torrent, cfg):
     human_readable = _util.human_readable(cfg)
-
     _info('Path', torrent.path, human_readable)
-
-    start_time = time.time()
-    progress = _util.Average(samples=5)
-    time_left = _util.Average(samples=3)
-    def progress_callback(torrent, filepath, pieces_done, pieces_total):
-        if human_readable:
-            msg = f'{pieces_done / pieces_total * 100:.2f} %'
-        else:
-            msg = f'{pieces_done / pieces_total * 100}'
-
-        if pieces_done < pieces_total:
-            progress.add(pieces_done)
-            if len(progress.values) >= 2:
-                time_diff = progress.times[-1] - progress.times[0]
-                pieces_diff = progress.values[-1] - progress.values[0]
-                bytes_diff = pieces_diff * torrent.piece_size
-                bytes_per_sec = bytes_diff / time_diff + 0.001  # Prevent ZeroDivisionError
-                bytes_left = (pieces_total - pieces_done) * torrent.piece_size
-                time_left.add(bytes_left / bytes_per_sec)
-                time_left_avg = datetime.timedelta(seconds=int(time_left.avg))
-                eta = datetime.datetime.now() + time_left_avg
-                if human_readable:
-                    eta_str = '{0:%H}:{0:%M}:{0:%S}'.format(eta)
-                    msg += f'  |  ETA: {eta_str}  |  {time_left_avg} left  |  {bytes_per_sec/1048576:.2f} MB/s'
-                else:
-                    msg += f'\t{eta.timestamp():.0f}\t{time_left_avg.total_seconds():.0f}\t{bytes_per_sec:.0f}'
-            elif not human_readable:
-                # Don't print the first line, which can't contain all fields
-                return
-
-        else:
-            # Print final line
-            total_time_diff = datetime.timedelta(seconds=round(time.time() - start_time))
-            bytes_per_sec = torrent.size / (total_time_diff.total_seconds() + 0.001)  # Prevent ZeroDivisionError
-            if human_readable:
-                msg += f'  |  Time: {total_time_diff}  |  {bytes_per_sec/1045876:.2f} MB/s'
-            else:
-                msg += f'\t{total_time_diff.total_seconds():.0f}\t{bytes_per_sec:.0f}'
-        _util.clear_line(cfg)
-        _info('Progress', msg, human_readable, newline=False)
-        if not human_readable:
-            print('', flush=True)
-
+    if human_readable:
+        status_reporter = HumanStatusReporter()
+    else:
+        status_reporter = MachineStatusReporter()
     canceled = True
     try:
-        try:
-            canceled = not torrent.generate(callback=progress_callback, interval=0.5)
-        finally:
-            if human_readable:
-                print()
+        with _util.disabled_echo(cfg):
+            canceled = not torrent.generate(callback=status_reporter, interval=0.5)
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)
     finally:
+        status_reporter.cleanup()
         if not canceled:
             _info('Info Hash', torrent.infohash, human_readable)
+
+
+class StatusReporterBase():
+    def __init__(self):
+        self._start_time = time.time()
+        self._progress = _util.Average(samples=5)
+        self._time_left = _util.Average(samples=3)
+        self.fraction_done = 0
+        self.time_left = datetime.timedelta(0)
+        self.time_elapsed = datetime.timedelta(0)
+        self.time_total = datetime.timedelta(0)
+        self.eta = datetime.datetime.now()
+        self.bytes_per_sec = 0
+
+    def cleanup(self):
+        pass
+
+    def __call__(self, torrent, filepath, pieces_done, pieces_total):
+        info = self._get_progress_string(torrent, filepath, pieces_done, pieces_total)
+        if self._human_readable:
+            _info('Progress', info, self._human_readable, newline=False)
+        else:
+            _info('Progress', info, self._human_readable, newline=True)
+            print('', end='', flush=True)
+
+    def _get_progress_string(self, torrent, filepath, pieces_done, pieces_total):
+        progress = self._progress
+        time_left = self._time_left
+        self.fraction_done = pieces_done / pieces_total
+        if pieces_done < pieces_total:
+            progress.add(pieces_done)
+            # Make sure we have enough samples to make estimates
+            if len(progress.values) >= 2:
+                self.time_elapsed = datetime.timedelta(seconds=round(time.time() - self._start_time))
+                time_diff = progress.times[-1] - progress.times[0]
+                pieces_diff = progress.values[-1] - progress.values[0]
+                bytes_diff = pieces_diff * torrent.piece_size
+                self.bytes_per_sec = bytes_diff / time_diff + 0.001  # Prevent ZeroDivisionError
+                bytes_left = (pieces_total - pieces_done) * torrent.piece_size
+                self._time_left.add(bytes_left / self.bytes_per_sec)
+                self.time_left = datetime.timedelta(seconds=round(time_left.avg))
+                self.time_total = self.time_elapsed + self.time_left
+                self.eta = datetime.datetime.now() + self.time_left
+        else:
+            # The last piece was hashed
+            self.time_left = datetime.timedelta(seconds=0)
+            self.time_elapsed = datetime.timedelta(seconds=round(time.time() - self._start_time))
+            self.time_total = self.time_elapsed
+            self.eta = datetime.datetime.now()
+            self.bytes_per_sec = torrent.size / (self.time_total.total_seconds() + 0.001)  # Prevent ZeroDivisionError
+        return self._make_progress_string(torrent, filepath, pieces_done, pieces_total)
+
+
+class HumanStatusReporter(StatusReporterBase):
+    """
+    References:
+      https://www.vt100.net/docs/vt100-ug/chapter3.html#DECSCNM
+      http://ascii-table.com/ansi-escape-sequences.php
+    """
+    _human_readable = True
+
+    def __init__(self):
+        super().__init__()
+        self._is_initialized = False
+        self._is_cleanedup = False
+        self._success = False
+
+    def _init(self):
+        # Ensure one line below for filename/progress bar
+        print('\n\x1b[1A', end='')
+        self._is_initialized = True
+
+    def cleanup(self):
+        if self._is_initialized and not self._is_cleanedup:
+            if self._success:
+                # There's one final "Progress" line
+                print('\n', end='')
+            else:
+                # Keep last progress info intact, which is spread over two lines
+                print('\n\n', end='')
+
+    def _make_progress_string(self, torrent, filepath, pieces_done, pieces_total):
+        if not self._is_initialized:
+            self._init()
+
+        time_total_str = str(self.time_total)
+        bytes_per_sec_str = f'{self.bytes_per_sec/1045876:.2f} MiB/s'
+
+        msg = f'{self.fraction_done * 100:.2f} %'
+        if pieces_done < pieces_total:
+            time_elapsed_str = str(self.time_elapsed)
+            time_left_str = str(self.time_left)
+            eta_str = '{0:%H}:{0:%M}:{0:%S}'.format(self.eta)
+            msg += (f'  |  {time_elapsed_str} elapsed, {time_left_str} left, {time_total_str} total'
+                    f'  |  ETA: {eta_str}'
+                    f'  |  {bytes_per_sec_str}')
+
+            # Display current file/progress bar in line below
+            progress_bar = _util.progress_bar(os.path.basename(filepath), self.fraction_done)
+            msg = ('\x1b7'      # Store cursor position
+                   '\x1b[1B' +  # Move one line down
+                   progress_bar +
+                   '\x1b8'      # Restore cursor position
+                   + msg)
+        else:
+            msg += f'  |  {time_total_str} total  |  {bytes_per_sec_str}'
+            self._success = True
+        return msg
+
+
+class MachineStatusReporter(StatusReporterBase):
+    _human_readable = False
+    def _make_progress_string(self, torrent, filepath, pieces_done, pieces_total):
+        return '\t'.join((f'{self.fraction_done * 100:.3f}',
+                          f'{round(self.time_elapsed.total_seconds())}',
+                          f'{round(self.time_left.total_seconds())}',
+                          f'{round(self.time_total.total_seconds())}',
+                          f'{round(self.eta.timestamp())}',
+                          f'{round(self.bytes_per_sec)}',
+                          f'{filepath}'))
