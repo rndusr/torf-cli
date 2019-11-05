@@ -82,6 +82,22 @@ def make_filetree(tree, parents_is_last=()):
     return lines
 
 
+def progress_bar(text, fraction_done, width=80):
+    if len(text) > width:
+        half = int(width/2)
+        text = text[:half] + '…' + text[-(width-half-1):]
+    elif len(text) < width:
+        text += ' ' * (width - len(text))
+    assert len(text) == width, f'len({text!r}) != {width}'
+    pos = int(fraction_done * width)
+    bar = ('\x1b[K'   +  # Erase line
+           '\x1b[4m'  +  # Reverse video on
+           text[:pos] +
+           '\x1b[0m'  +  # Reverse video off
+           text[pos:])
+    return "▕" + bar + "▏"
+
+
 _DATE_FORMATS = ('%Y-%m-%d %H:%M:%S',
                  '%Y-%m-%dT%H:%M:%S',
                  '%Y-%m-%d %H:%M',
