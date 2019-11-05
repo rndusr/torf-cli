@@ -197,7 +197,7 @@ def test_private_option(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    run([content_path, '--private'])
+    run([content_path, '--private', '--tracker', 'https://foo.bar:123/'])
 
     t = torf.Torrent.read(exp_torrent_filepath)
     assert t.private == True
