@@ -15,6 +15,7 @@ import tty
 import sys
 import time
 import torf
+import contextlib
 
 
 class Average():
@@ -162,6 +163,28 @@ def human_readable(cfg):
         return True
     else:
         return sys.stdout.isatty()
+
+
+@contextlib.contextmanager
+def disabled_echo(cfg):
+    if human_readable(cfg):
+        # Disable echo
+        fd = sys.stdin.fileno()
+        old = termios.tcgetattr(fd)
+        new = termios.tcgetattr(fd)
+        new[3] = new[3] & ~termios.ECHO  # lflags
+        termios.tcsetattr(fd, termios.TCSADRAIN, new)
+        # Hide cursor
+        print('\x1b[?25l', end='')
+        try:
+            yield
+        finally:
+            # Enable echo
+            termios.tcsetattr(fd, termios.TCSADRAIN, old)
+            # Show cursor
+            print('\x1b[?25h', end='')
+    else:
+        yield
 
 
 def clear_line(cfg):
