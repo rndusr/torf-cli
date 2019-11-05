@@ -26,7 +26,7 @@ def cfgfile(tmpdir, monkeypatch):
 
 def _assert_torrents_equal(orig, new, ignore=(), **new_attrs):
     attrs = ['comment', 'created_by', 'creation_date', 'files', 'filetree',
-             'httpseeds', 'include_md5', 'name', 'piece_size', 'pieces',
+             'httpseeds', 'name', 'piece_size', 'pieces',
              'private', 'randomize_infohash', 'size', 'source', 'trackers',
              'webseeds']
     for attr in attrs:
