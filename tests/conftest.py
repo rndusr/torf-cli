@@ -6,6 +6,7 @@ import torf
 import functools
 import shutil
 from types import GeneratorType
+import re
 
 
 @pytest.fixture(autouse=True)
@@ -98,3 +99,11 @@ def _create_torrent(tmpdir, mock_content, **kwargs):
 @pytest.fixture
 def create_torrent(tmpdir, mock_content):
     return functools.partial(_create_torrent, tmpdir, mock_content)
+
+
+@pytest.fixture
+def clear_ansi():
+    def _clear_ansi(string):
+        regex = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+        return regex.sub('', string)
+    return _clear_ansi
