@@ -164,62 +164,32 @@ def _edit_mode(cfg):
 
 
 def _verify_mode(cfg):
+    human_readable = _util.human_readable(cfg)
+
     # Read existing torrent
     try:
-        infile_torrent = torf.Torrent.read(cfg['in'])
+        torrent = torf.Torrent.read(cfg['in'])
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)
+    else:
+        _show_torrent_info(torrent, cfg)
+        _info('Path', torrent.path, human_readable)
+        _info('Info Hash', torrent.infohash, human_readable)
 
-    # Create torrent from PATH
+    if human_readable:
+        status_reporter = HumanStatusReporter()
+    else:
+        status_reporter = MachineStatusReporter()
+    canceled = True
     try:
-        path_torrent = torf.Torrent(path=cfg['PATH'],
-                                    piece_size=infile_torrent.piece_size,
-                                    private=infile_torrent.private)
+        with _util.disabled_echo(cfg):
+            canceled = not torrent.verify(cfg['PATH'],
+                                          callback=status_reporter.verify_callback,
+                                          interval=0.1)
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)
-
-    if infile_torrent.mode is None:
-        raise MainError(f'{cfg["in"]}: Empty torrent', errno=errno.ENOENT)
-
-    # Instead of hashing the content on disk, we do some quick checks first.
-    elif infile_torrent.mode == 'singlefile':
-        # Single-file torrent
-        if not os.path.isfile(path_torrent.path):
-            raise MainError(f'{cfg["PATH"]}: {os.strerror(errno.EISDIR)}',
-                            errno=errno.EISDIR)
-
-        local_path_size = os.path.getsize(os.path.realpath(path_torrent.path))
-        if local_path_size != infile_torrent.size:
-            raise MainError(f'{cfg["PATH"]}: Mismatching size', errno=errno.EFBIG)
-
-    elif infile_torrent.mode == 'multifile':
-        # Multi-file torrent
-        if not os.path.isdir(path_torrent.path):
-            raise MainError(f'{cfg["PATH"]}: {os.strerror(errno.ENOTDIR)}',
-                            errno=errno.ENOTDIR)
-
-        for file in infile_torrent.files:
-            # Remove first directory in path to get path inside the torrent
-            path_in_torrent = os.path.join(*(file.split(os.path.sep)[1:]))
-            local_path = os.path.join(cfg['PATH'], path_in_torrent)
-
-            # Check if file exists
-            if not os.path.exists(local_path):
-                raise MainError(f'{local_path}: {os.strerror(errno.ENOENT)}',
-                                errno=errno.ENOENT)
-
-            # Check file sizes
-            path_in_torrent_size = infile_torrent.file_size(path_in_torrent)
-            local_path_size = os.path.getsize(local_path)
-            if local_path_size != path_in_torrent_size:
-                raise MainError(f'{local_path}: Mismatching size', errno=errno.EFBIG)
-
-    # Finally, compare the metainfo hashes
-    path_torrent.generate()
-    if infile_torrent.infohash != path_torrent.infohash:
-        raise MainError(f'{path_torrent.infohash}: Mismatching hash', errno=errno.EADV)
-
-    print('{cfg["PATH"]} contains everything described in {cfg["in"]}')
+    finally:
+        status_reporter.cleanup()
 
 
 def _show_torrent_info(torrent, cfg):
@@ -376,7 +346,8 @@ def _hash_pieces(torrent, cfg):
     canceled = True
     try:
         with _util.disabled_echo(cfg):
-            canceled = not torrent.generate(callback=status_reporter, interval=0.5)
+            canceled = not torrent.generate(callback=status_reporter.generate_callback,
+                                            interval=0.5)
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)
     finally:
@@ -400,13 +371,17 @@ class StatusReporterBase():
     def cleanup(self):
         pass
 
-    def __call__(self, torrent, filepath, pieces_done, pieces_total):
+    def generate_callback(self, torrent, filepath, pieces_done, pieces_total):
         info = self._get_progress_string(torrent, filepath, pieces_done, pieces_total)
-        if self._human_readable:
-            _info('Progress', info, self._human_readable, newline=False)
+        _info('Progress', info, self._human_readable, newline=not self._human_readable)
+
+    def verify_callback(self, torrent, filepath, pieces_done, pieces_total,
+                        piece_index, piece_hash, exception):
+        if exception:
+            _info('Error', str(exception), self._human_readable)
         else:
-            _info('Progress', info, self._human_readable, newline=True)
-            print('', end='', flush=True)
+            info = self._get_progress_string(torrent, filepath, pieces_done, pieces_total)
+            _info('Progress', info, self._human_readable, newline=not self._human_readable)
 
     def _get_progress_string(self, torrent, filepath, pieces_done, pieces_total):
         progress = self._progress
