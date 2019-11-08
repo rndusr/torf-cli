@@ -324,7 +324,7 @@ def _info(label, value, human_readable, newline=True):
             value = sep.join(value)
 
     if newline:
-        print(f'{label}{sep}{value}')
+        print(f'{label}{sep}{value}', flush=True)
     else:
         print(f'{label}{sep}{value}', end='', flush=True)
 
