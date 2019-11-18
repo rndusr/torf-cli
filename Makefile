@@ -15,8 +15,7 @@ clean:
 
 venv:
 	python3 -m venv "$(VENV_PATH)"
-	# Docutils is needed for `setup.py check -r -s`
-	"$(VENV_PATH)"/bin/pip install --upgrade pytest wheel docutils
+	"$(VENV_PATH)"/bin/pip install --upgrade pytest wheel
 	"$(VENV_PATH)"/bin/pip install --editable ../torf
 	"$(VENV_PATH)"/bin/pip install --editable .
 
