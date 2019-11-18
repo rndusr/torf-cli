@@ -185,7 +185,7 @@ def _verify_mode(cfg):
         with _util.disabled_echo(cfg):
             canceled = not torrent.verify(cfg['PATH'],
                                           callback=status_reporter.verify_callback,
-                                          interval=0.1)
+                                          interval=0.5)
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)
     finally:
