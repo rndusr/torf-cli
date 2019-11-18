@@ -1,4 +1,5 @@
 2019-??-?? 3.1.0
+  - Huge performance increase due to multithreading
   - Show torrent size in bytes as well
   - Show file size in file tree
 
