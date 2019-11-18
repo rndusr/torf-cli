@@ -8,6 +8,12 @@ from datetime import datetime, date, time, timedelta
 import errno
 
 
+def assert_approximate_date(date1, date2):
+    date_min = date2.replace(microsecond=0) - timedelta(seconds=1)
+    date_max = date2.replace(microsecond=0) + timedelta(seconds=1)
+    assert date_min <= date1 <= date_max
+
+
 ### Basic creation modes
 
 def test_default_torrent_filepath(capsys, mock_content):
@@ -15,12 +21,13 @@ def test_default_torrent_filepath(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
+    now = datetime.today()
     run([content_path])
 
     t = torf.Torrent.read(exp_torrent_filepath)
     assert t.name == 'My Torrent'
     assert len(tuple(t.files)) == 3
-    assert t.creation_date == datetime.today().replace(microsecond=0)
+    assert_approximate_date(t.creation_date, now)
     assert t.created_by.startswith('torf/')
 
     cap = capsys.readouterr()
@@ -37,14 +44,13 @@ def test_user_given_torrent_filepath(capsys, mock_content):
     exp_torrent_filename = 'foo.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
+    now = datetime.today()
     run([content_path, '--out', exp_torrent_filename])
 
     t = torf.Torrent.read(exp_torrent_filepath)
     assert t.name == 'My Torrent'
     assert len(tuple(t.files)) == 3
-    exp_date_min = datetime.today() - timedelta(1)
-    exp_date_max = datetime.today()
-    assert exp_date_min <= t.creation_date <= exp_date_max
+    assert_approximate_date(t.creation_date, now)
     assert t.created_by.startswith('torf/')
 
     cap = capsys.readouterr()
@@ -78,7 +84,6 @@ def test_torrent_filepath_exists(capsys, mock_content):
 
 
 ### Options
-
 
 
 def test_nomagnet_option(capsys, mock_content):
@@ -341,14 +346,17 @@ def test_default_date(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
+    now = datetime.today().replace(microsecond=0)
     run([content_path])
 
     t = torf.Torrent.read(exp_torrent_filepath)
-    assert t.creation_date == datetime.today().replace(microsecond=0)
+    assert_approximate_date(t.creation_date, datetime.today())
 
     cap = capsys.readouterr()
-    exp_date = datetime.today().replace(microsecond=0).isoformat(sep=' ')
-    assert f'Created\t{exp_date}' in cap.out
+    exp_dates = [now.isoformat(sep=' '),
+                 (now + timedelta(seconds=1)).isoformat(sep=' ')]
+    assert (f'Created\t{exp_dates[0]}' in cap.out or
+            f'Created\t{exp_dates[1]}' in cap.out)
 
 
 def test_date_today(capsys, mock_content):
@@ -371,16 +379,14 @@ def test_date_now(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    date = datetime.today()
+    now = datetime.today()
     run([content_path, '--date', 'now'])
 
     t = torf.Torrent.read(exp_torrent_filepath)
-    exp_date_min = datetime.today() - timedelta(1)
-    exp_date_max = datetime.today()
-    assert exp_date_min <= t.creation_date <= exp_date_max
+    assert_approximate_date(t.creation_date, now)
 
     cap = capsys.readouterr()
-    exp_date = date.isoformat(sep=' ', timespec='seconds')
+    exp_date = now.isoformat(sep=' ', timespec='seconds')
     assert f'Created\t{exp_date}' in cap.out
 
 
