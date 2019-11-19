@@ -180,15 +180,16 @@ def _verify_mode(cfg):
         status_reporter = HumanStatusReporter()
     else:
         status_reporter = MachineStatusReporter()
-    success = False
-    try:
-        success = torrent.verify(cfg['PATH'],
-                                 callback=status_reporter.verify_callback,
-                                 interval=0.5)
-    except torf.TorfError as e:
-        raise MainError(e, errno=e.errno)
-    finally:
-        status_reporter.cleanup(success)
+    with _util.disabled_echo(cfg):
+        success = False
+        try:
+            success = torrent.verify(cfg['PATH'],
+                                     callback=status_reporter.verify_callback,
+                                     interval=0.5)
+        except torf.TorfError as e:
+            raise MainError(e, errno=e.errno)
+        finally:
+            status_reporter.cleanup(success)
 
 
 def _show_torrent_info(torrent, cfg):
@@ -342,16 +343,17 @@ def _hash_pieces(torrent, cfg):
         status_reporter = HumanStatusReporter()
     else:
         status_reporter = MachineStatusReporter()
-    success = False
-    try:
-        success = torrent.generate(callback=status_reporter.generate_callback,
-                                   interval=0.5)
-    except torf.TorfError as e:
-        raise MainError(e, errno=e.errno)
-    finally:
-        status_reporter.cleanup(success)
-        if success:
-            _info('Info Hash', torrent.infohash, human_readable)
+    with _util.disabled_echo(cfg):
+        success = False
+        try:
+            success = torrent.generate(callback=status_reporter.generate_callback,
+                                       interval=0.5)
+        except torf.TorfError as e:
+            raise MainError(e, errno=e.errno)
+        finally:
+            status_reporter.cleanup(success)
+            if success:
+                _info('Info Hash', torrent.infohash, human_readable)
 
 
 class StatusReporterBase():
