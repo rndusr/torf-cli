@@ -442,18 +442,12 @@ class HumanStatusReporter(StatusReporterBase):
     def _make_progress_string(self, torrent, filepath, pieces_done, pieces_total):
         if not self._is_initialized:
             self._init()
-
-        time_total_str = str(self.time_total)
-        bytes_per_sec_str = f'{self.bytes_per_sec/1045876:.2f} MiB/s'
-
         msg = f'{self.fraction_done * 100:.2f} %'
         if pieces_done < pieces_total:
-            time_elapsed_str = str(self.time_elapsed)
-            time_left_str = str(self.time_left)
             eta_str = '{0:%H}:{0:%M}:{0:%S}'.format(self.eta)
-            msg += (f'  |  {time_elapsed_str} elapsed, {time_left_str} left, {time_total_str} total'
+            msg += (f'  |  {self.time_elapsed} elapsed, {self.time_left} left, {self.time_total} total'
                     f'  |  ETA: {eta_str}'
-                    f'  |  {bytes_per_sec_str}')
+                    f'  |  {self.bytes_per_sec/1045876:.2f} MiB/s')
 
             # Display current file/progress bar in line below
             progress_bar = _util.progress_bar(os.path.basename(filepath), self.fraction_done)
@@ -463,8 +457,7 @@ class HumanStatusReporter(StatusReporterBase):
                    '\x1b8'      # Restore cursor position
                    + msg)
         else:
-            msg += f'  |  {time_total_str} total  |  {bytes_per_sec_str}'
-            self._success = True
+            msg += f'  |  {self.time_total} total  |  {self.bytes_per_sec/1045876:.2f} MiB/s'
         return msg
 
 
