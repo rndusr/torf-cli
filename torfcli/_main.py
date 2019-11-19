@@ -180,16 +180,15 @@ def _verify_mode(cfg):
         status_reporter = HumanStatusReporter()
     else:
         status_reporter = MachineStatusReporter()
-    canceled = True
+    success = False
     try:
-        with _util.disabled_echo(cfg):
-            canceled = not torrent.verify(cfg['PATH'],
-                                          callback=status_reporter.verify_callback,
-                                          interval=0.5)
+        success = torrent.verify(cfg['PATH'],
+                                 callback=status_reporter.verify_callback,
+                                 interval=0.5)
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)
     finally:
-        status_reporter.cleanup()
+        status_reporter.cleanup(success)
 
 
 def _show_torrent_info(torrent, cfg):
@@ -343,16 +342,15 @@ def _hash_pieces(torrent, cfg):
         status_reporter = HumanStatusReporter()
     else:
         status_reporter = MachineStatusReporter()
-    canceled = True
+    success = False
     try:
-        with _util.disabled_echo(cfg):
-            canceled = not torrent.generate(callback=status_reporter.generate_callback,
-                                            interval=0.5)
+        success = torrent.generate(callback=status_reporter.generate_callback,
+                                   interval=0.5)
     except torf.TorfError as e:
         raise MainError(e, errno=e.errno)
     finally:
-        status_reporter.cleanup()
-        if not canceled:
+        status_reporter.cleanup(success)
+        if success:
             _info('Info Hash', torrent.infohash, human_readable)
 
 
@@ -368,7 +366,7 @@ class StatusReporterBase():
         self.eta = datetime.datetime.now()
         self.bytes_per_sec = 0
 
-    def cleanup(self):
+    def cleanup(self, success):
         pass
 
     def generate_callback(self, torrent, filepath, pieces_done, pieces_total):
@@ -421,23 +419,25 @@ class HumanStatusReporter(StatusReporterBase):
 
     def __init__(self):
         super().__init__()
-        self._is_initialized = False
-        self._is_cleanedup = False
-        self._success = False
+        self._is_initialized = False    # Whether _init() was called
+        self._is_cleanedup = False      # Whether cleanup() was called
 
     def _init(self):
         # Ensure one line below for filename/progress bar
         print('\n\x1b[1A', end='')
         self._is_initialized = True
 
-    def cleanup(self):
+    def cleanup(self, success):
         if self._is_initialized and not self._is_cleanedup:
-            if self._success:
-                # There's one final "Progress" line
-                print('\n', end='')
+            if success:
+                # Final "Progress" line is a performance summary, which we keep
+                # by moving on to the next line
+                print(f'\n', end='')
             else:
-                # Keep last progress info intact, which is spread over two lines
+                # Keep last progress info intact so the user can see where it
+                # stopped
                 print('\n\n', end='')
+            self._is_cleanedup = True
 
     def _make_progress_string(self, torrent, filepath, pieces_done, pieces_total):
         if not self._is_initialized:
