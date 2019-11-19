@@ -105,5 +105,7 @@ def create_torrent(tmpdir, mock_content):
 def clear_ansi():
     def _clear_ansi(string):
         regex = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
-        return regex.sub('', string)
+        string = regex.sub('', string)
+        string = re.sub(r'\x1b[78]', '', string)
+        return string
     return _clear_ansi
