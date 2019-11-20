@@ -20,7 +20,8 @@ def run():
     try:
         run()
     except MainError as e:
-        print(f'{__appname__}: {e}', file=sys.stderr)
+        if str(e):
+            print(f'{__appname__}: {e}', file=sys.stderr)
         sys.exit(e.errno or 1)
     except KeyboardInterrupt:
         print(f'{__appname__}: Aborted', file=sys.stderr)

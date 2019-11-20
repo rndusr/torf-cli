@@ -16,11 +16,10 @@ import errno
 class MainError(Exception):
     def __init__(self, msg=None, errno=None):
         self.errno = errno
-        if msg is None:
-            if errno is None:
-                raise RuntimeError('Both msg and errno are missing!')
-            msg = os.strerror(errno)
-        super().__init__(msg)
+        if msg:
+            super().__init__(msg)
+        elif errno:
+            super().__init__(os.strerror(errno))
 
 
 class CLIError(MainError):
