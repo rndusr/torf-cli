@@ -105,22 +105,22 @@ The latest release is available on `PyPI <https://pypi.org/project/torf-cli>`_
 and on `AUR <https://aur.archlinux.org/packages/python-torf-cli/>`_.
 
 
-pipsi
+pipx
 `````
 
-The easiest and cleanest installation method is `pipsi
-<https://pypi.org/project/pipsi/>`_, which installs each application with all
+The easiest and cleanest installation method is `pipx
+<https://pipxproject.github.io/pipx/>`_, which installs each application with all
 dependencies in a separate virtual environment in ``~/.local/venvs/`` and links
 the executable to ``~/.local/bin/``.
 
 .. code:: sh
 
-    $ pipsi install torf-cli
-    $ pipsi upgrade torf-cli
-    $ pipsi uninstall torf-cli  # Also removes dependencies
+    $ pipx install torf-cli
+    $ pipx upgrade torf-cli
+    $ pipx uninstall torf-cli  # Also removes dependencies
 
-The only drawback is that, at the time of writing, pipsi doesn't make the man
-page available.  But you can just `read it in your browser
+The only drawback is that, at the time of writing, pipx doesn't make the man
+page available, but `it's also available here
 <https://rndusr.github.io/torf-cli/torf.1.html>`_.
 
 
