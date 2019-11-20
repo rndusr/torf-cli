@@ -190,6 +190,8 @@ def _verify_mode(cfg):
             raise MainError(e, errno=e.errno)
         finally:
             status_reporter.cleanup(success)
+    if not success:
+        raise MainError()
 
 
 def _show_torrent_info(torrent, cfg):
