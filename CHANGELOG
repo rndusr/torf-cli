@@ -1,7 +1,10 @@
 2019-??-?? 3.1.0
-  - Huge performance increase due to multithreading
-  - Show torrent size in bytes as well
-  - Show file size in file tree
+  - Huge performance increase due to multithreading.
+  - Verify a torrent's content: torf -i content.torrent path/to/content
+  - Progress is now reported in two lines with a progress bar and the currently
+    hashed file.
+  - Show torrent size in plain bytes as well.
+  - Show file size in file tree.
 
 
 2019-06-03 3.0.1
