@@ -75,7 +75,7 @@ ARGUMENTS
 
 class CLIParser(argparse.ArgumentParser):
     def error(self, msg):
-        raise _errors.CLIError(msg.capitalize())
+        raise _errors.CliError(msg.capitalize())
 
 _cliparser = CLIParser(add_help=False)
 
@@ -141,14 +141,14 @@ def get_cfg(cliargs):
     # CLI and config file
     try:
         cfg = parse_args(_cfg2args(filecfg) + cliargs)
-    except _errors.CLIError as e:
-        raise _errors.ConfigError(f'{cfgfile}: {e}', errno=e.errno)
+    except _errors.CliError as e:
+        raise _errors.ConfigError(f'{cfgfile}: {e}')
 
     # Apply profiles specified in config file or on CLI
     def apply_profile(profname):
         prof = filecfg.get(profname)
         if prof is None:
-            raise _errors.ConfigError(f'{cfgfile}: No such profile: {profname}', errno=errno.EINVAL)
+            raise _errors.ConfigError(f'{cfgfile}: No such profile: {profname}')
         else:
             profargs.extend(_cfg2args(prof))
 
@@ -160,14 +160,13 @@ def get_cfg(cliargs):
     args = _cfg2args(filecfg) + profargs + cliargs
     try:
         return parse_args(args)
-    except _errors.CLIError as e:
-        raise _errors.ConfigError(f'{cfgfile}: {e}', errno=e.errno)
+    except _errors.CliError as e:
+        raise _errors.ConfigError(f'{cfgfile}: {e}')
 
 def _check_illegal_configfile_arguments(cfg, cfgfile):
     for arg in ('config', 'noconfig', 'profile', 'help', 'version'):
         if arg in cfg:
-            raise _errors.ConfigError(f'{cfgfile}: Not allowed in config file: {arg}',
-                                      errno=errno.EINVAL)
+            raise _errors.ConfigError(f'{cfgfile}: Not allowed in config file: {arg}')
 
 
 _re_bool = re.compile(r'^(\S+)$')
@@ -181,7 +180,7 @@ def _readfile(filepath):
         with open(filepath, 'r') as f:
             lines = tuple(l.strip() for l in f.readlines())
     except OSError as e:
-        raise _errors.ConfigError(f'{filepath}: {os.strerror(e.errno)}', errno=e.errno)
+        raise _errors.ConfigError(f'{filepath}: {os.strerror(e.errno)}')
 
     # Parse lines
     cfg = subcfg = {}

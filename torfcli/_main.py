@@ -22,7 +22,7 @@ from collections import abc
 from . import _vars
 from . import _config
 from . import _util
-from ._errors import MainError, CLIError
+from . import _errors as err
 
 
 def run(args=sys.argv[1:]):
@@ -43,14 +43,14 @@ def run(args=sys.argv[1:]):
         elif cfg['PATH'] and not cfg['out'] and cfg['in']:
             _verify_mode(cfg)
         else:
-            raise CLIError(f'Not sure what to do (see USAGE in `{_vars.__appname__} -h`)')
+            raise err.CliError(f'Not sure what to do (see USAGE in `{_vars.__appname__} -h`)')
 
 
 def _info_mode(cfg):
     try:
         torrent = torf.Torrent.read(cfg['in'])
     except torf.TorfError as e:
-        raise MainError(e, errno=e.errno)
+        raise err.Error(e)
     else:
         _show_torrent_info(torrent, cfg)
         if not cfg['nomagnet']:
@@ -72,13 +72,13 @@ def _create_mode(cfg):
             created_by=None if cfg['nocreator'] else _config.DEFAULT_CREATOR
         )
     except torf.TorfError as e:
-        raise MainError(e, errno=e.errno)
+        raise err.Error(e)
 
     if not cfg['nodate']:
         try:
             torrent.creation_date = _util.parse_date(cfg['date'] or 'now')
         except ValueError:
-            raise MainError(f'{cfg["date"]}: Invalid date', errno=errno.EINVAL)
+            raise err.ParseError(f'{cfg["date"]}: Invalid date')
 
     if cfg['max_piece_size']:
         max_piece_size = cfg['max_piece_size'] * 1048576
@@ -86,7 +86,7 @@ def _create_mode(cfg):
             try:
                 torrent.piece_size = max_piece_size
             except torf.PieceSizeError as e:
-                raise MainError(e, errno=errno.EINVAL)
+                raise err.ParseError(e)
 
     _check_output_file_exists(torrent, cfg)
     _show_torrent_info(torrent, cfg)
@@ -99,7 +99,7 @@ def _edit_mode(cfg):
     try:
         torrent = torf.Torrent.read(cfg['in'])
     except torf.TorfError as e:
-        raise MainError(e, errno=e.errno)
+        raise err.Error(e)
 
     _check_output_file_exists(torrent, cfg)
 
@@ -110,7 +110,7 @@ def _edit_mode(cfg):
             try:
                 setattr(torrent, attr_name, cfg[arg_name])
             except torf.TorfError as e:
-                raise MainError(e, errno=e.errno)
+                raise err.Error(e)
 
     set_or_remove('comment', 'comment')
     set_or_remove('private', 'private')
@@ -126,7 +126,7 @@ def _edit_mode(cfg):
             try:
                 setattr(torrent, attr_name, new_list)
             except torf.TorfError as e:
-                raise MainError(e, errno=e.errno)
+                raise err.Error(e)
 
     list_set_or_remove('tracker', 'trackers')
     list_set_or_remove('webseed', 'webseeds')
@@ -140,14 +140,14 @@ def _edit_mode(cfg):
         try:
             torrent.creation_date = _util.parse_date(cfg['date'])
         except ValueError:
-            raise MainError(f'{cfg["date"]}: Invalid date', errno=errno.EINVAL)
+            raise err.ParseError(f'{cfg["date"]}: Invalid date')
 
     if cfg['PATH']:
         list_set_or_remove('exclude', 'exclude')
         try:
             torrent.path = cfg['PATH']
         except torf.TorfError as e:
-            raise MainError(e, errno=e.errno)
+            raise err.Error(e)
         else:
             # Setting torrent.path overwrites torrent.name, so it's important to
             # do that after
@@ -170,7 +170,7 @@ def _verify_mode(cfg):
     try:
         torrent = torf.Torrent.read(cfg['in'])
     except torf.TorfError as e:
-        raise MainError(e, errno=e.errno)
+        raise err.Error(e)
     else:
         _show_torrent_info(torrent, cfg)
         _info('Path', torrent.path, human_readable)
@@ -187,11 +187,11 @@ def _verify_mode(cfg):
                                      callback=status_reporter.verify_callback,
                                      interval=0.5)
         except torf.TorfError as e:
-            raise MainError(e, errno=e.errno)
+            raise err.Error(e)
         finally:
             status_reporter.cleanup(success)
     if not success:
-        raise MainError()
+        raise err.VerifyError(content=cfg["PATH"], torrent=cfg["in"])
 
 
 def _show_torrent_info(torrent, cfg):
@@ -315,11 +315,10 @@ def _check_output_file_exists(torrent, cfg):
         torrent_filepath = _get_torrent_filepath(torrent, cfg)
         if os.path.exists(torrent_filepath):
             if os.path.isdir(torrent_filepath):
-                raise MainError(f'{torrent_filepath}: {os.strerror(errno.EISDIR)}',
-                                errno=errno.EISDIR)
-            elif not cfg['yes'] and not _util.ask_yes_no(f'{torrent_filepath}: Overwrite file?', cfg, default='n'):
-                raise MainError(f'{torrent_filepath}: {os.strerror(errno.EEXIST)}',
-                                errno=errno.EEXIST)
+                raise err.WriteError(f'{torrent_filepath}: {os.strerror(errno.EISDIR)}')
+            elif not cfg['yes'] and not _util.ask_yes_no(f'{torrent_filepath}: Overwrite file?',
+                                                         cfg, default='n'):
+                raise err.WriteError(f'{torrent_filepath}: {os.strerror(errno.EEXIST)}')
 
 
 def _write_torrent(torrent, cfg):
@@ -333,7 +332,7 @@ def _write_torrent(torrent, cfg):
         try:
             torrent.write(torrent_filepath, overwrite=True)
         except torf.TorfError as e:
-            raise MainError(e, errno=e.errno)
+            raise err.Error(e)
         else:
             _info('Torrent', f'{torrent_filepath}', human_readable)
 
@@ -351,7 +350,7 @@ def _hash_pieces(torrent, cfg):
             success = torrent.generate(callback=status_reporter.generate_callback,
                                        interval=0.5)
         except torf.TorfError as e:
-            raise MainError(e, errno=e.errno)
+            raise err.Error(e)
         finally:
             status_reporter.cleanup(success)
             if success:

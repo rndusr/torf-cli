@@ -10,25 +10,24 @@
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
 import sys
-import errno
 
 def run():
     from ._main import run
-    from ._errors import MainError
+    from . import _errors
     from ._vars import __appname__
 
     try:
         run()
-    except MainError as e:
+    except _errors.Error as e:
         if str(e):
             print(f'{__appname__}: {e}', file=sys.stderr)
-        sys.exit(e.errno or 1)
+        sys.exit(e.exit_code)
     except KeyboardInterrupt:
         print(f'{__appname__}: Aborted', file=sys.stderr)
-        sys.exit(errno.ECANCELED)
+        sys.exit(_errors.Code.ABORTED)
     except BrokenPipeError:
         print(f'{__appname__}: Broken pipe', file=sys.stderr)
-        sys.exit(errno.EPIPE)
+        sys.exit(_errors.Code.BROKEN_PIPE)
     except BaseException as e:
         # Because we close stderr ourselves (see below), the Python interpreter
         # can't report tracebacks anymore (I think)

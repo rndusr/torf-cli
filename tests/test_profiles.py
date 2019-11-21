@@ -1,5 +1,6 @@
 from torfcli._main import run
-from torfcli._errors import ConfigError
+from torfcli import _errors as err
+
 import pytest
 import textwrap
 
@@ -9,7 +10,7 @@ def test_unknown_profile(cfgfile, mock_content, mock_create_mode):
     [foo]
     comment = Foo!
     '''))
-    with pytest.raises(ConfigError, match=rf'^{str(cfgfile)}: No such profile: bar$'):
+    with pytest.raises(err.ConfigError, match=rf'^{str(cfgfile)}: No such profile: bar$'):
         run([str(mock_content), '--profile', 'bar'])
     assert mock_create_mode.call_args is None
 
@@ -107,7 +108,7 @@ def test_illegal_configfile_arguments(cfgfile, mock_content, mock_create_mode):
         [foo]
         {arg} = foo
         '''))
-        with pytest.raises(ConfigError, match=f'^{str(cfgfile)}: Not allowed in config file: {arg}$'):
+        with pytest.raises(err.ConfigError, match=f'^{str(cfgfile)}: Not allowed in config file: {arg}$'):
             run(['--config', str(cfgfile), str(mock_content)])
         assert mock_create_mode.call_args is None
 
@@ -116,6 +117,6 @@ def test_illegal_configfile_arguments(cfgfile, mock_content, mock_create_mode):
         [foo]
         {arg}
         '''))
-        with pytest.raises(ConfigError, match=f'^{str(cfgfile)}: Not allowed in config file: {arg}$'):
+        with pytest.raises(err.ConfigError, match=f'^{str(cfgfile)}: Not allowed in config file: {arg}$'):
             run(['--config', str(cfgfile), str(mock_content)])
         assert mock_create_mode.call_args is None

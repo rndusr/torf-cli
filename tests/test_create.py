@@ -1,11 +1,10 @@
 from torfcli._main import run
-from torfcli._errors import MainError
+from torfcli import _errors as err
 import pytest
 from unittest.mock import patch, DEFAULT
 import os
 import torf
 from datetime import datetime, date, time, timedelta
-import errno
 
 
 def assert_approximate_date(date1, date2):
@@ -65,9 +64,8 @@ def test_user_given_torrent_filepath(capsys, mock_content):
 ### Error cases
 
 def test_content_path_doesnt_exist(capsys):
-    with pytest.raises(MainError, match=r'^/path/doesnt/exist: No such file or directory$') as exc_info:
+    with pytest.raises(err.ReadError, match=r'^/path/doesnt/exist: No such file or directory$') as exc_info:
         run(['/path/doesnt/exist'])
-    assert exc_info.value.errno == errno.ENOENT
 
 
 def test_torrent_filepath_exists(capsys, mock_content):
@@ -78,9 +76,8 @@ def test_torrent_filepath_exists(capsys, mock_content):
     with open(exp_torrent_filepath, 'wb') as f:
         f.write(b'<torrent data>')
 
-    with pytest.raises(MainError, match=rf'^{exp_torrent_filepath}: File exists$') as exc_info:
+    with pytest.raises(err.WriteError, match=rf'^{exp_torrent_filepath}: File exists$') as exc_info:
         run([content_path, '--out', exp_torrent_filepath])
-    assert exc_info.value.errno == errno.EEXIST
 
 
 ### Options
@@ -176,9 +173,8 @@ def test_exclude_everything(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    with pytest.raises(MainError, match=rf'^{content_path}: Empty directory$') as exc_info:
+    with pytest.raises(err.ReadError, match=rf'^{content_path}: Empty directory$') as exc_info:
         run([content_path, '--exclude', '*'])
-    assert exc_info.value.errno == errno.ENODATA
 
 
 def test_name_option(capsys, mock_content):
@@ -336,9 +332,8 @@ def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
         factor = 1.234
         exp_invalid_piece_size = int(factor*2**20)
         exp_error = rf'^Piece size must be a power of 2: {exp_invalid_piece_size}$'
-        with pytest.raises(MainError, match=exp_error) as exc_info:
+        with pytest.raises(err.ParseError, match=exp_error):
             run([content_path, '--max-piece-size', str(factor)])
-    assert exc_info.value.errno == errno.EINVAL
 
 
 def test_default_date(capsys, mock_content):
@@ -440,9 +435,8 @@ def test_invalid_date(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    with pytest.raises(MainError, match=r'^foo: Invalid date$') as exc_info:
+    with pytest.raises(err.ParseError, match=r'^foo: Invalid date$'):
         run([content_path, '--date', 'foo'])
-    assert exc_info.value.errno == errno.EINVAL
 
 
 def test_nodate_option(capsys, mock_content):

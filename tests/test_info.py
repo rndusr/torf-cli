@@ -1,5 +1,5 @@
 from torfcli._main import run
-from torfcli._errors import MainError
+from torfcli import _errors as err
 import pytest
 import os
 from datetime import datetime
@@ -9,17 +9,15 @@ import re
 
 def test_nonexisting_torrent_file(capsys):
     nonexising_path = '/no/such/file'
-    with pytest.raises(MainError, match=rf'^{nonexising_path}: No such file or directory$') as exc_info:
+    with pytest.raises(err.ReadError, match=rf'^{nonexising_path}: No such file or directory$') as exc_info:
         run(['-i', nonexising_path])
-    assert exc_info.value.errno == errno.ENOENT
 
 
 def test_insufficient_permissions(capsys, create_torrent):
     with create_torrent() as torrent_file:
         os.chmod(torrent_file, 0o000)
-        with pytest.raises(MainError, match=rf'^{torrent_file}: Permission denied$') as exc_info:
+        with pytest.raises(err.ReadError, match=rf'^{torrent_file}: Permission denied$') as exc_info:
             run(['-i', torrent_file])
-    assert exc_info.value.errno == errno.EACCES
 
 
 def test_magnet(capsys, create_torrent, human_readable, clear_ansi):

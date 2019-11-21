@@ -1,7 +1,6 @@
 from torfcli._main import run
-from torfcli._errors import MainError
+from torfcli import _errors as err
 import pytest
-import errno
 import torf
 import os
 from datetime import datetime
@@ -9,26 +8,23 @@ from datetime import datetime
 
 def test_nonexisting_input():
     nonexisting_path = '/no/such/file'
-    with pytest.raises(MainError, match=rf'^{nonexisting_path}: No such file or directory$') as exc_info:
+    with pytest.raises(err.ReadError, match=rf'^{nonexisting_path}: No such file or directory$'):
         run(['-i', nonexisting_path, '-o', 'out.torrent'])
-    assert exc_info.value.errno == errno.ENOENT
 
 
 def test_existing_output(create_torrent, tmpdir):
     outfile = tmpdir.join('out.torrent')
     outfile.write('some existing file content')
     with create_torrent() as infile:
-        with pytest.raises(MainError, match=rf'^{str(outfile)}: File exists$') as exc_info:
+        with pytest.raises(err.WriteError, match=rf'^{str(outfile)}: File exists$') as exc_info:
             run(['-i', infile, '-o', str(outfile)])
-        assert exc_info.value.errno == errno.EEXIST
 
 
 def test_unwritable_output(create_torrent):
     unwritable_path = '/out.torrent'
     with create_torrent() as infile:
-        with pytest.raises(MainError, match=rf'^{unwritable_path}: Permission denied$') as exc_info:
+        with pytest.raises(err.WriteError, match=rf'^{unwritable_path}: Permission denied$') as exc_info:
             run(['-i', infile, '-o', unwritable_path])
-        assert exc_info.value.errno == errno.EACCES
 
 
 def test_no_changes(create_torrent, tmpdir, assert_torrents_equal):
@@ -147,9 +143,8 @@ def test_invalid_tracker_url(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(trackers=['http://tracker1', 'http://tracker2']) as infile:
         orig = torf.Torrent.read(infile)
-        with pytest.raises(MainError, match=r'^not a url: Invalid URL$') as exc_info:
+        with pytest.raises(err.ParseError, match=r'^not a url: Invalid URL$'):
             run(['-i', infile, '--tracker', 'not a url', '-o', outfile])
-        assert exc_info.value.errno == 22
         assert not os.path.exists(outfile)
 
 
@@ -181,9 +176,8 @@ def test_invalid_webseed_url(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(webseeds=['http://webseed1', 'http://webseed2']) as infile:
         orig = torf.Torrent.read(infile)
-        with pytest.raises(MainError, match=r'^not a url: Invalid URL$') as exc_info:
+        with pytest.raises(err.ParseError, match=r'^not a url: Invalid URL$'):
             run(['-i', infile, '--webseed', 'not a url', '-o', outfile])
-        assert exc_info.value.errno == 22
         assert not os.path.exists(outfile)
 
 
@@ -207,9 +201,8 @@ def test_invalid_creation_date(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent() as infile:
         orig = torf.Torrent.read(infile)
-        with pytest.raises(MainError, match=r'^foo: Invalid date$') as exc_info:
+        with pytest.raises(err.ParseError, match=r'^foo: Invalid date$'):
             run(['-i', infile, '--date', 'foo', '-o', outfile])
-        assert exc_info.value.errno == 22
         assert not os.path.exists(outfile)
 
 
