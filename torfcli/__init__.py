@@ -27,20 +27,18 @@ def run():
         sys.exit(_errors.Code.ABORTED)
     except BrokenPipeError:
         print(f'{__appname__}: Broken pipe', file=sys.stderr)
-        sys.exit(_errors.Code.BROKEN_PIPE)
-    except BaseException as e:
-        # Because we close stderr ourselves (see below), the Python interpreter
-        # can't report tracebacks anymore (I think)
-        import traceback
-        traceback.print_exc()
-        raise
-    finally:
-        # Close stdout and stderr before the python interpreter tries it outside
-        # of our scope, which might fail if a pipe was broken (e.g. `torf ... |
-        # ls`), resuling in an ugly BrokePipeError message.
-        # https://stackoverflow.com/a/18954489
-        for fd in (sys.stdout, sys.stderr):
+        # Prevent Python interpreter from printing redundant error message
+        # "BrokenPipeError: [Errno 32] Broken pipe" and exit with correct exit
+        # code.
+        # https://bugs.python.org/issue11380#msg248579
+        try:
+            sys.stdout.flush()
+        finally:
             try:
-                fd.close()
-            except IOError:
-                pass
+                sys.stdout.close()
+            finally:
+                try:
+                    sys.stderr.flush()
+                finally:
+                    sys.stderr.close()
+                    sys.exit(_errors.Code.BROKEN_PIPE)
