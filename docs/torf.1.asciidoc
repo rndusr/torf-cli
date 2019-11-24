@@ -46,116 +46,137 @@ _PATH_::
     The path to the torrent's content.
 
 *--exclude*, *-e* _EXCLUDE_::
-    Exclude files from _PATH_ that match the pattern _EXCLUDE_.  This option may
-    be given multiple times.  It is ignored if _PATH_ is not a directory.  See
-    *EXCLUDING FILES*.
+Exclude files from _PATH_ that match the pattern _EXCLUDE_.  This option may be
+given multiple times.  It is ignored if _PATH_ is not a directory.  See
+*EXCLUDING FILES*.
 
 *--in*, *-i* _TORRENT_::
-    Read metainfo from _TORRENT_.
+Read metainfo from _TORRENT_.
 
 *--out*, *-o* _TORRENT_::
-    Write torrent to _TORRENT_. +
-    Default: __NAME__**.torrent**
+Write torrent to _TORRENT_. +
+Default: __NAME__**.torrent**
 
 *--notorrent*, *-N*::
-    Do not create a torrent file.
+Do not create a torrent file.
 
 *--nomagnet*, *-M*::
-    Do not create a magnet link.
+Do not create a magnet link.
 
 *--name*, *-n* _NAME_::
-    Destination file or directory when the torrent is downloaded. +
-    Default: Basename of _PATH_
+Destination file or directory when the torrent is downloaded. +
+Default: Basename of _PATH_
++
+WARNING: When editing, this option changes the info hash and creates a new
+torrent.
 
 *--tracker*, *-t* _URL_::
-    The announce URL of a tracker.  This option may be given multiple times.
+The announce URL of a tracker.  This option may be given multiple times.
 
 *--notracker*, *-T*::
-    Remove trackers from an existing torrent.
+Remove trackers from an existing torrent.
 
 *--webseed*, *-w* _URL_::
-    A webseed URL (BEP19).  This option may be given multiple times.
+A webseed URL (BEP19).  This option may be given multiple times.
 
 *--nowebseed*, *-W*::
-    Remove webseeds from an existing torrent.
+Remove webseeds from an existing torrent.
 
 *--private*, *-p*::
-    Tell clients to use tracker(s) exclusively for peer discovery.
+Tell clients to use tracker(s) exclusively for peer discovery.
++
+WARNING: When editing, this option changes the info hash and creates a new
+torrent.
 
 *--noprivate*, *-P*::
-    Allow clients to use DHT and PEX for peer discovery.
+Allow clients to use DHT and PEX for peer discovery.
++
+WARNING: When editing, this option changes the info hash and creates a new
+torrent.
 
 *--comment*, *-c* _COMMENT_::
-    A comment that is stored in the torrent file.
+A comment that is stored in the torrent file.
 
 *--nocomment*, *-C*::
-    Remove the comment from an existing torrent.
+Remove the comment from an existing torrent.
 
 *--date*, *-d* _DATE_::
-    The creation date in the format __YYYY__**-**__MM__**-**__DD__[
-    __HH__**:**__MM__[**:**__SS__]], *now* for the current time or *today* for
-    the current time at midnight. +
-    Default: *now*
+The creation date in the format __YYYY__**-**__MM__**-**__DD__[
+__HH__**:**__MM__[**:**__SS__]], *now* for the current time or *today* for today
+at midnight. +
+Default: *now*
 
 *--nodate*, *-D*::
-    Remove the creation date from an existing torrent.
+Remove the creation date from an existing torrent.
 
 *--source*, *-s* _SOURCE_::
-    Add a "`source`" field to the torrent file.  This is usually used to make the
-    torrent's info hash unique per tracker.
+Add a "`source`" field to the torrent file.  This is usually used to make the
+torrent's info hash unique per tracker.
++
+WARNING: When editing, this option changes the info hash and creates a new
+torrent.
 
 *--nosource*, *-S*::
-    Remove the "`source`" field from an existing torrent.
+Remove the "`source`" field from an existing torrent.
++
+WARNING: When editing, this option changes the info hash and creates a new
+torrent.
 
 *--xseed*, *-x*::
-    Randomize the info hash to help with cross-seeding.  This simply adds an
-    *entropy* field to the *info* section of the metainfo and sets it to a
-    random integer.
+Randomize the info hash to help with cross-seeding.  This simply adds an
+*entropy* field to the *info* section of the metainfo and sets it to a random
+integer.
++
+WARNING: When editing, this option changes the info hash and creates a new
+torrent.
 
 *--noxseed*, *-X*::
-    De-randomize a previously randomized info hash of an existing torrent.  This
-    removes the *entropy* field from the *info* section of the metainfo.
+De-randomize a previously randomized info hash of an existing torrent.  This
+removes the *entropy* field from the *info* section of the metainfo.
++
+WARNING: When editing, this option changes the info hash and creates a new
+torrent.
 
 *--max-piece-size* _SIZE_::
-    The maximum piece size when creating a torrent.  SIZE is multiplied by 1 MiB
-    (1048576 bytes).  The resulting number must be a power of two (2, 4, 8, 16,
-    etc.).  Numbers smaller than 1 are allowed, e.g. "`0.25`" sets the maximum
-    piece size to 256 KiB.
+The maximum piece size when creating a torrent.  SIZE is multiplied by 1 MiB
+(1048576 bytes).  The resulting number must be a power of two (2, 4, 8, 16,
+etc.).  Numbers smaller than 1 are allowed, e.g. "`0.25`" sets the maximum piece
+size to 256 KiB.
 
 *--nocreator*, *-R*::
-    Remove the name of the application that created the torrent from an existing
-    torrent.
+Remove the name of the application that created the torrent from an existing
+torrent.
 
 *--yes*, *-y*::
-    Answer all yes/no prompts with "`yes`".  At the moment, all this does is
-    overwrite _TORRENT_ without asking.
+Answer all yes/no prompts with "`yes`".  At the moment, all this does is
+overwrite _TORRENT_ without asking.
 
 *--config*, *-f* _FILE_::
-    Read command line arguments from configuration FILE.  See *CONFIGURATION
-    FILE*. +
-    Default: __$XDG_CONFIG_HOME__**/torf/config** where _$XDG_CONFIG_HOME_
-    defaults to *~/.config*
+Read command line arguments from configuration FILE.  See *CONFIGURATION
+FILE*. +
+Default: __$XDG_CONFIG_HOME__**/torf/config** where _$XDG_CONFIG_HOME_ defaults
+to *~/.config*
 
 *--noconfig*, *-F*::
-    Do not use any configuration file.
+Do not use any configuration file.
 
 *--profile*, *-z* _PROFILE_::
-    Use predefined arguments specified in _PROFILE_.  This option may be given
-    multiple times.  See *CONFIGURATION FILE*.
+Use predefined arguments specified in _PROFILE_.  This option may be given
+multiple times.  See *CONFIGURATION FILE*.
 
 *--human*, *-u*::
-    Display information in human-readable output even if stdout is not a TTY.
-    See *PIPING OUTPUT*.
+Display information in human-readable output even if stdout is not a TTY.  See
+*PIPING OUTPUT*.
 
 *--nohuman*, *-U*::
-    Display information in machine-readable output even if stdout is a TTY.  See
-    *PIPING OUTPUT*.
+Display information in machine-readable output even if stdout is a TTY.  See
+*PIPING OUTPUT*.
 
 *--help*, *-h*::
-    Display a short help text and exit.
+Display a short help text and exit.
 
 *--version*, *-V*::
-    Display the version number and exit.
+Display the version number and exit.
 
 
 == EXAMPLES
