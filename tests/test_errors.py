@@ -55,37 +55,6 @@ def test_WriteError():
         assert str(exc_info.value) == 'path/to/file: No space left on device'
 
 
-def test_ParseError():
-    for cls,args,kwargs in ((err.ParseError, ('parse error',), {}),
-                            (err.Error, ('parse error', err.Code.PARSE), {}),
-                            (err.Error, ('parse error',), {'code': err.Code.PARSE})):
-        print(f'{cls.__name__}({args}, {kwargs})')
-        with pytest.raises(err.ParseError) as exc_info:
-            raise cls(*args, **kwargs)
-        assert exc_info.value.exit_code is err.Code.PARSE
-        assert str(exc_info.value) == 'parse error'
-
-    with pytest.raises(err.ParseError) as exc_info:
-        raise err.Error(torf.ParseError('path/to/file'))
-    assert exc_info.value.exit_code is err.Code.PARSE
-    assert str(exc_info.value) == 'path/to/file: Invalid torrent file format'
-
-    with pytest.raises(err.ParseError) as exc_info:
-        raise err.Error(torf.MetainfoError('missing pieces'))
-    assert exc_info.value.exit_code is err.Code.PARSE
-    assert str(exc_info.value) == 'Invalid metainfo: missing pieces'
-
-    with pytest.raises(err.ParseError) as exc_info:
-        raise err.Error(torf.URLError('htp://gugu'))
-    assert exc_info.value.exit_code is err.Code.PARSE
-    assert str(exc_info.value) == 'htp://gugu: Invalid URL'
-
-    with pytest.raises(err.ParseError) as exc_info:
-        raise err.Error(torf.PieceSizeError(123))
-    assert exc_info.value.exit_code is err.Code.PARSE
-    assert str(exc_info.value) == 'Piece size must be a power of 2: 123'
-
-
 def test_VerifyError():
     for cls,args,kwargs in ((err.VerifyError, (), {'content': 'path/to/content', 'torrent': 'path/to/torrent'}),
                             (err.Error, ('path/to/content does not satisfy path/to/torrent', err.Code.VERIFY), {}),

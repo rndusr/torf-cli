@@ -143,7 +143,7 @@ def test_invalid_tracker_url(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(trackers=['http://tracker1', 'http://tracker2']) as infile:
         orig = torf.Torrent.read(infile)
-        with pytest.raises(err.ParseError, match=r'^not a url: Invalid URL$'):
+        with pytest.raises(err.CliError, match=r'^not a url: Invalid URL$'):
             run(['-i', infile, '--tracker', 'not a url', '-o', outfile])
         assert not os.path.exists(outfile)
 
@@ -176,7 +176,7 @@ def test_invalid_webseed_url(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(webseeds=['http://webseed1', 'http://webseed2']) as infile:
         orig = torf.Torrent.read(infile)
-        with pytest.raises(err.ParseError, match=r'^not a url: Invalid URL$'):
+        with pytest.raises(err.CliError, match=r'^not a url: Invalid URL$'):
             run(['-i', infile, '--webseed', 'not a url', '-o', outfile])
         assert not os.path.exists(outfile)
 

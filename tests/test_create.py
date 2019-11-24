@@ -332,7 +332,7 @@ def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
         factor = 1.234
         exp_invalid_piece_size = int(factor*2**20)
         exp_error = rf'^Piece size must be a power of 2: {exp_invalid_piece_size}$'
-        with pytest.raises(err.ParseError, match=exp_error):
+        with pytest.raises(err.CliError, match=exp_error):
             run([content_path, '--max-piece-size', str(factor)])
 
 
