@@ -135,6 +135,14 @@ def parse_args(args):
         except torf.PieceSizeError as e:
             raise _errors.CliError(e)
 
+    # Validate tracker URLs
+    if cfg['tracker']:
+        for tracker in cfg['tracker']:
+            try:
+                torf.Torrent().trackers = (tracker,)
+            except torf.URLError as e:
+                raise _errors.CliError(e)
+
     return cfg
 
 
