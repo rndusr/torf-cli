@@ -75,7 +75,7 @@ class Error(Exception):
 
     def __init__(self, msg=None, code=None):
         msg = msg or 'Unspecified error'
-        self._exit_code = code or _codes[type(self)]
+        self._exit_code = code or self._subclsmap[type(self)]
         super().__init__(str(msg))
 
     @property
