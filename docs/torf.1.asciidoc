@@ -11,6 +11,7 @@ torf - command line tool to create, display and edit torrents
 *torf* _PATH_ [_OPTIONS_] [*-o* _TORRENT_] +
 *torf* *-i* _TORRENT_ +
 *torf* *-i* _TORRENT_ [_OPTIONS_] *-o* _TORRENT_ +
+*torf* *-i* _TORRENT_ _PATH_ +
 
 
 == DESCRIPTION
