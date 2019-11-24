@@ -82,12 +82,7 @@ def _create_mode(cfg):
         torrent.creation_date = datetime.datetime.now()
 
     if cfg['max_piece_size']:
-        max_piece_size = cfg['max_piece_size'] * 1048576
-        if torrent.piece_size > max_piece_size:
-            try:
-                torrent.piece_size = max_piece_size
-            except torf.PieceSizeError as e:
-                raise err.ParseError(e)
+        torrent.piece_size = cfg['max_piece_size']
 
     _check_output_file_exists(torrent, cfg)
     _show_torrent_info(torrent, cfg)

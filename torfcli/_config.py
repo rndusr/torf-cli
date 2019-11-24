@@ -14,6 +14,7 @@ import argparse
 import os
 import errno
 from xdg import BaseDirectory
+import torf
 
 from . import _errors
 from . import _vars
@@ -125,6 +126,14 @@ def parse_args(args):
             cfg['date'] = _util.parse_date(cfg['date'] or 'now')
         except ValueError:
             raise _errors.CliError(f'{cfg["date"]}: Invalid date')
+
+    # Validate max piece size
+    if cfg['max_piece_size']:
+        cfg['max_piece_size'] = cfg['max_piece_size'] * 1048576
+        try:
+            torf.Torrent().piece_size = cfg['max_piece_size']
+        except torf.PieceSizeError as e:
+            raise _errors.CliError(e)
 
     return cfg
 
