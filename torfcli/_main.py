@@ -74,11 +74,12 @@ def _create_mode(cfg):
     except torf.TorfError as e:
         raise err.Error(e)
 
-    if not cfg['nodate']:
-        try:
-            torrent.creation_date = _util.parse_date(cfg['date'] or 'now')
-        except ValueError:
-            raise err.ParseError(f'{cfg["date"]}: Invalid date')
+    if cfg['nodate']:
+        torrent.creation_date = None
+    elif cfg['date']:
+        torrent.creation_date = cfg['date']
+    else:
+        torrent.creation_date = datetime.datetime.now()
 
     if cfg['max_piece_size']:
         max_piece_size = cfg['max_piece_size'] * 1048576
@@ -137,10 +138,7 @@ def _edit_mode(cfg):
     if cfg['nodate']:
         torrent.creation_date = None
     elif cfg['date']:
-        try:
-            torrent.creation_date = _util.parse_date(cfg['date'])
-        except ValueError:
-            raise err.ParseError(f'{cfg["date"]}: Invalid date')
+        torrent.creation_date = cfg['date']
 
     if cfg['PATH']:
         list_set_or_remove('exclude', 'exclude')

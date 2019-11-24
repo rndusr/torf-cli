@@ -3,6 +3,7 @@ from torfcli import _errors as err
 
 import pytest
 import textwrap
+import datetime
 
 
 def test_unknown_profile(cfgfile, mock_content, mock_create_mode):
@@ -25,13 +26,13 @@ def test_profile_option(cfgfile, mock_content, mock_create_mode):
     run([str(mock_content)])
     cfg = mock_create_mode.call_args[0][0]
     assert cfg['xseed'] == True
-    assert cfg['date'] == '2000-01-02'
+    assert cfg['date'] == datetime.datetime(2000, 1, 2)
     assert cfg['comment'] == ''
 
     run([str(mock_content), '--profile', 'foo'])
     cfg = mock_create_mode.call_args[0][0]
     assert cfg['xseed'] == True
-    assert cfg['date'] == '2000-01-02'
+    assert cfg['date'] == datetime.datetime(2000, 1, 2)
     assert cfg['comment'] == 'Foo!'
 
 

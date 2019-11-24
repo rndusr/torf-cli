@@ -201,7 +201,7 @@ def test_invalid_creation_date(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent() as infile:
         orig = torf.Torrent.read(infile)
-        with pytest.raises(err.ParseError, match=r'^foo: Invalid date$'):
+        with pytest.raises(err.CliError, match=r'^foo: Invalid date$'):
             run(['-i', infile, '--date', 'foo', '-o', outfile])
         assert not os.path.exists(outfile)
 

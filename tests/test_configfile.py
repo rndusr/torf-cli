@@ -4,6 +4,7 @@ import pytest
 from unittest import mock
 import textwrap
 import os
+import datetime
 
 
 def test_default_configfile_doesnt_exist(cfgfile, mock_content, mock_create_mode):
@@ -60,7 +61,7 @@ def test_cli_args_take_precedence(cfgfile, mock_content, mock_create_mode):
     assert cfg['noxseed'] == True
     assert cfg['xseed'] == True
     assert cfg['comment'] == 'Generic description'
-    assert cfg['date'] == '2001-02-03 04:05'
+    assert cfg['date'] == datetime.datetime(2001, 2, 3, 4, 5)
 
 
 def test_adding_to_list_via_cli(cfgfile, mock_content, mock_create_mode):
@@ -123,7 +124,7 @@ def test_environment_variable_resolution(cfgfile, mock_content, mock_create_mode
         run([str(mock_content)])
         cfg = mock_create_mode.call_args[0][0]
         assert cfg['tracker'] == ['https://tracker.example.org:123/announce']
-        assert cfg['date'] == '1999-12-31'
+        assert cfg['date'] == datetime.datetime(1999, 12, 31, 0, 0)
         assert cfg['comment'] == '$UNDEFINED'
 
 
@@ -142,7 +143,7 @@ def test_environment_variable_resolution_in_profile(cfgfile, mock_content, mock_
         run([str(mock_content), '--profile', 'foo'])
         cfg = mock_create_mode.call_args[0][0]
         assert cfg['tracker'] == ['https://tracker.example.org:123/announce']
-        assert cfg['date'] == '1999-12-31'
+        assert cfg['date'] == datetime.datetime(1999, 12, 31, 0, 0)
         assert cfg['comment'] == '$UNDEFINED'
 
 

@@ -435,7 +435,7 @@ def test_invalid_date(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    with pytest.raises(err.ParseError, match=r'^foo: Invalid date$'):
+    with pytest.raises(err.CliError, match=r'^foo: Invalid date$'):
         run([content_path, '--date', 'foo'])
 
 

@@ -17,6 +17,7 @@ from xdg import BaseDirectory
 
 from . import _errors
 from . import _vars
+from . import _util
 
 
 DEFAULT_CONFIG_FILE = os.path.join(BaseDirectory.xdg_config_home, _vars.__appname__, 'config')
@@ -116,7 +117,16 @@ _cliparser.add_argument('--help', '-h', action='store_true')
 _cliparser.add_argument('--version', '-V', action='store_true')
 
 def parse_args(args):
-    return vars(_cliparser.parse_args(args))
+    cfg = vars(_cliparser.parse_args(args))
+
+    # Validate creation date
+    if cfg['date']:
+        try:
+            cfg['date'] = _util.parse_date(cfg['date'] or 'now')
+        except ValueError:
+            raise _errors.CliError(f'{cfg["date"]}: Invalid date')
+
+    return cfg
 
 
 def get_cfg(cliargs):
