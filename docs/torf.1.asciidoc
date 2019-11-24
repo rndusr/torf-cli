@@ -269,10 +269,23 @@ is provided, the output format is slightly different:
   raw bytes for sizes, etc).
 
 
-== EXIT STATUS
+== EXIT CODES
 
-torf returns zero on success and non-zero on failure.  You can lookup error
-codes in the output of *errno -l*.
+1:: Anything not specified below
+
+2:: Unknown or invalid command line arguments
+
+3:: Error while reading or parsing the config file
+
+4:: Error while reading a torrent file or content
+
+5:: Error while writing a torrent file
+
+6:: Error while verifying a torrent's content
+
+128:: Aborted by SIGINT (typically Ctrl-c was pressed)
+
+129:: Broken pipe (stdout was closed before we could flush it)
 
 
 == REPORTING BUGS
