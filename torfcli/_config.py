@@ -143,6 +143,14 @@ def parse_args(args):
             except torf.URLError as e:
                 raise _errors.CliError(e)
 
+    # Validate webseed URLs
+    if cfg['webseed']:
+        for webseed in cfg['webseed']:
+            try:
+                torf.Torrent().webseeds = (webseed,)
+            except torf.URLError as e:
+                raise _errors.CliError(e)
+
     return cfg
 
 
