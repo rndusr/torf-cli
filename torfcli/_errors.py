@@ -20,8 +20,7 @@ class Code(IntEnum):
     CONFIG      = 3
     READ        = 4
     WRITE       = 5
-    PARSE       = 6
-    VERIFY      = 7
+    VERIFY      = 6
     ABORTED     = 128
     BROKEN_PIPE = 129
 
@@ -41,14 +40,13 @@ class Error(Exception):
 
     _subclsmap = defaultdict(
         lambda: Code.GENERIC,
+        # torf.URLError and torf.PieceSizeError are handled in _config.py
         {torf.ReadError               : Code.READ,
          torf.PathNotFoundError       : Code.READ,
          torf.PathEmptyError          : Code.READ,
+         torf.ParseError              : Code.READ,
+         torf.MetainfoError           : Code.READ,
          torf.WriteError              : Code.WRITE,
-         torf.ParseError              : Code.PARSE,
-         torf.MetainfoError           : Code.PARSE,
-         torf.URLError                : Code.PARSE,
-         torf.PieceSizeError          : Code.PARSE,
          torf.VerifyNotDirectoryError : Code.VERIFY,
          torf.VerifyIsDirectoryError  : Code.VERIFY,
          torf.VerifyFileSizeError     : Code.VERIFY,
@@ -99,10 +97,6 @@ class ReadError(Error):
 class WriteError(Error):
     def __init__(self, msg, code=None):
         super().__init__(msg, code=Code.WRITE)
-
-class ParseError(Error):
-    def __init__(self, msg, code=None):
-        super().__init__(msg, code=Code.PARSE)
 
 class VerifyError(Error):
     def __init__(self, content=None, code=None, torrent=None):
