@@ -10,15 +10,32 @@ torf - command line tool to create, display and edit torrents
 
 *torf* _PATH_ [_OPTIONS_] [*-o* _TORRENT_] +
 *torf* *-i* _TORRENT_ +
-*torf* *-i* _TORRENT_ [_OPTIONS_] *-o* _TORRENT_ +
+*torf* *-i* _TORRENT_ [_OPTIONS_] *-o* _NEWTORRENT_ +
 *torf* *-i* _TORRENT_ _PATH_ +
 
 
 == DESCRIPTION
 
-torf can create new torrents, display information about existing torrents, and
-edit torrents (e.g. to remove a comment or change the tracker) without
-re-hashing the content.
+torf can create, display and edit torrent files and verify the integrity of a
+torrent's content.
+
+* *torf* _PATH_ [_OPTIONS_] [*-o* _TORRENT_] +
+Create the torrent file _TORRENT_ from the file or directory _PATH_.
+
+* *torf* *-i* _TORRENT_ +
+Display information stored in the torrent file _TORRENT_.
+
+* *torf* *-i* _TORRENT_ [_OPTIONS_] *-o* _NEWTORRENT_ +
+Edit the existing torrent file _TORRENT_ (e.g. to fix a typo in the comment)
+and create the new torrent file _NEWTORRENT_.
++
+WARNING: Editing a torrent can change its hash, depending on the changes, which
+         essentially makes it a new torrent.  See OPTIONS to find out whether a
+         certain option will change the hash.
+
+* *torf* *-i* _TORRENT_ _PATH_ +
+Verify that the content in _PATH_ matches the metadata in the torrent file
+_TORRENT_.
 
 
 == OPTIONS
