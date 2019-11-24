@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
-.\" Generator: Asciidoctor 1.5.8
-.\"      Date: 2019-04-04
+.\" Generator: Asciidoctor 2.0.10
+.\"      Date: 2019-11-24
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2019-04-04" "\ \&" "\ \&"
+.TH "TORF" "1" "2019-11-24" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -35,13 +35,84 @@ torf \- command line tool to create, display and edit torrents
 .br
 \fBtorf\fP \fB\-i\fP \fITORRENT\fP
 .br
-\fBtorf\fP \fB\-i\fP \fITORRENT\fP [\fIOPTIONS\fP] \fB\-o\fP \fITORRENT\fP
+\fBtorf\fP \fB\-i\fP \fITORRENT\fP [\fIOPTIONS\fP] \fB\-o\fP \fINEWTORRENT\fP
+.br
+\fBtorf\fP \fB\-i\fP \fITORRENT\fP \fIPATH\fP
 .br
 .SH "DESCRIPTION"
 .sp
-torf can create new torrents, display information about existing torrents, and
-edit torrents (e.g. to remove a comment or change the tracker) without
-re\-hashing the content.
+torf can create, display and edit torrent files and verify the integrity of a
+torrent\(cqs content.
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+\fBtorf\fP \fIPATH\fP [\fIOPTIONS\fP] [\fB\-o\fP \fITORRENT\fP]
+.br
+Create the torrent file \fITORRENT\fP from the file or directory \fIPATH\fP.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+\fBtorf\fP \fB\-i\fP \fITORRENT\fP
+.br
+Display information stored in the torrent file \fITORRENT\fP.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+\fBtorf\fP \fB\-i\fP \fITORRENT\fP [\fIOPTIONS\fP] \fB\-o\fP \fINEWTORRENT\fP
+.br
+Edit the existing torrent file \fITORRENT\fP (e.g. to fix a typo in the comment)
+and create the new torrent file \fINEWTORRENT\fP.
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Warning
+.ps -1
+.br
+.sp
+Editing a torrent can change its hash, depending on the changes, which
+essentially makes it a new torrent.  See OPTIONS to find out whether a
+certain option will change the hash.
+.sp .5v
+.RE
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+\fBtorf\fP \fB\-i\fP \fITORRENT\fP \fIPATH\fP
+.br
+Verify that the content in \fIPATH\fP matches the metadata in the torrent file
+\fITORRENT\fP.
+.RE
 .SH "OPTIONS"
 .sp
 Options that start with \fB\-\-no\fP take precedence.
@@ -53,8 +124,8 @@ The path to the torrent\(cqs content.
 .sp
 \fB\-\-exclude\fP, \fB\-e\fP \fIEXCLUDE\fP
 .RS 4
-Exclude files from \fIPATH\fP that match the pattern \fIEXCLUDE\fP.  This option may
-be given multiple times.  It is ignored if \fIPATH\fP is not a directory.  See
+Exclude files from \fIPATH\fP that match the pattern \fIEXCLUDE\fP.  This option may be
+given multiple times.  It is ignored if \fIPATH\fP is not a directory.  See
 \fBEXCLUDING FILES\fP.
 .RE
 .sp
@@ -85,6 +156,21 @@ Do not create a magnet link.
 Destination file or directory when the torrent is downloaded.
 .br
 Default: Basename of \fIPATH\fP
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Warning
+.ps -1
+.br
+.sp
+When editing, this option changes the info hash and creates a new
+torrent.
+.sp .5v
+.RE
 .RE
 .sp
 \fB\-\-tracker\fP, \fB\-t\fP \fIURL\fP
@@ -110,11 +196,41 @@ Remove webseeds from an existing torrent.
 \fB\-\-private\fP, \fB\-p\fP
 .RS 4
 Tell clients to use tracker(s) exclusively for peer discovery.
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Warning
+.ps -1
+.br
+.sp
+When editing, this option changes the info hash and creates a new
+torrent.
+.sp .5v
+.RE
 .RE
 .sp
 \fB\-\-noprivate\fP, \fB\-P\fP
 .RS 4
 Allow clients to use DHT and PEX for peer discovery.
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Warning
+.ps -1
+.br
+.sp
+When editing, this option changes the info hash and creates a new
+torrent.
+.sp .5v
+.RE
 .RE
 .sp
 \fB\-\-comment\fP, \fB\-c\fP \fICOMMENT\fP
@@ -130,8 +246,8 @@ Remove the comment from an existing torrent.
 \fB\-\-date\fP, \fB\-d\fP \fIDATE\fP
 .RS 4
 The creation date in the format \fIYYYY\fP\fB\-\fP\fIMM\fP\fB\-\fP\fIDD\fP[
-\fIHH\fP\fB:\fP\fIMM\fP[\fB:\fP\fISS\fP]], \fBnow\fP for the current time or \fBtoday\fP for
-the current time at midnight.
+\fIHH\fP\fB:\fP\fIMM\fP[\fB:\fP\fISS\fP]], \fBnow\fP for the current time or \fBtoday\fP for today
+at midnight.
 .br
 Default: \fBnow\fP
 .RE
@@ -145,32 +261,92 @@ Remove the creation date from an existing torrent.
 .RS 4
 Add a \(lqsource\(rq field to the torrent file.  This is usually used to make the
 torrent\(cqs info hash unique per tracker.
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Warning
+.ps -1
+.br
+.sp
+When editing, this option changes the info hash and creates a new
+torrent.
+.sp .5v
+.RE
 .RE
 .sp
 \fB\-\-nosource\fP, \fB\-S\fP
 .RS 4
 Remove the \(lqsource\(rq field from an existing torrent.
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Warning
+.ps -1
+.br
+.sp
+When editing, this option changes the info hash and creates a new
+torrent.
+.sp .5v
+.RE
 .RE
 .sp
 \fB\-\-xseed\fP, \fB\-x\fP
 .RS 4
 Randomize the info hash to help with cross\-seeding.  This simply adds an
-\fBentropy\fP field to the \fBinfo\fP section of the metainfo and sets it to a
-random integer.
+\fBentropy\fP field to the \fBinfo\fP section of the metainfo and sets it to a random
+integer.
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Warning
+.ps -1
+.br
+.sp
+When editing, this option changes the info hash and creates a new
+torrent.
+.sp .5v
+.RE
 .RE
 .sp
 \fB\-\-noxseed\fP, \fB\-X\fP
 .RS 4
 De\-randomize a previously randomized info hash of an existing torrent.  This
 removes the \fBentropy\fP field from the \fBinfo\fP section of the metainfo.
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Warning
+.ps -1
+.br
+.sp
+When editing, this option changes the info hash and creates a new
+torrent.
+.sp .5v
+.RE
 .RE
 .sp
 \fB\-\-max\-piece\-size\fP \fISIZE\fP
 .RS 4
 The maximum piece size when creating a torrent.  SIZE is multiplied by 1 MiB
 (1048576 bytes).  The resulting number must be a power of two (2, 4, 8, 16,
-etc.).  Numbers smaller than 1 are allowed, e.g. \(lq0.25\(rq sets the maximum
-piece size to 256 KiB.
+etc.).  Numbers smaller than 1 are allowed, e.g. \(lq0.25\(rq sets the maximum piece
+size to 256 KiB.
 .RE
 .sp
 \fB\-\-nocreator\fP, \fB\-R\fP
@@ -190,8 +366,8 @@ overwrite \fITORRENT\fP without asking.
 Read command line arguments from configuration FILE.  See \fBCONFIGURATION
 FILE\fP.
 .br
-Default: \fI$XDG_CONFIG_HOME\fP\fB/torf/config\fP where \fI$XDG_CONFIG_HOME\fP
-defaults to \fB~/.config\fP
+Default: \fI$XDG_CONFIG_HOME\fP\fB/torf/config\fP where \fI$XDG_CONFIG_HOME\fP defaults
+to \fB~/.config\fP
 .RE
 .sp
 \fB\-\-noconfig\fP, \fB\-F\fP
@@ -207,8 +383,8 @@ multiple times.  See \fBCONFIGURATION FILE\fP.
 .sp
 \fB\-\-human\fP, \fB\-u\fP
 .RS 4
-Display information in human\-readable output even if stdout is not a TTY.
-See \fBPIPING OUTPUT\fP.
+Display information in human\-readable output even if stdout is not a TTY.  See
+\fBPIPING OUTPUT\fP.
 .RE
 .sp
 \fB\-\-nohuman\fP, \fB\-U\fP
@@ -427,10 +603,47 @@ The delimiter between label and value as well as between multiple values
 Numbers are not formatted (UNIX timestamps for times, seconds for time deltas,
 raw bytes for sizes, etc).
 .RE
-.SH "EXIT STATUS"
+.SH "EXIT CODES"
 .sp
-torf returns zero on success and non\-zero on failure.  You can lookup error
-codes in the output of \fBerrno \-l\fP.
+1
+.RS 4
+Anything not specified below
+.RE
+.sp
+2
+.RS 4
+Unknown or invalid command line arguments
+.RE
+.sp
+3
+.RS 4
+Error while reading or parsing the config file
+.RE
+.sp
+4
+.RS 4
+Error while reading a torrent file or content
+.RE
+.sp
+5
+.RS 4
+Error while writing a torrent file
+.RE
+.sp
+6
+.RS 4
+Error while verifying a torrent\(cqs content
+.RE
+.sp
+128
+.RS 4
+Aborted by SIGINT (typically Ctrl\-c was pressed)
+.RE
+.sp
+129
+.RS 4
+Broken pipe (stdout was closed before we could flush it)
+.RE
 .SH "REPORTING BUGS"
 .sp
 Bug reports, feature requests and poems about hedgehogs are welcome on the
