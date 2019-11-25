@@ -1,26 +1,39 @@
 from torfcli._main import run
-from torfcli._errors import MainError
+from torfcli import _errors as err
 import pytest
 import errno
 import torf
 import os
+import re
 
 
 def test_torrent_unreadable(mock_content):
-    with pytest.raises(MainError, match=r'^nonexisting.torrent: No such file or directory$') as exc_info:
+    with pytest.raises(err.ReadError, match=r'^nonexisting.torrent: No such file or directory$'):
         run([str(mock_content), '-i', 'nonexisting.torrent'])
-    assert exc_info.value.errno == errno.ENOENT
 
 
-def test_PATH_unreadable(create_torrent):
+def test_PATH_unreadable(create_torrent, human_readable, capsys, clear_ansi):
     with create_torrent() as torrent_file:
         t = torf.Torrent.read(torrent_file)
-        with pytest.raises(MainError, match=r'^path/to/nothing: No such file or directory$') as exc_info:
-            run(['path/to/nothing', '-i', torrent_file])
-        assert exc_info.value.errno == errno.ENOENT
+
+        with human_readable(True):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run(['path/to/nothing', '-i', torrent_file])
+            assert str(exc_info.value) == f'path/to/nothing does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error  path/to/nothing: Not a directory\n')
+
+        with human_readable(False):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run(['path/to/nothing', '-i', torrent_file])
+            assert str(exc_info.value) == f'path/to/nothing does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error\tpath/to/nothing: Not a directory\n')
 
 
-def test_singlefile_torrent__path_is_dir(create_torrent, tmpdir):
+def test_singlefile_torrent__path_is_dir(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
     content = tmpdir.join('content')
     content.write('some data')
     assert os.path.isfile(content) is True
@@ -33,25 +46,103 @@ def test_singlefile_torrent__path_is_dir(create_torrent, tmpdir):
         assert os.path.isfile(content) is False
 
         t = torf.Torrent.read(torrent_file)
-        with pytest.raises(MainError, match=rf'^{content}: Is a directory$') as exc_info:
-            run([str(content), '-i', torrent_file])
-        assert exc_info.value.errno == errno.EISDIR
+
+        with human_readable(True):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error  {content}: Is a directory\n')
+
+        with human_readable(False):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error\t{content}: Is a directory\n')
 
 
-def test_singlefile_torrent__mismatching_size(create_torrent, tmpdir):
+def test_singlefile_torrent__file_too_big(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
     content = tmpdir.join('content')
     content.write('some data')
 
     with create_torrent(path=content) as torrent_file:
-        content.write('some data!')
+        content.write('some data!!!')
 
         t = torf.Torrent.read(torrent_file)
-        with pytest.raises(MainError, match=rf'^{content}: Mismatching size$') as exc_info:
-            run([str(content), '-i', torrent_file])
-        assert exc_info.value.errno == errno.EFBIG
+
+        with human_readable(True):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error  {content}: Too big: 12 instead of 9 bytes\n')
+
+        with human_readable(False):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error\t{content}: Too big: 12 instead of 9 bytes\n')
 
 
-def test_multifile_torrent__path_is_file(create_torrent, tmpdir):
+def test_singlefile_torrent__wrong_size(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
+    content = tmpdir.join('content')
+    content.write('some data')
+
+    with create_torrent(path=content) as torrent_file:
+        content.write('some dat')
+
+        t = torf.Torrent.read(torrent_file)
+
+        with human_readable(True):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error  Corruption in piece 1\n')
+
+        with human_readable(False):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error\tCorruption in piece 1\n')
+
+
+def test_singlefile_torrent__correct_size_but_corrupt(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
+    content = tmpdir.join('content')
+    content.write('some data')
+
+    with create_torrent(path=content) as torrent_file:
+        content.write('somm date')
+
+        t = torf.Torrent.read(torrent_file)
+
+        with human_readable(True):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error  Corruption in piece 1\n')
+
+        with human_readable(False):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error\tCorruption in piece 1\n')
+
+
+def test_multifile_torrent__path_is_file(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
     content = tmpdir.mkdir('content')
     file1 = content.join('file1.jpg')
     file1.write('some data')
@@ -65,12 +156,25 @@ def test_multifile_torrent__path_is_file(create_torrent, tmpdir):
         assert os.path.isdir(content) is False
 
         t = torf.Torrent.read(torrent_file)
-        with pytest.raises(MainError, match=rf'^{content}: Not a directory$') as exc_info:
-            run([str(content), '-i', torrent_file])
-        assert exc_info.value.errno == errno.ENOTDIR
+
+        with human_readable(True):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error  {content}: Not a directory\n')
+
+        with human_readable(False):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error\t{content}: Not a directory\n')
 
 
-def test_multifile_torrent__missing_file(create_torrent, tmpdir):
+def test_multifile_torrent__missing_file(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
     content = tmpdir.mkdir('content')
     file1 = content.join('file1.jpg')
     file1.write('some data')
@@ -81,12 +185,29 @@ def test_multifile_torrent__missing_file(create_torrent, tmpdir):
         os.remove(file1)
 
         t = torf.Torrent.read(torrent_file)
-        with pytest.raises(MainError, match=rf'^{file1}: No such file or directory$') as exc_info:
-            run([str(content), '-i', torrent_file])
-        assert exc_info.value.errno == errno.ENOENT
+
+        with human_readable(True):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert re.search((rf'\s*Error  {file1}: No such file or directory\n'
+                              rf'\s*Error  Corruption in piece 1, at least one of these files is corrupt: '
+                              rf'{file1}, {file2}\n$'), clear_ansi(cap.out))
+
+        with human_readable(False):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert re.search((rf'\s*Error\t{file1}: No such file or directory\n'
+                              rf'\s*Error\tCorruption in piece 1, at least one of these files is corrupt: '
+                              rf'{file1}, {file2}\n$'), clear_ansi(cap.out))
 
 
-def test_multifile_torrent__mismatching_size(create_torrent, tmpdir):
+def test_multifile_torrent__wrong_size(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
     content = tmpdir.mkdir('content')
     file1 = content.join('file1.jpg')
     file1.write('some data')
@@ -95,30 +216,48 @@ def test_multifile_torrent__mismatching_size(create_torrent, tmpdir):
     file2_size = os.path.getsize(file2)
 
     with create_torrent(path=content) as torrent_file:
-        file2.write('some other data!')
-        assert os.path.getsize(file2) != file2_size
+        file2.write('some more other data')
+        assert os.path.getsize(file2) > file2_size
 
         t = torf.Torrent.read(torrent_file)
-        with pytest.raises(MainError, match=rf'^{file2}: Mismatching size$') as exc_info:
-            run([str(content), '-i', torrent_file])
-        assert exc_info.value.errno == errno.EFBIG
+
+        with human_readable(True):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error  Corruption in piece 1, '
+                                                f'at least one of these files is corrupt: '
+                                                f'{file1}, {file2}\n')
+
+        with human_readable(False):
+            with pytest.raises(err.VerifyError) as exc_info:
+                run([str(content), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert clear_ansi(cap.out).endswith(f'Error\tCorruption in piece 1, '
+                                                f'at least one of these files is corrupt: '
+                                                f'{file1}, {file2}\n')
 
 
-def test_mismatching_infohash(create_torrent, tmpdir):
-    content = tmpdir.mkdir('content')
-    file1 = content.join('file1.jpg')
-    file1.write('some data')
-    file1_size = os.path.getsize(file1)
-    file2 = content.join('file2.jpg')
-    file2.write('some other data')
+def test_success(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
+    content = tmpdir.join('content')
+    content.write('some data')
 
     with create_torrent(path=content) as torrent_file:
-        file1.write('some dutu')
-        assert os.path.getsize(file1) == file1_size
-        t_new = torf.Torrent(path=content)
-        t_new.generate()
+        t = torf.Torrent.read(torrent_file)
 
-        t_old = torf.Torrent.read(torrent_file)
-        with pytest.raises(MainError, match=rf'^{t_new.infohash}: Mismatching hash$') as exc_info:
+        with human_readable(True):
             run([str(content), '-i', torrent_file])
-        assert exc_info.value.errno == errno.EADV
+            cap = capsys.readouterr()
+            assert re.search(rf'\s*Progress  100.00 %  \|  \d+:\d+:\d+ total  \|  \d+\.\d+ MiB/s\n$',
+                              clear_ansi(cap.out))
+
+        with human_readable(False):
+            run([str(content), '-i', torrent_file])
+            cap = capsys.readouterr()
+            print(clear_ansi(cap.out))
+            assert re.search(rf'\s*Progress\t100\.000\t\d+\t\d+\t\d+\t\d+\t\d+\t{content}\n$',
+                             clear_ansi(cap.out))
