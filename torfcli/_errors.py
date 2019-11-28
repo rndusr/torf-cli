@@ -44,7 +44,7 @@ class Error(Exception):
         {torf.ReadError               : Code.READ,
          torf.PathNotFoundError       : Code.READ,
          torf.PathEmptyError          : Code.READ,
-         torf.ParseError              : Code.READ,
+         torf.BdecodeError            : Code.READ,
          torf.MetainfoError           : Code.READ,
          torf.WriteError              : Code.WRITE,
          torf.VerifyNotDirectoryError : Code.VERIFY,
