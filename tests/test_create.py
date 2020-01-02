@@ -5,6 +5,7 @@ from unittest.mock import patch, DEFAULT
 import os
 import torf
 from datetime import datetime, date, time, timedelta
+import re
 
 
 def assert_approximate_date(date1, date2):
@@ -291,13 +292,26 @@ def test_noxseed_option(capsys, mock_content):
     assert hash_1 == hash_2
 
 
-def test_max_piece_size_option_given(capsys, mock_content):
+def test_max_piece_size_option_not_taking_effect(capsys, mock_content):
+    # Create large sparse file, i.e. a file that isn't actually written to disk
+    large_file = mock_content.join('large file')
+    with open(large_file, 'ab') as f:
+        f.truncate(5**20)
+    content_path = str(mock_content)
+    with patch.multiple('torfcli._main', _hash_pieces=DEFAULT, _write_torrent=DEFAULT):
+        run([content_path, '--max-piece-size', '8'])
+    cap = capsys.readouterr()
+    piece_size = [line for line in cap.out.split('\n')
+                  if 'Piece Size' in line][0].split('\t')[1]
+    assert int(piece_size) < 5**20
+
+
+def test_max_piece_size_option_taking_effect(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
     large_file = mock_content.join('large file')
     with open(large_file, 'ab') as f:
         f.truncate(2**40)
     content_path = str(mock_content)
-
     with patch.multiple('torfcli._main', _hash_pieces=DEFAULT, _write_torrent=DEFAULT):
         run([content_path, '--max-piece-size', '2'])
     cap = capsys.readouterr()
@@ -348,8 +362,7 @@ def test_default_date(capsys, mock_content):
     assert_approximate_date(t.creation_date, datetime.today())
 
     cap = capsys.readouterr()
-    exp_dates = [now.isoformat(sep=' '),
-                 (now + timedelta(seconds=1)).isoformat(sep=' ')]
+    exp_dates = [int(now.timestamp()), int((now + timedelta(seconds=1)).timestamp())]
     assert (f'Created\t{exp_dates[0]}' in cap.out or
             f'Created\t{exp_dates[1]}' in cap.out)
 
@@ -365,7 +378,9 @@ def test_date_today(capsys, mock_content):
     assert t.creation_date == datetime.combine(date.today(), time(0, 0, 0))
 
     cap = capsys.readouterr()
-    exp_date = date.today().isoformat() + ' 00:00:00'
+    exp_date = int(datetime.today()
+                   .replace(hour=0, minute=0, second=0, microsecond=0)
+                   .timestamp())
     assert f'Created\t{exp_date}' in cap.out
 
 
@@ -381,7 +396,7 @@ def test_date_now(capsys, mock_content):
     assert_approximate_date(t.creation_date, now)
 
     cap = capsys.readouterr()
-    exp_date = now.isoformat(sep=' ', timespec='seconds')
+    exp_date = int(now.timestamp())
     assert f'Created\t{exp_date}' in cap.out
 
 
@@ -396,7 +411,7 @@ def test_user_given_date(capsys, mock_content):
     assert t.creation_date == datetime.combine(date(2000, 1, 2), time(0, 0, 0))
 
     cap = capsys.readouterr()
-    exp_date = date(2000, 1, 2).isoformat() + ' 00:00:00'
+    exp_date = int(datetime.fromisoformat('2000-01-02').timestamp())
     assert f'Created\t{exp_date}' in cap.out
 
 
@@ -411,7 +426,7 @@ def test_user_given_date_and_time(capsys, mock_content):
     assert t.creation_date == datetime(2000, 1, 2, 3, 4)
 
     cap = capsys.readouterr()
-    exp_date = datetime(2000, 1, 2, 3, 4).isoformat(sep=' ', timespec='seconds')
+    exp_date = int(datetime.fromisoformat('2000-01-02 03:04').timestamp())
     assert f'Created\t{exp_date}' in cap.out
 
 
@@ -426,7 +441,7 @@ def test_user_given_date_and_time_with_seconds(capsys, mock_content):
     assert t.creation_date == datetime(2000, 1, 2, 3, 4, 5)
 
     cap = capsys.readouterr()
-    exp_date = datetime(2000, 1, 2, 3, 4, 5).isoformat(sep=' ', timespec='seconds')
+    exp_date = int(datetime.fromisoformat('2000-01-02 03:04:05').timestamp())
     assert f'Created\t{exp_date}' in cap.out
 
 
@@ -529,6 +544,40 @@ def test_multiple_trackers(capsys, mock_content):
     assert '\thttps://tracker2.example.org/bar/' in cap.out
     assert '\thttps://tracker3.example.org/baz' in cap.out
 
+def test_multiple_tracker_tiers(capsys, mock_content, human_readable):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    with human_readable(True):
+        run([content_path,
+             '--tracker', 'http://foo,http://bar',
+             '--tracker', 'http://a,http://b,http://c',
+             '--tracker', 'http://asdf'])
+        t = torf.Torrent.read(exp_torrent_filepath)
+        assert t.trackers == [['http://foo', 'http://bar'],
+                              ['http://a', 'http://b', 'http://c'],
+                              ['http://asdf']]
+        cap = capsys.readouterr()
+        assert re.search(r'^(\s*)Trackers  Tier 1: http://foo\n'
+                         r'\1                  http://bar\n'
+                         r'\1          Tier 2: http://a\n'
+                         r'\1                  http://b\n'
+                         r'\1                  http://c\n'
+                         r'\1          Tier 3: http://asdf\n', cap.out, flags=re.MULTILINE)
+
+    with human_readable(False):
+        run([content_path, '-y',
+             '--tracker', 'http://foo,http://bar',
+             '--tracker', 'http://a,http://b,http://c',
+             '--tracker', 'http://asdf'])
+        t = torf.Torrent.read(exp_torrent_filepath)
+        assert t.trackers == [['http://foo', 'http://bar'],
+                              ['http://a', 'http://b', 'http://c'],
+                              ['http://asdf']]
+        cap = capsys.readouterr()
+        assert re.search(r'^Trackers\thttp://foo\thttp://bar\t'
+                         r'http://a\thttp://b\thttp://c\thttp://asdf\n', cap.out, flags=re.MULTILINE)
 
 def test_notracker_option(capsys, mock_content):
     content_path = str(mock_content)
@@ -538,7 +587,7 @@ def test_notracker_option(capsys, mock_content):
     run([content_path, '--tracker', 'https://mytracker.example.org', '--notracker'])
 
     t = torf.Torrent.read(exp_torrent_filepath)
-    assert t.trackers == None
+    assert t.trackers == []
 
     cap = capsys.readouterr()
     assert 'Tracker\t' not in cap.out
@@ -587,7 +636,7 @@ def test_nowebseed_option(capsys, mock_content):
     run([content_path, '--webseed', 'https://mywebseed.example.org/foo', '--nowebseed'])
 
     t = torf.Torrent.read(exp_torrent_filepath)
-    assert t.webseeds == None
+    assert t.webseeds == []
 
     cap = capsys.readouterr()
     assert 'Webseed\t' not in cap.out

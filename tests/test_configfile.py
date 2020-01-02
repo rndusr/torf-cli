@@ -9,7 +9,7 @@ import datetime
 
 def test_default_configfile_doesnt_exist(cfgfile, mock_content, mock_create_mode):
     run([str(mock_content)])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['PATH'] == str(mock_content)
 
 
@@ -35,7 +35,7 @@ def test_custom_configfile(tmpdir, mock_content, mock_create_mode):
     comment = asdf
     '''))
     run(['--config', str(cfgfile), str(mock_content)])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['comment'] == 'asdf'
 
 
@@ -45,9 +45,9 @@ def test_noconfig_option(cfgfile, mock_content, mock_create_mode):
     comment = Nobody shall see this!
     '''))
     run([str(mock_content), '--noconfig'])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['private'] == False
-    assert cfg['comment'] == ''
+    assert cfg['comment'] == None
 
 
 def test_cli_args_take_precedence(cfgfile, mock_content, mock_create_mode):
@@ -57,7 +57,7 @@ def test_cli_args_take_precedence(cfgfile, mock_content, mock_create_mode):
     date = 1970-01-01
     '''))
     run([str(mock_content), '--noxseed', '--date', '2001-02-03 04:05'])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['noxseed'] == True
     assert cfg['xseed'] == True
     assert cfg['comment'] == 'Generic description'
@@ -70,7 +70,7 @@ def test_adding_to_list_via_cli(cfgfile, mock_content, mock_create_mode):
     tracker = https://bar
     '''))
     run([str(mock_content), '--tracker', 'https://baz'])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['tracker'] == ['https://foo', 'https://bar', 'https://baz']
 
 
@@ -122,7 +122,7 @@ def test_environment_variable_resolution(cfgfile, mock_content, mock_create_mode
                                       'PATH': '/announce',
                                       'DATE': '1999-12-31'}):
         run([str(mock_content)])
-        cfg = mock_create_mode.call_args[0][0]
+        cfg = mock_create_mode.call_args[0][1]
         assert cfg['tracker'] == ['https://tracker.example.org:123/announce']
         assert cfg['date'] == datetime.datetime(1999, 12, 31, 0, 0)
         assert cfg['comment'] == '$UNDEFINED'
@@ -141,7 +141,7 @@ def test_environment_variable_resolution_in_profile(cfgfile, mock_content, mock_
                                       'PATH': 'announce',
                                       'DATE': '1999-12-31'}):
         run([str(mock_content), '--profile', 'foo'])
-        cfg = mock_create_mode.call_args[0][0]
+        cfg = mock_create_mode.call_args[0][1]
         assert cfg['tracker'] == ['https://tracker.example.org:123/announce']
         assert cfg['date'] == datetime.datetime(1999, 12, 31, 0, 0)
         assert cfg['comment'] == '$UNDEFINED'
@@ -167,35 +167,35 @@ def test_escaping_dollar(cfgfile, mock_content, mock_create_mode):
 
     with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
         run([str(mock_content), '--profile', 'one'])
-        cfg = mock_create_mode.call_args[0][0]
+        cfg = mock_create_mode.call_args[0][1]
         assert cfg['comment'] == '$COMMENT'
 
     with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
         run([str(mock_content), '--profile', 'two'])
-        cfg = mock_create_mode.call_args[0][0]
+        cfg = mock_create_mode.call_args[0][1]
         assert cfg['comment'] == '\\The comment.'
 
     with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
         run([str(mock_content), '--profile', 'three'])
-        cfg = mock_create_mode.call_args[0][0]
+        cfg = mock_create_mode.call_args[0][1]
         assert cfg['comment'] == '\\$COMMENT'
 
     with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
         run([str(mock_content), '--profile', 'four'])
-        cfg = mock_create_mode.call_args[0][0]
+        cfg = mock_create_mode.call_args[0][1]
         assert cfg['comment'] == '\\\\The comment.'
 
     with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
         run([str(mock_content), '--profile', 'five'])
-        cfg = mock_create_mode.call_args[0][0]
+        cfg = mock_create_mode.call_args[0][1]
         assert cfg['comment'] == '\\\\$COMMENT'
 
     with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
         run([str(mock_content), '--profile', 'six'])
-        cfg = mock_create_mode.call_args[0][0]
+        cfg = mock_create_mode.call_args[0][1]
         assert cfg['comment'] == '\\\\\\The comment.'
 
     with mock.patch.dict(os.environ, {'COMMENT': 'The comment.'}):
         run([str(mock_content), '--profile', 'seven'])
-        cfg = mock_create_mode.call_args[0][0]
+        cfg = mock_create_mode.call_args[0][1]
         assert cfg['comment'] == '\\\\\\$COMMENT'

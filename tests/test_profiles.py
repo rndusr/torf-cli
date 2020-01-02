@@ -24,13 +24,13 @@ def test_profile_option(cfgfile, mock_content, mock_create_mode):
     comment = Foo!
     '''))
     run([str(mock_content)])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['xseed'] == True
     assert cfg['date'] == datetime.datetime(2000, 1, 2)
-    assert cfg['comment'] == ''
+    assert cfg['comment'] == None
 
     run([str(mock_content), '--profile', 'foo'])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['xseed'] == True
     assert cfg['date'] == datetime.datetime(2000, 1, 2)
     assert cfg['comment'] == 'Foo!'
@@ -51,21 +51,21 @@ def test_overloading_values(cfgfile, mock_content, mock_create_mode):
     xseed
     '''))
     run([str(mock_content), '--profile', 'foo', '--profile', 'bar'])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['comment'] == 'Bar'
     assert cfg['private'] == True
     assert cfg['yes'] == True
     assert cfg['xseed'] == False
 
     run([str(mock_content), '--profile', 'bar', '--profile', 'foo'])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['comment'] == 'Foo'
     assert cfg['private'] == True
     assert cfg['yes'] == True
     assert cfg['xseed'] == False
 
     run([str(mock_content), '--profile', 'bar', '--profile', 'baz'])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['comment'] == 'Baz'
     assert cfg['private'] == False
     assert cfg['yes'] == True
@@ -83,22 +83,22 @@ def test_list_value(cfgfile, mock_content, mock_create_mode):
     webseed = https://baz
     '''))
     run([str(mock_content), '--profile', 'foo', '--profile', 'bar'])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['webseed'] == ['https://foo', 'https://bar']
     assert cfg['nowebseed'] == False
 
     run([str(mock_content), '--profile', 'bar', '--profile', 'foo'])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['webseed'] == ['https://bar', 'https://foo']
     assert cfg['nowebseed'] == False
 
     run([str(mock_content), '--profile', 'bar', '--profile', 'baz'])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['webseed'] == ['https://bar', 'https://baz']
     assert cfg['nowebseed'] == True
 
     run([str(mock_content), '--profile', 'bar', '--profile', 'baz', '--profile', 'foo'])
-    cfg = mock_create_mode.call_args[0][0]
+    cfg = mock_create_mode.call_args[0][1]
     assert cfg['webseed'] == ['https://bar', 'https://baz', 'https://foo']
     assert cfg['nowebseed'] == True
 

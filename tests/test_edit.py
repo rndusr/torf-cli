@@ -121,15 +121,29 @@ def test_remove_trackers(create_torrent, tmpdir, assert_torrents_equal):
         orig = torf.Torrent.read(infile)
         run(['-i', infile, '--notracker', '-o', outfile])
         new = torf.Torrent.read(outfile)
-        assert_torrents_equal(orig, new, trackers=None)
+        assert_torrents_equal(orig, new, trackers=[])
 
-def test_add_tracker(create_torrent, tmpdir, assert_torrents_equal):
+def test_add_trackers(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(trackers=['http://tracker1', 'http://tracker2']) as infile:
         orig = torf.Torrent.read(infile)
-        run(['-i', infile, '--tracker', 'http://tracker3', '-o', outfile])
+        run(['-i', infile, '--tracker', 'http://a', '-o', outfile])
         new = torf.Torrent.read(outfile)
-        assert_torrents_equal(orig, new, trackers=[['http://tracker1'], ['http://tracker2'], ['http://tracker3']])
+        assert_torrents_equal(orig, new, trackers=[['http://tracker1', 'http://a'], ['http://tracker2']])
+
+    outfile = str(tmpdir.join('out.torrent'))
+    with create_torrent(trackers=['http://foo', 'http://bar']) as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile,
+             '--tracker', 'http://a,http://b',
+             '--tracker', 'http://x',
+             '--tracker', 'http://y',
+             '-o', outfile, '-y'])
+        new = torf.Torrent.read(outfile)
+        print(new.trackers)
+        assert_torrents_equal(orig, new, trackers=[['http://foo', 'http://a', 'http://b'],
+                                                   ['http://bar', 'http://x'],
+                                                   ['http://y']])
 
 def test_replace_trackers(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
@@ -154,7 +168,7 @@ def test_remove_webseeds(create_torrent, tmpdir, assert_torrents_equal):
         orig = torf.Torrent.read(infile)
         run(['-i', infile, '--nowebseed', '-o', outfile])
         new = torf.Torrent.read(outfile)
-        assert_torrents_equal(orig, new, webseeds=None)
+        assert_torrents_equal(orig, new, webseeds=[])
 
 def test_add_webseed(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))

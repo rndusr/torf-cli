@@ -135,7 +135,7 @@ def test_creation_date(capsys, create_torrent, human_readable, clear_ansi):
         with human_readable(False):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(r'^Created\t2000-05-10 00:30:45$', cap.out, flags=re.MULTILINE)
+            assert re.search(r'^Created\t957911445$', cap.out, flags=re.MULTILINE)
 
 
 def test_created_by(capsys, create_torrent, human_readable, clear_ansi):
@@ -218,7 +218,8 @@ def test_webseeds(capsys, create_torrent, human_readable, clear_ansi):
         with human_readable(True):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(rf'^(\s*)Webseeds  {webseeds[0]}\n\1          {webseeds[1]}$', clear_ansi(cap.out), flags=re.MULTILINE)
+            assert re.search((rf'^(\s*)Webseeds  {webseeds[0]}\n'
+                              rf'\1          {webseeds[1]}$'), clear_ansi(cap.out), flags=re.MULTILINE)
 
         with human_readable(False):
             run(['-i', torrent_file])
@@ -233,7 +234,8 @@ def test_httpseeds(capsys, create_torrent, human_readable, clear_ansi):
         with human_readable(True):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(rf'^(\s*)HTTP Seeds  {httpseeds[0]}\n\1            {httpseeds[1]}$', clear_ansi(cap.out), flags=re.MULTILINE)
+            assert re.search((rf'^(\s*)HTTP Seeds  {httpseeds[0]}\n'
+                              rf'\1            {httpseeds[1]}$'), clear_ansi(cap.out), flags=re.MULTILINE)
 
         with human_readable(False):
             run(['-i', torrent_file])

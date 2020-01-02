@@ -252,7 +252,8 @@ def test_success(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
         with human_readable(True):
             run([str(content), '-i', torrent_file])
             cap = capsys.readouterr()
-            assert re.search(rf'\s*Progress  100.00 %  \|  \d+:\d+:\d+ total  \|  \d+\.\d+ MiB/s\n$',
+            print(clear_ansi(cap.out))
+            assert re.search(rf'\s*Progress  100.00 %  \|  \d+:\d+:\d+ total  \|  \d+\.\d+ MiB/s$',
                               clear_ansi(cap.out))
 
         with human_readable(False):
