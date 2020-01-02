@@ -107,5 +107,6 @@ def clear_ansi():
         regex = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
         string = regex.sub('', string)
         string = re.sub(r'\x1b[78]', '', string)
+        string = re.sub(r'\r', '', string)
         return string
     return _clear_ansi
