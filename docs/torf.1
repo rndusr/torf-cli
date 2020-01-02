@@ -2,12 +2,12 @@
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
 .\" Generator: Asciidoctor 2.0.10
-.\"      Date: 2019-11-24
+.\"      Date: 2020-01-02
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2019-11-24" "\ \&" "\ \&"
+.TH "TORF" "1" "2020-01-02" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -93,9 +93,9 @@ and create the new torrent file \fINEWTORRENT\fP.
 .ps -1
 .br
 .sp
-Editing a torrent can change its hash, depending on the changes, which
-essentially makes it a new torrent.  See OPTIONS to find out whether a
-certain option will change the hash.
+Editing a torrent can change its hash, depending on what is changed,
+which essentially makes it a new torrent.  See OPTIONS to find out
+whether a certain option will change the hash.
 .sp .5v
 .RE
 .RE
@@ -175,7 +175,9 @@ torrent.
 .sp
 \fB\-\-tracker\fP, \fB\-t\fP \fIURL\fP
 .RS 4
-The announce URL of a tracker.  This option may be given multiple times.
+List of comma\-separated announce URLs.  This option may be given multiple times
+for multiple tiers.  Clients try all URLs from one tier in random order before
+moving on to the next tier.
 .RE
 .sp
 \fB\-\-notracker\fP, \fB\-T\fP
@@ -439,6 +441,14 @@ Change the comment and remove the date from \(lqfoo.torrent\(rq, write the resul
 $ torf \-i foo.torrent \-c \(aqNew comment\(aq \-D \-o bar.torrent
 .fi
 .if n .RE
+.sp
+Check if \(lqpath/to/foo\(rq contains valid data as specified in \(lqbar.torrent\(rq:
+.sp
+.if n .RS 4
+.nf
+$ torf \-i bar.torrent path/to/foo
+.fi
+.if n .RE
 .SH "EXCLUDING FILES"
 .sp
 The \fB\-\-exclude\fP option takes a pattern that is matched against each file path
@@ -590,6 +600,7 @@ Leading spaces are removed from each line.
 .\}
 The delimiter between label and value as well as between multiple values
 (files, trackers, etc) is a tab character (\(lq\(rst\(rq or ASCII code 0x9).
+Trackers are flattened into a one\-dimensional list.
 .RE
 .sp
 .RS 4
