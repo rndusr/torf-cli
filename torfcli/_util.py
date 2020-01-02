@@ -10,13 +10,18 @@
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
 import datetime
-import termios
-import tty
-import io
-import sys
 import time
+
 import torf
-import contextlib
+
+
+def get_torrent_filepath(torrent, cfg):
+    if cfg['out']:
+        # User-given torrent file path
+        return cfg['out']
+    else:
+        # Default to torrent's name in cwd
+        return torrent.name + '.torrent'
 
 
 class Average():
@@ -84,22 +89,6 @@ def make_filetree(tree, parents_is_last=()):
     return lines
 
 
-def progress_bar(text, fraction_done, width=80):
-    if len(text) > width:
-        half = int(width/2)
-        text = text[:half] + '…' + text[-(width-half-1):]
-    elif len(text) < width:
-        text += ' ' * (width - len(text))
-    assert len(text) == width, f'len({text!r}) != {width}'
-    pos = int(fraction_done * width)
-    bar = ('\x1b[K'   +  # Erase line
-           '\x1b[4m'  +  # Reverse video on
-           text[:pos] +
-           '\x1b[0m'  +  # Reverse video off
-           text[pos:])
-    return "▕" + bar + "▏"
-
-
 _DATE_FORMATS = ('%Y-%m-%d %H:%M:%S',
                  '%Y-%m-%dT%H:%M:%S',
                  '%Y-%m-%d %H:%M',
@@ -137,79 +126,3 @@ def bytes2string(b, include_bytes=False):
         return f'{string} {prefix}B / {b:,} B'
     else:
         return f'{string} {prefix}B'
-
-
-_ANSWERS = {'y': True, 'n': False,
-            'Y': True, 'N': False,
-            '\x03': False,  # ctrl-c
-            '\x07': False,  # ctrl-g
-            '\x1b': False}  # escape
-def ask_yes_no(question, cfg, default='n'):
-    if not human_readable(cfg):
-        return _ANSWERS.get(default)
-
-    while True:
-        print(question, end=' [y|n] ', flush=True)
-        key = getch()
-        clear_line(cfg)
-        answer = _ANSWERS.get(key, None)
-        if answer is not None:
-            return answer
-
-
-def human_readable(cfg):
-    if cfg['nohuman']:
-        return False
-    elif cfg['human']:
-        return True
-    else:
-        return sys.stdout.isatty()
-
-
-@contextlib.contextmanager
-def disabled_echo(cfg):
-    if human_readable(cfg):
-        try:
-            # Disable echo
-            fd = sys.stdin.fileno()
-            old = termios.tcgetattr(fd)
-            new = termios.tcgetattr(fd)
-            new[3] = new[3] & ~termios.ECHO  # lflags
-            termios.tcsetattr(fd, termios.TCSADRAIN, new)
-            # Hide cursor
-            print('\x1b[?25l', end='')
-            try:
-                yield
-            finally:
-                # Enable echo
-                termios.tcsetattr(fd, termios.TCSADRAIN, old)
-                # Show cursor
-                print('\x1b[?25h', end='')
-        except io.UnsupportedOperation:
-            yield
-    else:
-        yield
-
-
-def clear_line(cfg):
-    if human_readable(cfg):
-        print('\x1b[2K\x1b[0E', end='', flush=True)
-
-
-def getch():
-    enable_raw_mode()
-    key = sys.stdin.read(1)
-    disable_raw_mode()
-    return key
-
-
-_old_term_settings = None
-def enable_raw_mode():
-    global _old_term_settings
-    _old_term_settings = termios.tcgetattr(sys.stdin.fileno())
-    tty.setraw(sys.stdin.fileno())
-
-
-def disable_raw_mode():
-    if _old_term_settings is not None:
-        termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, _old_term_settings)

@@ -12,10 +12,9 @@
 import re
 import argparse
 import os
-import errno
 from xdg import BaseDirectory
-import torf
 
+import torf
 from . import _errors
 from . import _vars
 from . import _util
@@ -40,8 +39,9 @@ ARGUMENTS
     --in, -i TORRENT       Read metainfo from TORRENT
     --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
     --name, -n NAME        Torrent name (default: basename of PATH)
-    --tracker, -t TRACKER  Announce URL
-    --webseed, -w WEBSEED  Webseed URL
+    --tracker, -t TRACKER  List of comma-separated announce URLs; may be
+                           given multiple times for multiple tiers
+    --webseed, -w WEBSEED  Webseed URL; may be given multiple times
     --private, -p          Forbid clients to use DHT and PEX
     --comment, -c COMMENT  Comment that is stored in TORRENT
     --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now'
@@ -137,11 +137,12 @@ def parse_args(args):
 
     # Validate tracker URLs
     if cfg['tracker']:
-        for tracker in cfg['tracker']:
-            try:
-                torf.Torrent().trackers = (tracker,)
-            except torf.URLError as e:
-                raise _errors.CliError(e)
+        for tier in cfg['tracker']:
+            for url in tier.split(','):
+                try:
+                    torf.Torrent().trackers = url
+                except torf.URLError as e:
+                    raise _errors.CliError(e)
 
     # Validate webseed URLs
     if cfg['webseed']:

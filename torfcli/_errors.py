@@ -10,8 +10,9 @@
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
 from enum import IntEnum
-import torf
 from collections import defaultdict
+
+import torf
 
 
 class Code(IntEnum):
