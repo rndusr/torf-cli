@@ -71,7 +71,9 @@ WARNING: When editing, this option changes the info hash and creates a new
 torrent.
 
 *--tracker*, *-t* _URL_::
-The announce URL of a tracker.  This option may be given multiple times.
+List of comma-separated announce URLs.  This option may be given multiple times
+for multiple tiers.  Clients try all URLs from one tier in random order before
+moving on to the next tier.
 
 *--notracker*, *-T*::
 Remove trackers from an existing torrent.
