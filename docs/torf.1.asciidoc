@@ -203,6 +203,10 @@ Change the comment and remove the date from "`foo.torrent`", write the result to
 
     $ torf -i foo.torrent -c 'New comment' -D -o bar.torrent
 
+Check if "`path/to/foo`" contains valid data as specified in "`bar.torrent`":
+
+    $ torf -i bar.torrent path/to/foo
+
 
 == EXCLUDING FILES
 
