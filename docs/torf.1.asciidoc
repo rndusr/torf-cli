@@ -29,9 +29,9 @@ Display information stored in the torrent file _TORRENT_.
 Edit the existing torrent file _TORRENT_ (e.g. to fix a typo in the comment)
 and create the new torrent file _NEWTORRENT_.
 +
-WARNING: Editing a torrent can change its hash, depending on the changes, which
-         essentially makes it a new torrent.  See OPTIONS to find out whether a
-         certain option will change the hash.
+WARNING: Editing a torrent can change its hash, depending on what is changed,
+         which essentially makes it a new torrent.  See OPTIONS to find out
+         whether a certain option will change the hash.
 
 * *torf* *-i* _TORRENT_ _PATH_ +
 Verify that the content in _PATH_ matches the metadata in the torrent file
