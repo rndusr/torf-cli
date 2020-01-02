@@ -309,6 +309,7 @@ is provided, the output format is slightly different:
 
 - The delimiter between label and value as well as between multiple values
   (files, trackers, etc) is a tab character ("`\t`" or ASCII code 0x9).
+  Trackers are flattened into a one-dimensional list.
 
 - Numbers are not formatted (UNIX timestamps for times, seconds for time deltas,
   raw bytes for sizes, etc).
