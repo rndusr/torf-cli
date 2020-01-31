@@ -116,7 +116,7 @@ class _HumanFormatter(_FormatterBase):
         return torrent.creation_date.isoformat(sep=' ', timespec='seconds')
 
     def piece_size(self, torrent):
-        return _util.bytes2string(torrent.size)
+        return _util.bytes2string(torrent.piece_size)
 
     def files(self, torrent):
         return _util.make_filetree(torrent.filetree)
