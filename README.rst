@@ -102,7 +102,7 @@ Installation
 ------------
 
 The latest release is available on `PyPI <https://pypi.org/project/torf-cli>`_
-and on `AUR <https://aur.archlinux.org/packages/python-torf-cli/>`_.
+and on `AUR <https://aur.archlinux.org/packages/torf-cli/>`_.
 
 
 pipx
