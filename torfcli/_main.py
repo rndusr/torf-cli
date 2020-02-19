@@ -192,11 +192,11 @@ def _hash_pieces(ui, torrent):
                 raise _errors.Error(e)
             finally:
                 sr.result = sr.SUCCESS if success else sr.FAILURE
-            if success:
-                ui.info('Info Hash', torrent.infohash)
         except KeyboardInterrupt:
             sr.result = sr.ABORTED
             raise
+    if success:
+        ui.info('Info Hash', torrent.infohash)
 
 def _write_torrent(ui, torrent, cfg):
     if not cfg['nomagnet']:
