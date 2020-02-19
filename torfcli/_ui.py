@@ -162,9 +162,10 @@ class _HumanFormatter(_FormatterBase):
             value = '\n'.join(value_parts)
 
         if newline:
-            print(f'{label}{sep}{value}')
+            sys.stdout.write(f'{label}{sep}{value}\n')
         else:
-            print(f'{label}{sep}{value}', end='', flush=True)
+            sys.stdout.write(f'{label}{sep}{value}')
+            sys.stdout.flush()
 
     def infos(self, pairs):
         for key, value in pairs:
@@ -177,7 +178,8 @@ class _HumanFormatter(_FormatterBase):
                              '\x1b': False}  # escape
     def dialog_yes_no(self, question):
         while True:
-            print(question, end=' [y|n] ', flush=True)
+            sys.stdout.write(f'{question} [y|n] ')
+            sys.stdout.flush()
             key = _term.getch()
             _term.echo('erase_line', 'move_pos1')
             answer = self.DIALOG_YES_NO_ANSWERS.get(key, None)
@@ -209,7 +211,7 @@ class _MachineFormatter(_FormatterBase):
         # Join multiple values with a tab character
         if not isinstance(value, str) and isinstance(value, abc.Iterable):
             value = '\t'.join(str(v) for v in value)
-        print(f'{key}\t{value}', flush=True)
+        sys.stdout.write(f'{key}\t{value}\n')
 
     def infos(self, pairs):
         for key, value in pairs:
@@ -314,10 +316,10 @@ class _HumanStatusReporter(_StatusReporterBase):
             # down; we can re-use the line from the progress bar.
             _term.echo('erase_to_eol', 'move_down', 'erase_line', 'move_pos1')
         elif self.result is self.FAILURE:
-            print()
+            sys.stdout.write('\n')
         elif self.result is self.ABORTED:
             # Keep last progress info intact so we can see where it stopped
-            print('\n\n', end='')
+            sys.stdout.write('\n\n')
         else:
             raise RuntimeError(f'{self} exited with invalid result: {self.result!r}')
 
