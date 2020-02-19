@@ -263,9 +263,8 @@ class _StatusReporterBase():
         _term.echo('erase_line', 'move_pos1')
         if exception:
             self._ui.info('Error', str(exception))
-        else:
-            self._update_progress_info(torrent, filepath, pieces_done, pieces_total)
-            self._ui.info('Progress', self._get_progress_string(self._info), newline=False)
+        self._update_progress_info(torrent, filepath, pieces_done, pieces_total)
+        self._ui.info('Progress', self._get_progress_string(self._info), newline=False)
 
     def _update_progress_info(self, torrent, filepath, pieces_done, pieces_total):
         info = self._info
