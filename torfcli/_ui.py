@@ -310,10 +310,10 @@ class _HumanStatusReporter(_StatusReporterBase):
         if self.result is None:
             raise RuntimeError(f'{self} exited without result')
         elif self.result is self.SUCCESS:
-            # Final "Progress" line is a performance summary. Keep the summary
-            # but erase the progress bar blow. Do not insert "\n", just move
-            # down; we can re-use the line from the progress bar.
-            _term.echo('erase_to_eol', 'move_down', 'erase_line', 'move_pos1')
+            # Final "Progress" line is a performance summary.  Keep the summary
+            # but erase the progress bar blow.
+            _term.echo('erase_to_eol', 'move_down', 'erase_line', 'move_up')
+            sys.stdout.write('\n')
         elif self.result is self.FAILURE:
             sys.stdout.write('\n')
         elif self.result is self.ABORTED:
