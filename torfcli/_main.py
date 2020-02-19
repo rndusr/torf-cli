@@ -162,8 +162,7 @@ def _verify_mode(ui, cfg):
         ui.info('Info Hash', torrent.infohash)
 
     success = False
-    sr = ui.StatusReporter()
-    with sr:
+    with ui.StatusReporter() as sr:
         try:
             try:
                 success = torrent.verify(cfg['PATH'],
@@ -181,8 +180,7 @@ def _verify_mode(ui, cfg):
 
 def _hash_pieces(ui, torrent):
     success = False
-    sr = ui.StatusReporter()
-    with sr:
+    with ui.StatusReporter() as sr:
         try:
             try:
                 success = torrent.generate(callback=sr.generate_callback,

@@ -239,7 +239,7 @@ class _StatusReporterBase():
             eta=datetime.datetime.now() + datetime.timedelta(300))
 
     def __enter__(self):
-        pass
+        return self
 
     def __exit__(self, _, __, ___):
         pass
@@ -302,6 +302,7 @@ class _HumanStatusReporter(_StatusReporterBase):
     def __enter__(self):
         _term.no_user_input.enable()
         _term.echo('ensure_line_below')
+        return self
 
     def __exit__(self, _, __, ___):
         _term.no_user_input.disable()
