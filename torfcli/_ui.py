@@ -23,6 +23,8 @@ from . import _term
 
 
 class UI:
+    """Universal abstraction layer to allow different UIs"""
+
     def _human(self):
         if self._cfg['nohuman']:
             return False
