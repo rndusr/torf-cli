@@ -19,6 +19,9 @@ from . import _ui
 from . import _util
 from . import _errors
 
+# Seconds between progress updates
+PROGRESS_INTERVAL = 0.5
+
 
 def run(args=sys.argv[1:]):
     cfg = _config.get_cfg(args)
@@ -167,7 +170,7 @@ def _verify_mode(ui, cfg):
             try:
                 success = torrent.verify(cfg['PATH'],
                                          callback=sr.verify_callback,
-                                         interval=0.5)
+                                         interval=PROGRESS_INTERVAL)
             except torf.TorfError as e:
                 raise _errors.Error(e)
             finally:
@@ -184,7 +187,7 @@ def _hash_pieces(ui, torrent):
         try:
             try:
                 success = torrent.generate(callback=sr.generate_callback,
-                                           interval=0.5)
+                                           interval=PROGRESS_INTERVAL)
             except torf.TorfError as e:
                 raise _errors.Error(e)
             finally:
