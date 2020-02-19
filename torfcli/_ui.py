@@ -314,7 +314,7 @@ class _HumanStatusReporter(_StatusReporterBase):
             # down; we can re-use the line from the progress bar.
             _term.echo('erase_to_eol', 'move_down', 'erase_line', 'move_pos1')
         elif self.result is self.FAILURE:
-            pass
+            print()
         elif self.result is self.ABORTED:
             # Keep last progress info intact so we can see where it stopped
             print('\n\n', end='')
