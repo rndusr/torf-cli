@@ -130,6 +130,8 @@ def parse_args(args):
     # Validate max piece size
     if cfg['max_piece_size']:
         cfg['max_piece_size'] = cfg['max_piece_size'] * 1048576
+        if cfg['max_piece_size'] > torf.Torrent.piece_size_max:
+            torf.Torrent.piece_size_max = cfg['max_piece_size']
         try:
             torf.Torrent().piece_size = cfg['max_piece_size']
         except torf.PieceSizeError as e:
