@@ -303,21 +303,20 @@ def test_max_piece_size_option_not_taking_effect(capsys, mock_content):
     cap = capsys.readouterr()
     piece_size = [line for line in cap.out.split('\n')
                   if 'Piece Size' in line][0].split('\t')[1]
-    assert int(piece_size) < 5**20
+    assert int(piece_size) == 8 * 1048576
 
-
-def test_max_piece_size_option_taking_effect(capsys, mock_content):
+def test_max_piece_size_option_smaller_than_default(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
     large_file = mock_content.join('large file')
     with open(large_file, 'ab') as f:
-        f.truncate(2**40)
+        f.truncate(5**20)
     content_path = str(mock_content)
     with patch.multiple('torfcli._main', _hash_pieces=DEFAULT, _write_torrent=DEFAULT):
         run([content_path, '--max-piece-size', '2'])
     cap = capsys.readouterr()
     piece_size = [line for line in cap.out.split('\n')
                   if 'Piece Size' in line][0].split('\t')[1]
-    assert piece_size == str(2 * 2**20)
+    assert int(piece_size) == 2 * 1048576
 
 def test_max_piece_size_option_larger_than_default(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
@@ -344,8 +343,7 @@ def test_max_piece_size_option_not_given(capsys, mock_content):
     cap = capsys.readouterr()
     piece_size = [line for line in cap.out.split('\n')
                   if 'Piece Size' in line][0].split('\t')[1]
-    assert piece_size == str(16 * 2**20)
-
+    assert int(piece_size) == torf.Torrent.piece_size_max
 
 def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
