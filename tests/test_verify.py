@@ -12,253 +12,210 @@ def test_torrent_unreadable(mock_content):
         run([str(mock_content), '-i', 'nonexisting.torrent'])
 
 
-def test_PATH_unreadable(create_torrent, human_readable, capsys, clear_ansi):
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_PATH_unreadable(create_torrent, human_readable, hr_enabled, capsys, clear_ansi, regex):
     with create_torrent() as torrent_file:
-        t = torf.Torrent.read(torrent_file)
-
-        with human_readable(True):
+        with human_readable(hr_enabled):
             with pytest.raises(err.VerifyError) as exc_info:
                 run(['path/to/nothing', '-i', torrent_file])
             assert str(exc_info.value) == f'path/to/nothing does not satisfy {torrent_file}'
             cap = capsys.readouterr()
             print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error  path/to/nothing: Not a directory\n')
-
-        with human_readable(False):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run(['path/to/nothing', '-i', torrent_file])
-            assert str(exc_info.value) == f'path/to/nothing does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error\tpath/to/nothing: Not a directory\n')
+            if hr_enabled:
+                assert clear_ansi(cap.out) == regex('Error  path/to/nothing: Not a directory\n')
+            else:
+                assert clear_ansi(cap.out) == regex('Error\tpath/to/nothing: Not a directory\n')
 
 
-def test_singlefile_torrent__path_is_dir(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
-    content = tmpdir.join('content')
-    content.write('some data')
-    assert os.path.isfile(content) is True
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_singlefile_torrent__path_is_dir(tmp_path, create_torrent, human_readable, hr_enabled, capsys, clear_ansi, regex):
+    content_path = tmp_path / 'content'
+    content_path.write_bytes(b'some data')
+    assert os.path.isfile(content_path) is True
 
-    with create_torrent(path=content) as torrent_file:
-        os.remove(content)
-        content = tmpdir.mkdir('content')
-        content_file = content.join('some.file')
-        content_file.write('some data')
-        assert os.path.isfile(content) is False
+    with create_torrent(path=content_path) as torrent_file:
+        os.remove(content_path)
+        content_path.mkdir()
+        content_file = (content_path / 'some.file').write_bytes(b'some data')
+        assert os.path.isfile(content_path) is False
 
-        t = torf.Torrent.read(torrent_file)
+        with pytest.raises(err.VerifyError) as exc_info:
+            with human_readable(hr_enabled):
+                run([str(content_path), '-i', torrent_file])
+        assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
 
-        with human_readable(True):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error  {content}: Is a directory\n')
-
-        with human_readable(False):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error\t{content}: Is a directory\n')
+    cap = capsys.readouterr()
+    print(clear_ansi(cap.out))
+    if hr_enabled:
+        assert clear_ansi(cap.out) == regex(rf'Error  {content_path}: Is a directory\n')
+    else:
+        assert clear_ansi(cap.out) == regex(rf'Error\t{content_path}: Is a directory\n')
 
 
-def test_singlefile_torrent__file_too_big(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
-    content = tmpdir.join('content')
-    content.write('some data')
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_singlefile_torrent__wrong_size(tmp_path, create_torrent, human_readable, hr_enabled, capsys, clear_ansi, regex):
+    content_path = tmp_path / 'file.jpg'
+    content_path.write_text('some data')
 
-    with create_torrent(path=content) as torrent_file:
-        content.write('some data!!!')
+    with create_torrent(path=content_path) as torrent_file:
+        content_path.write_text('some data!!!')
 
-        t = torf.Torrent.read(torrent_file)
+        with pytest.raises(err.VerifyError) as exc_info:
+            with human_readable(hr_enabled):
+                run([str(content_path), '-i', torrent_file])
+        assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
 
-        with human_readable(True):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error  {content}: Too big: 12 instead of 9 bytes\n')
-
-        with human_readable(False):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error\t{content}: Too big: 12 instead of 9 bytes\n')
+    cap = capsys.readouterr()
+    print(clear_ansi(cap.out))
+    if hr_enabled:
+        assert clear_ansi(cap.out) == regex(rf'Error  {content_path}: Too big: 12 instead of 9 bytes\n')
+    else:
+        assert clear_ansi(cap.out) == regex(rf'Error\t{content_path}: Too big: 12 instead of 9 bytes\n')
 
 
-def test_singlefile_torrent__wrong_size(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
-    content = tmpdir.join('content')
-    content.write('some data')
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_singlefile_torrent__correct_size_but_corrupt(tmp_path, create_torrent, human_readable, hr_enabled, capsys, clear_ansi, regex):
+    content_path = tmp_path / 'content'
+    content_path.write_text('some data')
 
-    with create_torrent(path=content) as torrent_file:
-        content.write('some dat')
+    with create_torrent(path=content_path) as torrent_file:
+        content_path.write_text('somm date')
 
-        t = torf.Torrent.read(torrent_file)
-
-        with human_readable(True):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error  Corruption in piece 1\n')
-
-        with human_readable(False):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error\tCorruption in piece 1\n')
+        with pytest.raises(err.VerifyError) as exc_info:
+            with human_readable(hr_enabled):
+                run([str(content_path), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
+    cap = capsys.readouterr()
+    print(clear_ansi(cap.out))
+    if hr_enabled:
+        assert clear_ansi(cap.out) == regex(rf'Error  Corruption in piece 1\n')
+    else:
+        assert clear_ansi(cap.out) == regex(rf'Error\tCorruption in piece 1\n')
 
 
-def test_singlefile_torrent__correct_size_but_corrupt(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
-    content = tmpdir.join('content')
-    content.write('some data')
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_multifile_torrent__path_is_file(tmp_path, create_torrent, human_readable, hr_enabled, capsys, clear_ansi, regex):
+    content_path = tmp_path / 'content'
+    content_path.mkdir()
+    file1 = content_path / 'file1.jpg'
+    file1.write_text('some data')
+    assert os.path.isdir(content_path) is True
 
-    with create_torrent(path=content) as torrent_file:
-        content.write('somm date')
-
-        t = torf.Torrent.read(torrent_file)
-
-        with human_readable(True):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error  Corruption in piece 1\n')
-
-        with human_readable(False):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error\tCorruption in piece 1\n')
-
-
-def test_multifile_torrent__path_is_file(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
-    content = tmpdir.mkdir('content')
-    file1 = content.join('file1.jpg')
-    file1.write('some data')
-    assert os.path.isdir(content) is True
-
-    with create_torrent(path=content) as torrent_file:
+    with create_torrent(path=content_path) as torrent_file:
         os.remove(file1)
-        os.rmdir(content)
-        content = tmpdir.join('content')
-        content.write('some data')
-        assert os.path.isdir(content) is False
+        os.rmdir(content_path)
+        content_path.write_text('some data')
+        assert os.path.isdir(content_path) is False
 
-        t = torf.Torrent.read(torrent_file)
-
-        with human_readable(True):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error  {content}: Not a directory\n')
-
-        with human_readable(False):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error\t{content}: Not a directory\n')
+        with pytest.raises(err.VerifyError) as exc_info:
+            with human_readable(hr_enabled):
+                run([str(content_path), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
+    cap = capsys.readouterr()
+    print(clear_ansi(cap.out))
+    if hr_enabled:
+        assert clear_ansi(cap.out) == regex(rf'Error  {content_path}: Not a directory\n')
+    else:
+        assert clear_ansi(cap.out) == regex(rf'Error\t{content_path}: Not a directory\n')
 
 
-def test_multifile_torrent__missing_file(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
-    content = tmpdir.mkdir('content')
-    file1 = content.join('file1.jpg')
-    file1.write('some data')
-    file2 = content.join('file2.jpg')
-    file2.write('some other data')
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_multifile_torrent__missing_file(tmp_path, create_torrent, human_readable, hr_enabled, capsys, clear_ansi, regex):
+    content_path = tmp_path / 'content'
+    content_path.mkdir()
+    file1 = content_path / 'file1.jpg'
+    file1.write_text('some data')
+    file2 = content_path / 'file2.jpg'
+    file2.write_text('some other data')
 
-    with create_torrent(path=content) as torrent_file:
+    with create_torrent(path=content_path) as torrent_file:
         os.remove(file1)
 
-        t = torf.Torrent.read(torrent_file)
+        with pytest.raises(err.VerifyError) as exc_info:
+            with human_readable(hr_enabled):
+                run([str(content_path), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
 
-        with human_readable(True):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert re.search((rf'\s*Error  {file1}: No such file or directory\n'
-                              rf'\s*Error  Corruption in piece 1, at least one of these files is corrupt: '
-                              rf'{file1}, {file2}\n$'), clear_ansi(cap.out))
-
-        with human_readable(False):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert re.search((rf'\s*Error\t{file1}: No such file or directory\n'
-                              rf'\s*Error\tCorruption in piece 1, at least one of these files is corrupt: '
-                              rf'{file1}, {file2}\n$'), clear_ansi(cap.out))
+    cap = capsys.readouterr()
+    print(clear_ansi(cap.out))
+    if hr_enabled:
+        assert clear_ansi(cap.out) == regex(rf'\s*Error  {file1}: No such file or directory\n')
+        assert clear_ansi(cap.out) == regex(rf'\s*Error  Corruption in piece 1, '
+                                            rf'at least one of these files is corrupt: {file1}, {file2}\n')
+    else:
+        assert clear_ansi(cap.out) == regex(rf'\s*Error\t{file1}: No such file or directory\n')
+        assert clear_ansi(cap.out) == regex(rf'\s*Error\tCorruption in piece 1, '
+                                            rf'at least one of these files is corrupt: {file1}, {file2}\n')
 
 
-def test_multifile_torrent__wrong_size(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
-    content = tmpdir.mkdir('content')
-    file1 = content.join('file1.jpg')
-    file1.write('some data')
-    file2 = content.join('file2.jpg')
-    file2.write('some other data')
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_multifile_torrent__wrong_size(tmp_path, create_torrent, human_readable, hr_enabled, capsys, clear_ansi, regex):
+    content_path = tmp_path / 'content'
+    content_path.mkdir()
+    file1 = content_path / 'file1.jpg'
+    file1.write_text('some data')
+    file2 = content_path / 'file2.jpg'
+    file2.write_text('some other data')
     file2_size = os.path.getsize(file2)
 
-    with create_torrent(path=content) as torrent_file:
-        file2.write('some more other data')
-        assert os.path.getsize(file2) > file2_size
+    with create_torrent(path=content_path) as torrent_file:
+        file2.write_text('some more other data')
+        assert os.path.getsize(file2) != file2_size
 
-        t = torf.Torrent.read(torrent_file)
-
-        with human_readable(True):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error  Corruption in piece 1, '
-                                                f'at least one of these files is corrupt: '
-                                                f'{file1}, {file2}\n')
-
-        with human_readable(False):
-            with pytest.raises(err.VerifyError) as exc_info:
-                run([str(content), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content} does not satisfy {torrent_file}'
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert clear_ansi(cap.out).endswith(f'Error\tCorruption in piece 1, '
-                                                f'at least one of these files is corrupt: '
-                                                f'{file1}, {file2}\n')
+        with pytest.raises(err.VerifyError) as exc_info:
+            with human_readable(hr_enabled):
+                run([str(content_path), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
+    cap = capsys.readouterr()
+    print(clear_ansi(cap.out))
+    if hr_enabled:
+        assert clear_ansi(cap.out) == regex(rf'Error  Corruption in piece 1, '
+                                            rf'at least one of these files is corrupt: {file1}, {file2}\n')
+    else:
+        assert clear_ansi(cap.out) == regex(rf'Error\tCorruption in piece 1, '
+                                            rf'at least one of these files is corrupt: {file1}, {file2}\n')
 
 
-def test_success(tmpdir, create_torrent, human_readable, capsys, clear_ansi):
-    content = tmpdir.join('content')
-    content.write('some data')
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_multifile_torrent__correct_size_but_corrupt(tmp_path, create_torrent, human_readable, hr_enabled, capsys, clear_ansi, regex):
+    content_path = tmp_path / 'content'
+    content_path.mkdir()
+    file1 = content_path / 'file1.jpg'
+    file1.write_text('some data')
+    file1_size = os.path.getsize(file1)
+    file2 = content_path / 'file2.jpg'
+    file2.write_text('some other data')
 
-    with create_torrent(path=content) as torrent_file:
-        t = torf.Torrent.read(torrent_file)
+    with create_torrent(path=content_path) as torrent_file:
+        file1.write_text('SOME DATA')
+        assert os.path.getsize(file1) == file1_size
 
-        with human_readable(True):
-            run([str(content), '-i', torrent_file])
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert re.search(rf'\s*Progress  100.00 %  \|  \d+:\d+:\d+ total  \|  \d+\.\d+ MiB/s$',
-                              clear_ansi(cap.out))
+        with pytest.raises(err.VerifyError) as exc_info:
+            with human_readable(hr_enabled):
+                run([str(content_path), '-i', torrent_file])
+            assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
+    cap = capsys.readouterr()
+    print(clear_ansi(cap.out))
+    if hr_enabled:
+        assert clear_ansi(cap.out) == regex(rf'Error  Corruption in piece 1, '
+                                            rf'at least one of these files is corrupt: {file1}, {file2}\n')
+    else:
+        assert clear_ansi(cap.out) == regex(rf'Error\tCorruption in piece 1, '
+                                            rf'at least one of these files is corrupt: {file1}, {file2}\n')
 
-        with human_readable(False):
-            run([str(content), '-i', torrent_file])
-            cap = capsys.readouterr()
-            print(clear_ansi(cap.out))
-            assert re.search(rf'\s*Progress\t100\.000\t\d+\t\d+\t\d+\t\d+\t\d+\t{content}\n$',
-                             clear_ansi(cap.out))
+
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_success(tmp_path, create_torrent, human_readable, hr_enabled, capsys, clear_ansi, regex):
+    content_path = tmp_path / 'content'
+    content_path.write_text('some data')
+
+    with create_torrent(path=content_path) as torrent_file:
+        with human_readable(hr_enabled):
+            run([str(content_path), '-i', torrent_file])
+
+    cap = capsys.readouterr()
+    print(clear_ansi(cap.out))
+    if hr_enabled:
+        assert clear_ansi(cap.out) == regex(rf'\s*Progress  100.00 %  \|  \d+:\d+:\d+ total  \|  \s*\d+\.\d+ MiB/s$')
+    else:
+        assert clear_ansi(cap.out) == regex(rf'\s*Progress\t100\.000\t\d+\t\d+\t\d+\t\d+\t\d+\t{content_path}\n$')
