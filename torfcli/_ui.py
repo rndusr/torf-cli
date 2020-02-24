@@ -339,7 +339,8 @@ class _HumanStatusReporter(_StatusReporterBase):
                            _term.restore_cursor_pos,
                            msg))
         else:
-            msg += f'  |  {info.time_total} total  |  {info.bytes_per_sec/1045876:.2f} MiB/s'
+            msg = ''.join((f'{msg}  |  {info.time_total} total  |  {info.bytes_per_sec/1045876:.2f} MiB/s',
+                           _term.erase_to_eol))
         return msg
 
     PROGRESS_BAR_WIDTH = 80
