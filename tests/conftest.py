@@ -8,6 +8,20 @@ import shutil
 from types import GeneratorType
 import re
 
+@pytest.fixture
+def regex():
+    # https://kalnytskyi.com/howto/assert-str-matches-regex-in-pytest/
+    class _regex:
+        def __init__(self, pattern, flags=0):
+            self._regex = re.compile(pattern, flags)
+
+        def __eq__(self, string):
+            return bool(self._regex.search(string))
+
+        def __repr__(self):
+            return self._regex.pattern
+    return _regex
+
 
 @pytest.fixture(autouse=True)
 def change_cwd(tmpdir):
