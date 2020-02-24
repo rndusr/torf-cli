@@ -323,29 +323,25 @@ class _HumanStatusReporter(_StatusReporterBase):
             raise RuntimeError(f'{self} exited with invalid result: {self.result!r}')
 
     def _get_progress_string(self, info):
-        msg = f'{info.fraction_done * 100:.2f} %'
+        perc_str = f'{info.fraction_done * 100:.2f} %'
+        bps_str = f'{info.bytes_per_sec/1045876:6.2f} MiB/s'
         if info.pieces_done < info.pieces_total:
+            progress_bar = self._progress_bar(os.path.basename(info.filepath), info.fraction_done, 45)
+            first_line = ' '.join((perc_str, progress_bar, bps_str))
             eta_str = '{0:%H}:{0:%M}:{0:%S}'.format(info.eta)
-            msg += (f'  |  {info.time_elapsed} elapsed, {info.time_left} left, {info.time_total} total'
-                    f'  |  ETA: {eta_str}'
-                    f'  |  {info.bytes_per_sec/1045876:.2f} MiB/s')
-
-            # Display current file/progress bar in line below
-            progress_bar = self._progress_bar(os.path.basename(info.filepath), info.fraction_done)
-            msg = ''.join((_term.erase_to_eol,
-                           _term.save_cursor_pos,
-                           _term.move_down,
-                           progress_bar,
-                           _term.restore_cursor_pos,
-                           msg))
+            second_line = (f'{info.time_elapsed} elapsed  |  {info.time_left} left '
+                           f' |  {info.time_total} total  |  ETA: {eta_str}')
+            return ''.join((_term.erase_to_eol,
+                            _term.save_cursor_pos,
+                            _term.move_down,
+                            second_line,
+                            _term.restore_cursor_pos,
+                            first_line))
         else:
-            msg = ''.join((f'{msg}  |  {info.time_total} total  |  {info.bytes_per_sec/1045876:.2f} MiB/s',
-                           _term.erase_to_eol))
-        return msg
+            return ''.join((f'{perc_str}  |  {info.time_total} total  |  {bps_str}',
+                            _term.erase_to_eol))
 
-    PROGRESS_BAR_WIDTH = 80
-    def _progress_bar(self, text, fraction_done):
-        width = self.PROGRESS_BAR_WIDTH
+    def _progress_bar(self, text, fraction_done, width):
         if len(text) > width:
             half = int(width/2)
             text = text[:half] + '…' + text[-(width-half-1):]
