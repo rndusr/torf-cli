@@ -332,12 +332,12 @@ class _HumanStatusReporter(_StatusReporterBase):
 
             # Display current file/progress bar in line below
             progress_bar = self._progress_bar(os.path.basename(info.filepath), info.fraction_done)
-            msg = (_term.erase_to_eol +
-                   _term.save_cursor_pos +
-                   _term.move_down +
-                   progress_bar +
-                   _term.restore_cursor_pos +
-                   msg)
+            msg = ''.join((_term.erase_to_eol,
+                           _term.save_cursor_pos,
+                           _term.move_down,
+                           progress_bar,
+                           _term.restore_cursor_pos,
+                           msg))
         else:
             msg += f'  |  {info.time_total} total  |  {info.bytes_per_sec/1045876:.2f} MiB/s'
         return msg
@@ -352,11 +352,12 @@ class _HumanStatusReporter(_StatusReporterBase):
             text += ' ' * (width - len(text))
         assert len(text) == width, f'len({text!r}) != {width}'
         pos = int(fraction_done * width)
-        bar = (_term.reverse_on +
-               text[:pos] +
-               _term.reverse_off +
-               text[pos:])
-        return "▕" + bar + "▏"
+        return ''.join(('▕',
+                        _term.reverse_on,
+                        text[:pos],
+                        _term.reverse_off,
+                        text[pos:],
+                        '▏'))
 
 class _MachineStatusReporter(_StatusReporterBase):
     def _get_progress_string(self, info):
