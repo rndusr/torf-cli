@@ -1,10 +1,8 @@
 from torfcli._main import run
 from torfcli import _errors as err
 import pytest
-import errno
 import torf
 import os
-import re
 
 
 def test_torrent_unreadable(mock_content):
