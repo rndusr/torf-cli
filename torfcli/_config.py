@@ -116,6 +116,7 @@ _cliparser.add_argument('--nohuman', '-U', action='store_true')
 _cliparser.add_argument('--yes', '-y', action='store_true')
 _cliparser.add_argument('--help', '-h', action='store_true')
 _cliparser.add_argument('--version', '-V', action='store_true')
+_cliparser.add_argument('--debug-file')
 
 def parse_args(args):
     cfg = vars(_cliparser.parse_args(args))
@@ -160,6 +161,11 @@ def parse_args(args):
 def get_cfg(cliargs):
     """Combine values from CLI, config file, profiles and defaults"""
     clicfg = parse_args(cliargs)
+
+    if clicfg['debug_file']:
+        import logging
+        logging.basicConfig(level=logging.DEBUG, format='%(message)s',
+                            filename=clicfg['debug_file'])
 
     # If we don't need to read a config file, return parsed CLI arguments
     cfgfile = clicfg['config'] or DEFAULT_CONFIG_FILE
