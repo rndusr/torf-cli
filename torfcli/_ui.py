@@ -150,6 +150,7 @@ class _HumanFormatter(_FormatterBase):
         return lines
 
     def info(self, key, value, newline=True):
+        _term.echo('erase_line', 'move_pos1')
         sep = '  '
         label_width = 11
         label = key.rjust(label_width)
@@ -255,13 +256,11 @@ class _StatusReporterBase():
         self._result = result
 
     def generate_callback(self, torrent, filepath, pieces_done, pieces_total):
-        _term.echo('erase_line', 'move_pos1')
         self._update_progress_info(torrent, filepath, pieces_done, pieces_total)
         self._ui.info('Progress', self._get_progress_string(self._info), newline=False)
 
     def verify_callback(self, torrent, filepath, pieces_done, pieces_total,
                         piece_index, piece_hash, exception):
-        _term.echo('erase_line', 'move_pos1')
         if exception:
             self._ui.info('Error', self._format_error(exception))
         self._update_progress_info(torrent, filepath, pieces_done, pieces_total)
