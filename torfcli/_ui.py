@@ -16,6 +16,7 @@ import types
 import os
 import time
 import datetime
+import torf
 
 from . import _util
 from . import _errors as err
@@ -262,7 +263,7 @@ class _StatusReporterBase():
                         piece_index, piece_hash, exception):
         _term.echo('erase_line', 'move_pos1')
         if exception:
-            self._ui.info('Error', str(exception))
+            self._ui.info('Error', self._format_error(exception))
         self._update_progress_info(torrent, filepath, pieces_done, pieces_total)
         self._ui.info('Progress', self._get_progress_string(self._info), newline=False)
 
@@ -356,6 +357,16 @@ class _HumanStatusReporter(_StatusReporterBase):
                         text[pos:],
                         '▏'))
 
+    def _format_error(self, exception):
+        if isinstance(exception, torf.VerifyContentError):
+            lines = [f'Corruption in piece {exception.piece_index+1}, '
+                     f'at least one of these files is corrupt:']
+            for filepath in exception.files:
+                lines.append(f'  {filepath}')
+            return lines
+        else:
+            return str(exception)
+
 class _MachineStatusReporter(_StatusReporterBase):
     def _get_progress_string(self, info):
         return '\t'.join((f'{info.fraction_done * 100:.3f}',
@@ -365,3 +376,12 @@ class _MachineStatusReporter(_StatusReporterBase):
                           f'{round(info.eta.timestamp())}',
                           f'{round(info.bytes_per_sec)}',
                           f'{info.filepath}'))
+
+    def _format_error(self, exception):
+        if isinstance(exception, torf.VerifyContentError):
+            lines = [f'Corruption in piece {exception.piece_index+1}, '
+                     f'at least one of these files is corrupt:']
+            lines.extend(exception.files)
+            return lines
+        else:
+            return str(exception)
