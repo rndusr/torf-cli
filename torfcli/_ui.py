@@ -323,7 +323,7 @@ class _HumanStatusReporter(_StatusReporterBase):
             raise RuntimeError(f'{self} exited with invalid result: {self.result!r}')
 
     def _get_progress_string(self, info):
-        perc_str = f'{info.fraction_done * 100:.2f} %'
+        perc_str = f'{info.fraction_done * 100:5.2f} %'
         bps_str = f'{info.bytes_per_sec/1045876:6.2f} MiB/s'
         if info.pieces_done < info.pieces_total:
             progress_bar = self._progress_bar(os.path.basename(info.filepath), info.fraction_done, 45)
