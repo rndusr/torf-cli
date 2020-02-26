@@ -1,5 +1,6 @@
 from torfcli._main import run
 from torfcli import _errors as err
+from torfcli._vars import __version__
 import pytest
 from unittest.mock import patch, DEFAULT
 import os
@@ -16,13 +17,15 @@ def assert_approximate_date(date1, date2):
 
 ### Basic creation modes
 
-def test_default_torrent_filepath(capsys, mock_content):
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_default_torrent_filepath(capsys, mock_content, human_readable, hr_enabled, clear_ansi, assert_no_ctrl, regex):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
     now = datetime.today()
-    run([content_path])
+    with human_readable(hr_enabled):
+        run([content_path])
 
     t = torf.Torrent.read(exp_torrent_filepath)
     assert t.name == 'My Torrent'
@@ -31,12 +34,23 @@ def test_default_torrent_filepath(capsys, mock_content):
     assert t.created_by.startswith('torf/')
 
     cap = capsys.readouterr()
-    assert f'Magnet\tmagnet:?xt=urn:btih:' in cap.out
-    assert f'Torrent\t{exp_torrent_filename}' in cap.out
-    assert 'Name\tMy Torrent' in cap.out
-    assert 'File Count\t3' in cap.out
-    assert 'Info Hash' in cap.out
-    assert 'Created By\ttorf' in cap.out
+    if hr_enabled:
+          out_cleared = clear_ansi(cap.out)
+          print(out_cleared)
+          assert out_cleared == regex(rf'^\s*Magnet  magnet:\?xt=urn:btih:{t.infohash}&dn=My\+Torrent&xl=\d+$', flags=re.MULTILINE)
+          assert out_cleared == regex(rf'^\s*Torrent  {exp_torrent_filename}$', flags=re.MULTILINE)
+          assert out_cleared == regex(rf'^\s*Name  My Torrent$', flags=re.MULTILINE)
+          assert out_cleared == regex(rf'^\s*File Count  3$', flags=re.MULTILINE)
+          assert out_cleared == regex(rf'^\s*Info Hash  {t.infohash}$', flags=re.MULTILINE)
+          assert out_cleared == regex(rf'^\s*Created By  torf/{re.escape(__version__)}$', flags=re.MULTILINE)
+    else:
+        assert_no_ctrl(cap.out)
+        assert cap.out == regex(rf'^Magnet\tmagnet:\?xt=urn:btih:{t.infohash}&dn=My\+Torrent&xl=\d+$', flags=re.MULTILINE)
+        assert cap.out == regex(rf'^Torrent\t{exp_torrent_filename}$', flags=re.MULTILINE)
+        assert cap.out == regex(rf'^Name\tMy Torrent$', flags=re.MULTILINE)
+        assert cap.out == regex(rf'^File Count\t3$', flags=re.MULTILINE)
+        assert cap.out == regex(rf'^Info Hash\t{t.infohash}$', flags=re.MULTILINE)
+        assert cap.out == regex(rf'^Created By\ttorf/{re.escape(__version__)}$', flags=re.MULTILINE)
 
 
 def test_user_given_torrent_filepath(capsys, mock_content):
