@@ -262,7 +262,7 @@ class _StatusReporterBase():
     def verify_callback(self, torrent, filepath, pieces_done, pieces_total,
                         piece_index, piece_hash, exception):
         if exception:
-            self._ui.info('Error', self._format_error(exception))
+            self._ui.info('Error', self._format_error(exception, torrent))
         self._update_progress_info(torrent, filepath, pieces_done, pieces_total)
         self._ui.info('Progress', self._get_progress_string(self._info), newline=False)
 
@@ -356,8 +356,8 @@ class _HumanStatusReporter(_StatusReporterBase):
                         text[pos:],
                         '▏'))
 
-    def _format_error(self, exception):
-        if isinstance(exception, torf.VerifyContentError):
+    def _format_error(self, exception, torrent):
+        if isinstance(exception, torf.VerifyContentError) and len(tuple(torrent.files)) > 1:
             lines = [f'Corruption in piece {exception.piece_index+1}, '
                      f'at least one of these files is corrupt:']
             for filepath in exception.files:
@@ -376,8 +376,8 @@ class _MachineStatusReporter(_StatusReporterBase):
                           f'{round(info.bytes_per_sec)}',
                           f'{info.filepath}'))
 
-    def _format_error(self, exception):
-        if isinstance(exception, torf.VerifyContentError):
+    def _format_error(self, exception, torrent):
+        if isinstance(exception, torf.VerifyContentError) and len(tuple(torrent.files)) > 1:
             lines = [f'Corruption in piece {exception.piece_index+1}, '
                      f'at least one of these files is corrupt:']
             lines.extend(exception.files)

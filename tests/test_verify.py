@@ -212,13 +212,15 @@ def test_multifile_torrent__correct_size_but_corrupt(tmp_path, create_torrent, h
     content_path = tmp_path / 'content'
     content_path.mkdir()
     file1 = content_path / 'file1.jpg'
-    file1.write_text('some data')
+    file1_data = bytearray(b'\x00' * int(1e6))
+    file1.write_bytes(file1_data)
     file1_size = os.path.getsize(file1)
     file2 = content_path / 'file2.jpg'
     file2.write_text('some other data')
 
     with create_torrent(path=content_path) as torrent_file:
-        file1.write_text('SOME DATA')
+        file1_data[int(1e6 / 2)] = (file1_data[int(1e6 / 2)] + 1) % 256
+        file1.write_bytes(file1_data)
         assert os.path.getsize(file1) == file1_size
 
         with pytest.raises(err.VerifyError) as exc_info:
@@ -228,14 +230,13 @@ def test_multifile_torrent__correct_size_but_corrupt(tmp_path, create_torrent, h
     cap = capsys.readouterr()
     if hr_enabled:
         print(clear_ansi(cap.out))
-        assert clear_ansi(cap.out) == regex(rf'^\s*Error  Corruption in piece 1, at least one of these files is corrupt:$',
+        assert clear_ansi(cap.out) == regex(rf'^\s*Error  Corruption in piece 31, at least one of these files is corrupt:$',
                                             flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*      {file1}$', flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(rf'^\s*      {file2}$', flags=re.MULTILINE)
     else:
         print(repr(cap.out))
         assert_no_ctrl(cap.out)
-        assert cap.out == regex((rf'^Error\tCorruption in piece 1, at least one of these files is corrupt:\t{file1}\t{file2}$'),
+        assert cap.out == regex((rf'^Error\tCorruption in piece 31, at least one of these files is corrupt:\t{file1}$'),
                                 flags=re.MULTILINE)
 
 
