@@ -554,7 +554,7 @@ def test_multiple_trackers(capsys, mock_content):
     assert '\thttps://tracker2.example.org/bar/' in cap.out
     assert '\thttps://tracker3.example.org/baz' in cap.out
 
-def test_multiple_tracker_tiers(capsys, mock_content, human_readable):
+def test_multiple_tracker_tiers(capsys, mock_content, human_readable, clear_ansi, regex):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
@@ -569,12 +569,13 @@ def test_multiple_tracker_tiers(capsys, mock_content, human_readable):
                               ['http://a', 'http://b', 'http://c'],
                               ['http://asdf']]
         cap = capsys.readouterr()
-        assert re.search(r'^(\s*)Trackers  Tier 1: http://foo\n'
-                         r'\1                  http://bar\n'
-                         r'\1          Tier 2: http://a\n'
-                         r'\1                  http://b\n'
-                         r'\1                  http://c\n'
-                         r'\1          Tier 3: http://asdf\n', cap.out, flags=re.MULTILINE)
+        assert clear_ansi(cap.out) == regex(r'^(\s*)Trackers  Tier 1: http://foo\n'
+                                            r'\1                  http://bar\n'
+                                            r'\1          Tier 2: http://a\n'
+                                            r'\1                  http://b\n'
+                                            r'\1                  http://c\n'
+                                            r'\1          Tier 3: http://asdf\n',
+                                            flags=re.MULTILINE)
 
     with human_readable(False):
         run([content_path, '-y',
@@ -586,8 +587,9 @@ def test_multiple_tracker_tiers(capsys, mock_content, human_readable):
                               ['http://a', 'http://b', 'http://c'],
                               ['http://asdf']]
         cap = capsys.readouterr()
-        assert re.search(r'^Trackers\thttp://foo\thttp://bar\t'
-                         r'http://a\thttp://b\thttp://c\thttp://asdf\n', cap.out, flags=re.MULTILINE)
+        assert cap.out == regex(r'^Trackers\thttp://foo\thttp://bar\t'
+                                r'http://a\thttp://b\thttp://c\thttp://asdf\n',
+                                flags=re.MULTILINE)
 
 def test_notracker_option(capsys, mock_content):
     content_path = str(mock_content)
