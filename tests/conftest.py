@@ -65,14 +65,13 @@ def assert_torrents_equal():
     return _assert_torrents_equal
 
 
-@contextlib.contextmanager
-def _human_readable(monkeypatch, human_readable):
-    from torfcli import _ui
-    monkeypatch.setattr(_ui.UI, '_human', lambda self: bool(human_readable))
-    yield
-
 @pytest.fixture
 def human_readable(monkeypatch):
+    @contextlib.contextmanager
+    def _human_readable(monkeypatch, human_readable):
+        from torfcli import _ui
+        monkeypatch.setattr(_ui.UI, '_human', lambda self: bool(human_readable))
+        yield
     return functools.partial(_human_readable, monkeypatch)
 
 
