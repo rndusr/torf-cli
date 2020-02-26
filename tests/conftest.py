@@ -130,3 +130,12 @@ def clear_ansi():
         string = re.sub(r'\r', '', string)
         return string
     return _clear_ansi
+
+@pytest.fixture
+def assert_no_ctrl():
+    """Assert string doesn't contain control sequences except for \n and \t"""
+    exempt = ('\n', '\t')
+    def _assert_no_ctrl(string):
+        for c in string:
+            assert ord(c) >= 32 or c in exempt
+    return _assert_no_ctrl
