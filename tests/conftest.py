@@ -12,11 +12,17 @@ import re
 def regex():
     # https://kalnytskyi.com/howto/assert-str-matches-regex-in-pytest/
     class _regex:
-        def __init__(self, pattern, flags=0):
+        def __init__(self, pattern, flags=0, show_groups=False):
             self._regex = re.compile(pattern, flags)
+            self._show_groups = show_groups
 
         def __eq__(self, string):
-            return bool(self._regex.search(string))
+            match = self._regex.search(string)
+            if match is not None and self._show_groups:
+                print(match.groups())
+                return False
+            else:
+                return bool(match)
 
         def __repr__(self):
             return self._regex.pattern
