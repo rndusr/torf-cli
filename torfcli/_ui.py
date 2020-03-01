@@ -357,7 +357,7 @@ class _HumanStatusReporter(_StatusReporterBase):
                         '▏'))
 
     def _format_error(self, exception, torrent):
-        if isinstance(exception, torf.VerifyContentError) and len(tuple(torrent.files)) > 1:
+        if isinstance(exception, torf.VerifyContentError) and len(torrent.files) > 1:
             lines = [f'Corruption in piece {exception.piece_index+1}, '
                      f'at least one of these files is corrupt:']
             for filepath in exception.files:
@@ -377,7 +377,7 @@ class _MachineStatusReporter(_StatusReporterBase):
                           f'{info.filepath}'))
 
     def _format_error(self, exception, torrent):
-        if isinstance(exception, torf.VerifyContentError) and len(tuple(torrent.files)) > 1:
+        if isinstance(exception, torf.VerifyContentError) and len(torrent.files) > 1:
             lines = [f'Corruption in piece {exception.piece_index+1}, '
                      f'at least one of these files is corrupt:']
             lines.extend(exception.files)
