@@ -77,7 +77,7 @@ def make_filetree(tree, parents_is_last=()):
             else:
                 indent += f'{_C_DOWN_RIGHT}{_C_RIGHT}'
 
-        if isinstance(node, torf.Torrent.File):
+        if isinstance(node, torf.File):
             lines.append(f'{indent}{name} [{bytes2string(node.size, include_bytes=True)}]')
         else:
             lines.append(f'{indent}{name}')
