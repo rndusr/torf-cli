@@ -59,7 +59,7 @@ def _create_mode(ui, cfg):
         torrent = torf.Torrent(
             path=cfg['PATH'],
             name=cfg['name'] or None,
-            exclude=cfg['exclude'],
+            exclude_globs=cfg['exclude'],
             trackers=() if cfg['notracker'] else trackers,
             webseeds=() if cfg['nowebseed'] else cfg['webseed'],
             private=False if cfg['noprivate'] else cfg['private'],
@@ -135,7 +135,7 @@ def _edit_mode(ui, cfg):
         torrent.creation_date = cfg['date']
 
     if cfg['PATH']:
-        list_set_or_remove('exclude', 'exclude')
+        list_set_or_remove('exclude', 'exclude_globs')
         try:
             torrent.path = cfg['PATH']
         except torf.TorfError as e:

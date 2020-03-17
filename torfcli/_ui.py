@@ -81,8 +81,8 @@ class UI:
             info('Piece Count', torrent.pieces)
         files = tuple(torrent.files)
         info('File Count', len(files))
-        if torrent.exclude:
-            info('Exclude', torrent.exclude)
+        if torrent.exclude_globs:
+            info('Exclude', torrent.exclude_globs)
         info('Files', self._fmt.files(torrent))
 
     def StatusReporter(self):
