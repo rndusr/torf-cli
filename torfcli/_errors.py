@@ -35,16 +35,13 @@ class Error(Exception):
     ReadError('foo')
     >>> Error(torf.ReadError(errno.ENOENT, 'foo'))
     ReadError('foo: No such file or directory')
-    >>> Error(torf.PathEmptyError('foo'))
-    ReadError('foo: Empty directory')
     """
 
     _subclsmap = defaultdict(
         lambda: Code.GENERIC,
         # torf.URLError and torf.PieceSizeError are handled in _config.py
         {torf.ReadError               : Code.READ,
-         torf.PathNotFoundError       : Code.READ,
-         torf.PathEmptyError          : Code.READ,
+         torf.PathError               : Code.READ,
          torf.BdecodeError            : Code.READ,
          torf.MetainfoError           : Code.READ,
          torf.WriteError              : Code.WRITE,
