@@ -190,13 +190,13 @@ class _HumanFormatter(_FormatterBase):
 
 class _MachineFormatter(_FormatterBase):
     def size(self, torrent):
-        return torrent.size
+        return int(torrent.size)
 
     def creation_date(self, torrent):
         return int(torrent.creation_date.timestamp())
 
     def piece_size(self, torrent):
-        return torrent.piece_size
+        return int(torrent.piece_size)
 
     def files(self, torrent):
         return '\t'.join(str(f) for f in torrent.files)
