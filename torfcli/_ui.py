@@ -155,13 +155,16 @@ class _HumanFormatter(_FormatterBase):
         label_width = 11
         label = key.rjust(label_width)
         # Show multiple values as indented list
-        if not isinstance(value, str) and isinstance(value, abc.Iterable) and value:
-            # Print one indented value per line
-            value_parts = [f'{value[0]}']
-            indent = len(label) * ' '
-            for item in value[1:]:
-                value_parts.append(f'{indent}{sep}{item}')
-            value = '\n'.join(value_parts)
+        if not isinstance(value, str) and isinstance(value, abc.Iterable):
+            if value:
+                # Print one indented value per line
+                value_parts = [f'{value[0]}']
+                indent = len(label) * ' '
+                for item in value[1:]:
+                    value_parts.append(f'{indent}{sep}{item}')
+                value = '\n'.join(value_parts)
+            else:
+                value = ''
 
         if newline:
             sys.stdout.write(f'{label}{sep}{value}\n')
