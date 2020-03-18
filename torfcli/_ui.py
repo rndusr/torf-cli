@@ -199,7 +199,7 @@ class _MachineFormatter(_FormatterBase):
         return torrent.piece_size
 
     def files(self, torrent):
-        return '\t'.join(torrent.files)
+        return '\t'.join(str(f) for f in torrent.files)
 
     def comment(self, torrent):
         return torrent.comment.splitlines()
