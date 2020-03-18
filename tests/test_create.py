@@ -188,7 +188,7 @@ def test_exclude_everything(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    with pytest.raises(err.ReadError, match=rf'^{content_path}: Empty directory$') as exc_info:
+    with pytest.raises(err.ReadError, match=rf'^{content_path}: Empty or all files excluded$') as exc_info:
         run([content_path, '--exclude', '*'])
 
 

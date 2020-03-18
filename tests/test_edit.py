@@ -231,11 +231,8 @@ def test_edit_path(create_torrent, tmpdir, assert_torrents_equal):
         new = torf.Torrent.read(outfile)
         assert_torrents_equal(orig, new, ignore=('files', 'filetree', 'name',
                                                  'piece_size', 'pieces', 'size'))
-        assert tuple(new.files) == ('new content/some file',)
-        assert new.filetree == {'new content': {'some file': torf.Torrent.File(name='some file',
-                                                                               path='new content/some file',
-                                                                               dir='new content',
-                                                                               size=14)}}
+        assert tuple(new.files) == (torf.File('new content/some file', size=14),)
+        assert new.filetree == {'new content': {'some file': torf.File('new content/some file', size=14)}}
         assert new.name == 'new content'
         assert new.size == len('different data')
 
@@ -253,11 +250,9 @@ def test_edit_path_with_exclude_option(create_torrent, tmpdir, assert_torrents_e
         new = torf.Torrent.read(outfile)
         assert_torrents_equal(orig, new, ignore=('files', 'filetree', 'name',
                                                  'piece_size', 'pieces', 'size'))
-        assert tuple(new.files) == ('new content/some image.jpg',)
-        assert new.filetree == {'new content': {'some image.jpg': torf.Torrent.File(name='some image.jpg',
-                                                                                    path='new content/some image.jpg',
-                                                                                    dir='new content',
-                                                                                    size=10)}}
+        assert tuple(new.files) == (torf.File('new content/some image.jpg', size=10),)
+        assert new.filetree == {'new content': {'some image.jpg': torf.File('new content/some image.jpg',
+                                                                            size=10)}}
         assert new.name == 'new content'
         assert new.size == len('image data')
 
@@ -271,14 +266,11 @@ def test_edit_name(create_torrent, tmpdir, assert_torrents_equal):
         assert_torrents_equal(orig, new, ignore=('name', 'files', 'filetree'))
 
         assert new.name == 'new name'
-        assert tuple(new.files) == tuple(path.replace(orig.name, 'new name')
-                                         for path in orig.files)
-        assert new.filetree == {'new name': {'Anotherthing.iso': torf.Torrent.File(name='Anotherthing.iso',
-                                                                      path='new name/Anotherthing.iso',
-                                                                      dir='new name', size=9),
-                                             'Something.jpg': torf.Torrent.File(name='Something.jpg',
-                                                                   path='new name/Something.jpg',
-                                                                   dir='new name', size=9),
-                                             'Thirdthing.txt': torf.Torrent.File(name='Thirdthing.txt',
-                                                                    path='new name/Thirdthing.txt',
-                                                                    dir='new name', size=9)}}
+        orig_files = orig.files
+        for of,nf in zip(orig.files, new.files):
+            assert nf.parts[0] == 'new name'
+            assert nf.parts[1:] == of.parts[1:]
+
+        assert new.filetree == {'new name': {'Anotherthing.iso': torf.File('new name/Anotherthing.iso', size=9),
+                                             'Something.jpg': torf.File('new name/Something.jpg', size=9),
+                                             'Thirdthing.txt': torf.File('new name/Thirdthing.txt', size=9)}}

@@ -28,7 +28,7 @@ def test_ConfigError():
 def test_ReadError():
     for cls,args,kwargs in ((err.ReadError, ('path/to/file: No such file or directory',), {}),
                             (err.Error, (torf.ReadError(errno.ENOENT, 'path/to/file'),), {}),
-                            (err.Error, (torf.PathNotFoundError('path/to/file'),), {}),
+                            (err.Error, (torf.PathError('path/to/file', msg='No such file or directory'),), {}),
                             (err.Error, ('path/to/file: No such file or directory', err.Code.READ), {}),
                             (err.Error, ('path/to/file: No such file or directory',), {'code': err.Code.READ})):
         print(f'>>> {cls.__name__}({args}, {kwargs})')
@@ -36,11 +36,6 @@ def test_ReadError():
             raise cls(*args, **kwargs)
         assert exc_info.value.exit_code is err.Code.READ
         assert str(exc_info.value) == 'path/to/file: No such file or directory'
-
-    with pytest.raises(err.ReadError) as exc_info:
-        raise err.Error(torf.PathEmptyError('path/to/file'))
-    assert exc_info.value.exit_code is err.Code.READ
-    assert str(exc_info.value) == 'path/to/file: Empty directory'
 
 
 def test_WriteError():

@@ -98,7 +98,7 @@ def mock_create_mode(monkeypatch):
 def _create_torrent(tmpdir, mock_content, **kwargs):
     torrent_file = str(tmpdir.join('test.torrent'))
     kw = {'path': str(mock_content),
-          'exclude': ['Original', 'exclusions'],
+          'exclude_globs': ['Original', 'exclusions'],
           'trackers': ['http://some.tracker'],
           'webseeds': ['http://some.webseed'],
           'private': False,
