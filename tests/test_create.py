@@ -96,7 +96,6 @@ def test_content_path_doesnt_exist(capsys):
     with pytest.raises(err.ReadError, match=r'^/path/doesnt/exist: No such file or directory$') as exc_info:
         run(['/path/doesnt/exist'])
 
-
 def test_torrent_filepath_exists(capsys, mock_content):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
@@ -110,7 +109,6 @@ def test_torrent_filepath_exists(capsys, mock_content):
 
 
 ### Options
-
 
 def test_nomagnet_option(capsys, mock_content):
     content_path = str(mock_content)
