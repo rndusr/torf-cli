@@ -199,9 +199,11 @@ def _hash_pieces(ui, torrent):
         ui.info('Info Hash', torrent.infohash)
 
 def _write_torrent(ui, torrent, cfg):
+    if not torrent.is_ready:
+        raise _errors.WriteError('Attempt to write incomplete torrent. '
+                                 'Please report this as a bug.')
     if not cfg['nomagnet']:
         ui.info('Magnet', torrent.magnet())
-
     if not cfg['notorrent']:
         filepath = _util.get_torrent_filepath(torrent, cfg)
         try:
