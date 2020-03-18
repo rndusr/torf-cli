@@ -78,6 +78,20 @@ def test_user_given_torrent_filepath(capsys, mock_content):
 
 ### Error cases
 
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_content_path_is_empty_directory(capsys, tmp_path, human_readable, hr_enabled):
+    (tmp_path / 'empty').mkdir()
+    with human_readable(hr_enabled):
+        with pytest.raises(err.ReadError, match=rf'^{tmp_path / "empty"}: Empty or all files excluded$') as exc_info:
+            run([str(tmp_path / 'empty')])
+
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_content_path_is_empty_file(capsys, tmp_path, human_readable, hr_enabled):
+    (tmp_path / 'empty').write_bytes(b'')
+    with human_readable(hr_enabled):
+        with pytest.raises(err.ReadError, match=rf'^{tmp_path / "empty"}: Empty or all files excluded$') as exc_info:
+            run([str(tmp_path / 'empty')])
+
 def test_content_path_doesnt_exist(capsys):
     with pytest.raises(err.ReadError, match=r'^/path/doesnt/exist: No such file or directory$') as exc_info:
         run(['/path/doesnt/exist'])
