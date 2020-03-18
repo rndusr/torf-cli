@@ -17,7 +17,7 @@ def run():
     from ._vars import __appname__
 
     try:
-        run()
+        run(sys.argv[1:])
     except _errors.Error as e:
         if str(e):
             print(f'{__appname__}: {e}', file=sys.stderr)

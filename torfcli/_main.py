@@ -23,7 +23,7 @@ from . import _errors
 PROGRESS_INTERVAL = 0.5
 
 
-def run(args=sys.argv[1:]):
+def run(args):
     cfg = _config.get_cfg(args)
 
     if cfg['help']:
