@@ -228,10 +228,6 @@ class _MachineFormatter(_FormatterBase):
 
 
 class _StatusReporterBase():
-    SUCCESS = 1
-    FAILURE = 2
-    ABORTED = 3
-
     def __init__(self, ui):
         self._ui = ui
         self._start_time = time.time()
@@ -252,12 +248,11 @@ class _StatusReporterBase():
     def __exit__(self, _, __, ___):
         pass
 
-    @property
-    def result(self):
-        return getattr(self, '_result', None)
-    @result.setter
-    def result(self, result):
-        self._result = result
+    def keep_progress_summary(self):
+        pass
+
+    def keep_progress(self):
+        pass
 
     def generate_callback(self, torrent, filepath, pieces_done, pieces_total):
         self._update_progress_info(torrent, filepath, pieces_done, pieces_total)
@@ -309,22 +304,18 @@ class _HumanStatusReporter(_StatusReporterBase):
         _term.echo('ensure_line_below')
         return self
 
+    def keep_progress_summary(self):
+        # The first of the final "Progress" lines is a performance summary.
+        # Keep the summary but erase the progress bar blow.
+        _term.echo('erase_to_eol', 'move_down', 'erase_line', 'move_up')
+        sys.stdout.write('\n')
+
+    def keep_progress(self):
+        # Keep progress info fully intact so we can see how far it got
+        sys.stdout.write('\n\n')
+
     def __exit__(self, _, __, ___):
         _term.no_user_input.disable()
-        if self.result is None:
-            raise RuntimeError(f'{self} exited without result')
-        elif self.result is self.SUCCESS:
-            # Final "Progress" line is a performance summary.  Keep the summary
-            # but erase the progress bar blow.
-            _term.echo('erase_to_eol', 'move_down', 'erase_line', 'move_up')
-            sys.stdout.write('\n')
-        elif self.result is self.FAILURE:
-            sys.stdout.write('\n')
-        elif self.result is self.ABORTED:
-            # Keep last progress info intact so we can see where it stopped
-            sys.stdout.write('\n\n')
-        else:
-            raise RuntimeError(f'{self} exited with invalid result: {self.result!r}')
 
     def _get_progress_string(self, info):
         perc_str = f'{info.fraction_done * 100:5.2f} %'

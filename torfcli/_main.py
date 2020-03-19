@@ -164,39 +164,35 @@ def _verify_mode(ui, cfg):
         ui.info('Path', cfg['PATH'])
         ui.info('Info Hash', torrent.infohash)
 
-    success = False
     with ui.StatusReporter() as sr:
         try:
-            try:
-                success = torrent.verify(cfg['PATH'],
-                                         callback=sr.verify_callback,
-                                         interval=PROGRESS_INTERVAL)
-            except torf.TorfError as e:
-                raise _errors.Error(e)
-            finally:
-                sr.result = sr.SUCCESS if success else sr.FAILURE
+            success = torrent.verify(cfg['PATH'],
+                                     callback=sr.verify_callback,
+                                     interval=PROGRESS_INTERVAL)
+        except torf.TorfError as e:
+            raise _errors.Error(e)
+        except KeyboardInterrupt:
+            sr.keep_progress()
+            raise
+        else:
+            sr.keep_progress_summary()
             if not success:
                 raise _errors.VerifyError(content=cfg["PATH"], torrent=cfg["in"])
-        except KeyboardInterrupt:
-            sr.result = sr.ABORTED
-            raise
 
 def _hash_pieces(ui, torrent):
-    success = False
     with ui.StatusReporter() as sr:
         try:
-            try:
-                success = torrent.generate(callback=sr.generate_callback,
-                                           interval=PROGRESS_INTERVAL)
-            except torf.TorfError as e:
-                raise _errors.Error(e)
-            finally:
-                sr.result = sr.SUCCESS if success else sr.FAILURE
+            success = torrent.generate(callback=sr.generate_callback,
+                                       interval=PROGRESS_INTERVAL)
+        except torf.TorfError as e:
+            raise _errors.Error(e)
         except KeyboardInterrupt:
-            sr.result = sr.ABORTED
+            sr.keep_progress()
             raise
-    if success:
-        ui.info('Info Hash', torrent.infohash)
+        else:
+            sr.keep_progress_summary()
+            if success:
+                ui.info('Info Hash', torrent.infohash)
 
 def _write_torrent(ui, torrent, cfg):
     if not torrent.is_ready:
