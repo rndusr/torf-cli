@@ -335,8 +335,8 @@ class _HumanStatusReporter(_StatusReporterBase):
             eta_str = '{0:%H}:{0:%M}:{0:%S}'.format(info.eta)
             second_line = (f'{info.time_elapsed} elapsed  |  {info.time_left} left '
                            f' |  {info.time_total} total  |  ETA: {eta_str}')
-            return ''.join((_term.erase_to_eol,
-                            _term.save_cursor_pos,
+            return ''.join((_term.save_cursor_pos,
+                            _term.erase_to_eol,
                             _term.move_down,
                             second_line,
                             _term.restore_cursor_pos,
