@@ -217,6 +217,7 @@ class _MachineFormatter(_FormatterBase):
         if not isinstance(value, str) and isinstance(value, abc.Iterable):
             value = '\t'.join(str(v) for v in value)
         sys.stdout.write(f'{key}\t{value}\n')
+        sys.stdout.flush()
 
     def infos(self, pairs):
         for key, value in pairs:
