@@ -15,7 +15,7 @@ def test_creating_prints_performance_summary_on_success(tmp_path, human_readable
 
     cap = capsys.readouterr()
     if hr_enabled:
-        pattern = (r'\s*Progress  100.00 %  \|  \d+:\d{2}:\d{2} total  \|  \s*\d+\.\d{2} MiB/s\n'
+        pattern = (r'\s*Progress  100.00 %  \|  \d+:\d{2}:\d{2} total  \|  \s*\d+\.\d{2} [KMGT]iB/s\n'
                    r'\s*Info Hash  [0-9a-f]{40}\n'
                    r'\s*Magnet  magnet:\?xt=urn:btih:[0-9a-f]{40}&dn=foo&xl=3\n'
                    r'\s*Torrent  foo.torrent\n$')
@@ -55,7 +55,7 @@ def test_creating_keeps_progress_when_aborted(tmp_path, human_readable, hr_enabl
     if hr_enabled:
         pattern = (r'\s*Progress  \d+:\d{2}:\d{2} elapsed  \|  \d+:\d{2}:\d{2} left  \|  '
                    r'\d+:\d{2}:\d{2} total  \|  ETA: \d{2}:\d{2}:\d{2}'
-                   r'\d{1,2}\.\d{2} % ▕foo\s+▏ \s*\d+\.\d{2} MiB/s\n$')
+                   r'\d{1,2}\.\d{2} % ▕foo\s+▏ \s*\d+\.\d{2} [KMGT]iB/s\n$')
         assert clear_ansi(cap.out) == regex(pattern), clear_ansi(cap.out)
     else:
         pattern = (r'\nProgress\t\d+\.\d+\t\d+\t\d+\t\d+\t\d+\t\d+\t' + str(content_path) + '\n$')
@@ -73,7 +73,7 @@ def test_verifying_prints_performance_summary_on_success(tmp_path, human_readabl
 
     cap = capsys.readouterr()
     if hr_enabled:
-        pattern = r'\s*Progress  100.00 %  \|  \d+:\d{2}:\d{2} total  \|  \s*\d+\.\d{2} MiB/s\n$'
+        pattern = r'\s*Progress  100.00 %  \|  \d+:\d{2}:\d{2} total  \|  \s*\d+\.\d{2} [KMGT]iB/s\n$'
         assert clear_ansi(cap.out) == regex(pattern)
     else:
         pattern = rf'Progress\t100.000\t\d+\t\d+\t\d+\t\d+\t\d+\t{content_path}\n$'
@@ -112,7 +112,7 @@ def test_verifying_keeps_progress_when_aborted(tmp_path, human_readable, hr_enab
     if hr_enabled:
         pattern = (r'\s*Progress  \d+:\d{2}:\d{2} elapsed  \|  \d+:\d{2}:\d{2} left  \|  '
                    r'\d+:\d{2}:\d{2} total  \|  ETA: \d{2}:\d{2}:\d{2}'
-                   r'\d{1,2}\.\d{2} % ▕foo\s+▏ \s*\d+\.\d{2} MiB/s\n$')
+                   r'\d{1,2}\.\d{2} % ▕foo\s+▏ \s*\d+\.\d{2} [KMGT]iB/s\n$')
         assert clear_ansi(cap.out) == regex(pattern), clear_ansi(cap.out)
     else:
         pattern = (r'\nProgress\t\d+\.\d+\t\d+\t\d+\t\d+\t\d+\t\d+\t' + str(content_path) + '\n$')
