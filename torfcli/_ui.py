@@ -150,7 +150,6 @@ class _HumanFormatter(_FormatterBase):
         return lines
 
     def info(self, key, value, newline=True):
-        _term.echo('erase_line', 'move_pos1')
         sep = '  '
         label_width = 11
         label = key.rjust(label_width)
@@ -162,10 +161,14 @@ class _HumanFormatter(_FormatterBase):
                 indent = len(label) * ' '
                 for item in value[1:]:
                     value_parts.append(f'{indent}{sep}{item}')
-                value = '\n'.join(value_parts)
+                value = f'{_term.erase_to_eol}\n'.join(value_parts)
             else:
                 value = ''
+        else:
+            value = str(value)
+        value += _term.erase_to_eol
 
+        _term.echo('move_pos1')
         if newline:
             sys.stdout.write(f'{label}{sep}{value}\n')
         else:
