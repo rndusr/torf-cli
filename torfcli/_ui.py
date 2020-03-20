@@ -79,8 +79,7 @@ class UI:
             info('Piece Size', self._fmt.piece_size(torrent))
         if torrent.piece_size:
             info('Piece Count', torrent.pieces)
-        files = tuple(torrent.files)
-        info('File Count', len(files))
+        info('File Count', len(torrent.files))
         if torrent.exclude_globs:
             info('Exclude', torrent.exclude_globs)
         info('Files', self._fmt.files(torrent))
