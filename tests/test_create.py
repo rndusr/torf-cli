@@ -36,7 +36,6 @@ def test_default_torrent_filepath(capsys, mock_content, human_readable, hr_enabl
     cap = capsys.readouterr()
     if hr_enabled:
           out_cleared = clear_ansi(cap.out)
-          print(out_cleared)
           assert out_cleared == regex(rf'^\s*Magnet  magnet:\?xt=urn:btih:{t.infohash}&dn=My\+Torrent&xl=\d+$', flags=re.MULTILINE)
           assert out_cleared == regex(rf'^\s*Torrent  {exp_torrent_filename}$', flags=re.MULTILINE)
           assert out_cleared == regex(rf'^\s*Name  My Torrent$', flags=re.MULTILINE)
