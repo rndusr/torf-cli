@@ -2,12 +2,12 @@
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
 .\" Generator: Asciidoctor 2.0.10
-.\"      Date: 2020-01-02
+.\"      Date: 2020-03-21
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2020-01-02" "\ \&" "\ \&"
+.TH "TORF" "1" "2020-03-21" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -381,6 +381,34 @@ Do not use any configuration file.
 .RS 4
 Use predefined arguments specified in \fIPROFILE\fP.  This option may be given
 multiple times.  See \fBCONFIGURATION FILE\fP.
+.RE
+.sp
+\fB\-\-verbose\fP, \fB\-v\fP
+.RS 4
+Produce more output or be more thorough.
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+Display file and other sizes as precise numbers.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+When verifying, corrupt files are always read to the end instead of skipping
+them after the first corrupt piece.
+.RE
 .RE
 .sp
 \fB\-\-human\fP, \fB\-u\fP
