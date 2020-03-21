@@ -2,10 +2,11 @@
   - Huge performance increase due to multithreading.
   - Verify a torrent's content: torf -i content.torrent path/to/content
   - Progress is now reported in two lines with more information.
-  - Show file sizes in plain bytes as well.
-  - Show file sizes in file tree.
+  - New option: --verbose shows file sizes in plain bytes, and verifies file
+    content more thoroughly.
   - Support for multiple tiers of announce URLs when creating torrents.
   - Exit codes have changed and are now properly documented in the man page.
+  - Fix --max-piece-size to allow piece sizes larger than 16 MiB.
 
 
 2019-06-03 3.0.1
