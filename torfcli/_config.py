@@ -68,6 +68,7 @@ ARGUMENTS
     --noconfig, -F         Ignore configuration file
     --profile, -z PROFILE  Use options from PROFILE
 
+    --verbose, -v          Increase verbosity
     --human, -u            Force human-readable output
     --nohuman, -U          Force machine-readable output
     --help, -h             Show this help screen and exit
@@ -111,6 +112,7 @@ _cliparser.add_argument('--config', '-f')
 _cliparser.add_argument('--noconfig', '-F', action='store_true')
 _cliparser.add_argument('--profile', '-z', default=[], action='append')
 
+_cliparser.add_argument('--verbose', '-v', action='count', default=0)
 _cliparser.add_argument('--human', '-u', action='store_true')
 _cliparser.add_argument('--nohuman', '-U', action='store_true')
 _cliparser.add_argument('--yes', '-y', action='store_true')

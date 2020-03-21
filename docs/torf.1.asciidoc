@@ -166,6 +166,10 @@ Do not use any configuration file.
 Use predefined arguments specified in _PROFILE_.  This option may be given
 multiple times.  See *CONFIGURATION FILE*.
 
+*--verbose*, *-v*::
+
+Produce more output or be more thorough.
+
 *--human*, *-u*::
 Display information in human-readable output even if stdout is not a TTY.  See
 *PIPING OUTPUT*.
