@@ -46,7 +46,7 @@ _C_DOWN       = '\u2502'  # │
 _C_DOWN_RIGHT = '\u251C'  # ├
 _C_RIGHT      = '\u2500'  # ─
 _C_CORNER     = '\u2514'  # └
-def make_filetree(tree, parents_is_last=()):
+def make_filetree(tree, parents_is_last=(), plain_bytes=False):
     lines = []
     items = tuple(tree.items())
     max_i = len(items)-1
@@ -78,14 +78,13 @@ def make_filetree(tree, parents_is_last=()):
                 indent += f'{_C_DOWN_RIGHT}{_C_RIGHT}'
 
         if isinstance(node, torf.File):
-            lines.append(f'{indent}{name} [{bytes2string(node.size, include_bytes=True)}]')
+            lines.append(f'{indent}{name} [{bytes2string(node.size, plain_bytes=plain_bytes)}]')
         else:
             lines.append(f'{indent}{name}')
             # Descend into child node
             sub_parents_is_last = parents_is_last + (is_last,)
-            lines.extend(
-                make_filetree(node, parents_is_last=sub_parents_is_last))
-
+            lines.extend(make_filetree(node, parents_is_last=sub_parents_is_last,
+                                       plain_bytes=plain_bytes))
     return lines
 
 
@@ -109,7 +108,7 @@ def parse_date(date_str):
 
 
 _PREFIXES = ((1024**4, 'Ti'), (1024**3, 'Gi'), (1024**2, 'Mi'), (1024, 'Ki'))
-def bytes2string(b, include_bytes=False):
+def bytes2string(b, plain_bytes=False):
     string = str(b)
     prefix = ''
     for minval,_prefix in _PREFIXES:
@@ -122,7 +121,7 @@ def bytes2string(b, include_bytes=False):
             if string[-1] == '.':
                 string = string[:-1]
             break
-    if include_bytes and prefix:
+    if plain_bytes and prefix:
         return f'{string} {prefix}B / {b:,} B'
     else:
         return f'{string} {prefix}B'

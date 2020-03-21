@@ -170,6 +170,7 @@ multiple times.  See *CONFIGURATION FILE*.
 
 Produce more output or be more thorough.
 +
+* Display file and other sizes as precise numbers.
 * When verifying, corrupt files are always read to the end instead of skipping
   them after the first corrupt piece.
 

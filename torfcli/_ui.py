@@ -112,16 +112,16 @@ class _FormatterBase:
 
 class _HumanFormatter(_FormatterBase):
     def size(self, torrent):
-        return _util.bytes2string(torrent.size, include_bytes=True)
+        return _util.bytes2string(torrent.size, plain_bytes=self._cfg['verbose'] > 0)
 
     def creation_date(self, torrent):
         return torrent.creation_date.isoformat(sep=' ', timespec='seconds')
 
     def piece_size(self, torrent):
-        return _util.bytes2string(torrent.piece_size)
+        return _util.bytes2string(torrent.piece_size, plain_bytes=self._cfg['verbose'] > 0)
 
     def files(self, torrent):
-        return _util.make_filetree(torrent.filetree)
+        return _util.make_filetree(torrent.filetree, plain_bytes=self._cfg['verbose'] > 0)
 
     def comment(self, torrent):
         # Split lines into paragraphs, then wrap each paragraph at max width.
