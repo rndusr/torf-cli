@@ -169,6 +169,9 @@ multiple times.  See *CONFIGURATION FILE*.
 *--verbose*, *-v*::
 
 Produce more output or be more thorough.
++
+* When verifying, corrupt files are always read to the end instead of skipping
+  them after the first corrupt piece.
 
 *--human*, *-u*::
 Display information in human-readable output even if stdout is not a TTY.  See

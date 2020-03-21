@@ -1,14 +1,25 @@
 from torfcli._main import run
 from torfcli import _errors as err
+
 import pytest
 import torf
 import os
 import re
+from unittest import mock
 
 
 def test_torrent_unreadable(mock_content):
     with pytest.raises(err.ReadError, match=r'^nonexisting.torrent: No such file or directory$'):
         run([str(mock_content), '-i', 'nonexisting.torrent'])
+
+
+def test_skipping_files_with_increased_verbosity(mock_content, create_torrent):
+    with create_torrent(path=mock_content) as torrent_file:
+        with mock.patch('torf.Torrent.verify') as mock_verify:
+            run([str(mock_content), '-i', torrent_file])
+            assert mock_verify.call_args.kwargs['skip_file_on_first_error'] is False
+            run([str(mock_content), '-i', torrent_file, '--verbose'])
+            assert mock_verify.call_args.kwargs['skip_file_on_first_error'] is True
 
 
 @pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
