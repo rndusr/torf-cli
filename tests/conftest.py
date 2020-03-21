@@ -121,7 +121,7 @@ def create_torrent(tmpdir, mock_content):
 
 
 ansi_regex = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
-erase_line_regex = re.compile(r'^.*?\x1b\[2?K(.*?)$', flags=re.MULTILINE)
+erase_line_regex = re.compile(r'^(.*?)\x1b\[2K.*?$', flags=re.MULTILINE)
 @pytest.fixture
 def clear_ansi():
     def _clear_ansi(string):
