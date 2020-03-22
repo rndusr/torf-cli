@@ -167,7 +167,6 @@ Use predefined arguments specified in _PROFILE_.  This option may be given
 multiple times.  See *CONFIGURATION FILE*.
 
 *--verbose*, *-v*::
-
 Produce more output or be more thorough.
 +
 * Display file and other sizes as precise numbers.
