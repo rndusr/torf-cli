@@ -21,7 +21,7 @@ from . import _util
 
 
 DEFAULT_CONFIG_FILE = os.path.join(BaseDirectory.xdg_config_home, _vars.__appname__, 'config')
-DEFAULT_CREATOR = f'{_vars.__appname__}/{_vars.__version__}'
+DEFAULT_CREATOR = f'{_vars.__appname__} {_vars.__version__}'
 VERSION_TEXT = f'{_vars.__appname__} {_vars.__version__} <{_vars.__url__}>'
 HELP_TEXT = f"""
 {_vars.__appname__} - {_vars.__description__}

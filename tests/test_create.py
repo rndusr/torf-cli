@@ -31,7 +31,7 @@ def test_default_torrent_filepath(capsys, mock_content, human_readable, hr_enabl
     assert t.name == 'My Torrent'
     assert len(tuple(t.files)) == 3
     assert_approximate_date(t.creation_date, now)
-    assert t.created_by.startswith('torf/')
+    assert t.created_by.startswith('torf')
 
     cap = capsys.readouterr()
     if hr_enabled:
@@ -41,7 +41,7 @@ def test_default_torrent_filepath(capsys, mock_content, human_readable, hr_enabl
           assert out_cleared == regex(rf'^\s*Name  My Torrent$', flags=re.MULTILINE)
           assert out_cleared == regex(rf'^\s*File Count  3$', flags=re.MULTILINE)
           assert out_cleared == regex(rf'^\s*Info Hash  {t.infohash}$', flags=re.MULTILINE)
-          assert out_cleared == regex(rf'^\s*Created By  torf/{re.escape(__version__)}$', flags=re.MULTILINE)
+          assert out_cleared == regex(rf'^\s*Created By  torf {re.escape(__version__)}$', flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Magnet\tmagnet:\?xt=urn:btih:{t.infohash}&dn=My\+Torrent&xl=\d+$', flags=re.MULTILINE)
@@ -49,7 +49,7 @@ def test_default_torrent_filepath(capsys, mock_content, human_readable, hr_enabl
         assert cap.out == regex(rf'^Name\tMy Torrent$', flags=re.MULTILINE)
         assert cap.out == regex(rf'^File Count\t3$', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Info Hash\t{t.infohash}$', flags=re.MULTILINE)
-        assert cap.out == regex(rf'^Created By\ttorf/{re.escape(__version__)}$', flags=re.MULTILINE)
+        assert cap.out == regex(rf'^Created By\ttorf {re.escape(__version__)}$', flags=re.MULTILINE)
 
 
 def test_user_given_torrent_filepath(capsys, mock_content):
@@ -64,7 +64,7 @@ def test_user_given_torrent_filepath(capsys, mock_content):
     assert t.name == 'My Torrent'
     assert len(tuple(t.files)) == 3
     assert_approximate_date(t.creation_date, now)
-    assert t.created_by.startswith('torf/')
+    assert t.created_by.startswith('torf')
 
     cap = capsys.readouterr()
     assert f'Magnet\tmagnet:?xt=urn:btih:' in cap.out
