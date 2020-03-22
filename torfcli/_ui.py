@@ -17,6 +17,7 @@ import os
 import time
 import datetime
 import torf
+import json
 
 from . import _util
 from . import _errors as err
@@ -38,19 +39,21 @@ class UI:
 
     def __init__(self, cfg):
         self._cfg = cfg
-        if self._human():
+        if cfg['json']:
+            self._fmt = _JSONFormatter(cfg)
+        elif self._human():
             self._fmt = _HumanFormatter(cfg)
         else:
             self._fmt = _MachineFormatter(cfg)
 
-    def info(self, *args, **kwargs):
-        return self._fmt.info(*args, **kwargs)
+    def info(self, key, value, newline=None):
+        return self._fmt.info(key, value)
 
-    def infos(self, *args, **kwargs):
-        return self._fmt.infos(*args, **kwargs)
+    def infos(self, pairs):
+        return self._fmt.infos(pairs)
 
     def show_torrent_info(self, torrent):
-        info = self._fmt.info
+        info = self.info
         info('Name', torrent.name)
         if torrent.is_ready:
             info('Info Hash', torrent.infohash)
@@ -63,7 +66,7 @@ class UI:
             info('Created By', torrent.created_by)
         if torrent.source:
             info('Source', torrent.source)
-        info('Private', 'yes' if torrent.private else 'no')
+        info('Private', self._fmt.private(torrent))
         if not self._cfg['nomagnet'] and torrent.is_ready:
             info('Magnet', torrent.magnet())
         if torrent.trackers:
@@ -85,7 +88,9 @@ class UI:
         info('Files', self._fmt.files(torrent))
 
     def StatusReporter(self):
-        if self._human():
+        if self._cfg['json']:
+            return _JSONStatusReporter(self)
+        elif self._human():
             return _HumanStatusReporter(self)
         else:
             return _MachineStatusReporter(self)
@@ -99,6 +104,9 @@ class UI:
                       not self._fmt.dialog_yes_no(f'{filepath}: Overwrite file?')):
                     raise err.WriteError(f'{filepath}: File exists')
 
+    def terminate(self):
+        self._fmt.terminate()
+
 
 class _FormatterBase:
     def __init__(self, cfg):
@@ -110,7 +118,13 @@ class _FormatterBase:
     def httpseeds(self, torrent):
         return torrent.httpseeds
 
+    def terminate(self):
+        pass
+
 class _HumanFormatter(_FormatterBase):
+    def private(self, torrent):
+        return 'yes' if torrent.private else 'no'
+
     def size(self, torrent):
         return _util.bytes2string(torrent.size, plain_bytes=self._cfg['verbose'] > 0)
 
@@ -194,6 +208,9 @@ class _HumanFormatter(_FormatterBase):
                 return answer
 
 class _MachineFormatter(_FormatterBase):
+    def private(self, torrent):
+        return 'yes' if torrent.private else 'no'
+
     def size(self, torrent):
         return int(torrent.size)
 
@@ -227,6 +244,28 @@ class _MachineFormatter(_FormatterBase):
 
     def dialog_yes_no(self, *_, **__):
         return False
+
+
+class _JSONFormatter(_MachineFormatter):
+    def __init__(self, *args, **kwargs):
+        self._info = {}
+
+    def private(self, torrent):
+        return torrent.private
+
+    def files(self, torrent):
+        return torrent.files
+
+    def info(self, key, value, newline=None):
+        # Join multiple values with a tab character
+        if not isinstance(value, str) and isinstance(value, abc.Iterable):
+            value = tuple(value)
+        self._info[key] = value
+
+    def terminate(self):
+        sys.stdout.write(json.dumps(self._info, allow_nan=False, indent=4, default=str))
+        sys.stdout.write('\n')
+        sys.stdout.flush()
 
 
 class _StatusReporterBase():
@@ -381,3 +420,12 @@ class _MachineStatusReporter(_StatusReporterBase):
             return lines
         else:
             return str(exception)
+
+class _JSONStatusReporter(_MachineStatusReporter):
+    def generate_callback(self, torrent, filepath, pieces_done, pieces_total):
+        pass
+
+    def verify_callback(self, torrent, filepath, pieces_done, pieces_total,
+                        piece_index, piece_hash, exception):
+        if exception:
+            self._ui.info('Error', self._format_error(exception, torrent))

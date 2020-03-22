@@ -2,6 +2,7 @@
   - Huge performance increase due to multithreading.
   - Verify a torrent's content: torf -i content.torrent path/to/content
   - Progress is now reported in two lines with more information.
+  - New option: --json prints a json object.
   - New option: --verbose shows file sizes in plain bytes, and verifies file
     content more thoroughly.
   - Support for multiple tiers of announce URLs when creating torrents.

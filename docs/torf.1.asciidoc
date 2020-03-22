@@ -173,6 +173,9 @@ Produce more output or be more thorough.
 * When verifying, corrupt files are always read to the end instead of skipping
   them after the first corrupt piece.
 
+*--json*, *-j*::
+Print torrent information as JSON.  Progress is not reported.
+
 *--human*, *-u*::
 Display information in human-readable output even if stdout is not a TTY.  See
 *PIPING OUTPUT*.

@@ -44,6 +44,7 @@ def run(args):
             _verify_mode(ui, cfg)
         else:
             raise _errors.CliError(f'Not sure what to do (see USAGE in `{_vars.__appname__} -h`)')
+        ui.terminate()
 
 def _info_mode(ui, cfg):
     try:
