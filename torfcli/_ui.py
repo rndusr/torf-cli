@@ -54,8 +54,8 @@ class UI:
         else:
             self._fmt = _MachineFormatter(cfg)
 
-    def info(self, key, value, newline=None):
-        return self._fmt.info(key, value)
+    def info(self, key, value, newline=True):
+        return self._fmt.info(key, value, newline=newline)
 
     def infos(self, pairs):
         return self._fmt.infos(pairs)
