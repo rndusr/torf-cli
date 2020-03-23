@@ -122,6 +122,17 @@ _cliparser.add_argument('--help', '-h', action='store_true')
 _cliparser.add_argument('--version', '-V', action='store_true')
 _cliparser.add_argument('--debug-file')
 
+
+def parse_early_args(args):
+    # Parse only some arguments we need to figure out how to report errors.
+    # Ignore all other arguments and any errors we might encounter.
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('--json', '-j', action='store_true')
+    parser.add_argument('--human', '-u', action='store_true')
+    parser.add_argument('--nohuman', '-U', action='store_true')
+    return vars(parser.parse_known_args(args)[0])
+
+
 def parse_args(args):
     cfg = vars(_cliparser.parse_args(args))
 
