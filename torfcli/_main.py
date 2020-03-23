@@ -23,16 +23,13 @@ from . import _errors
 PROGRESS_INTERVAL = 0.5
 
 
-def run(args):
-    cfg = _config.get_cfg(args)
-
+def run(ui):
+    cfg = ui.cfg
     if cfg['help']:
         print(_config.HELP_TEXT)
     elif cfg['version']:
         print(_config.VERSION_TEXT)
     else:
-        # Abstraction layer that formats human/machine readable output
-        ui = _ui.UI(cfg)
         # Figure out our modus operandi
         if cfg['PATH'] and not cfg['in']:
             _create_mode(ui, cfg)
@@ -44,7 +41,6 @@ def run(args):
             _verify_mode(ui, cfg)
         else:
             raise _errors.CliError(f'Not sure what to do (see USAGE in `{_vars.__appname__} -h`)')
-        ui.terminate()
 
 def _info_mode(ui, cfg):
     try:

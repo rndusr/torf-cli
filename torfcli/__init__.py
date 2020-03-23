@@ -11,34 +11,45 @@
 
 import sys
 
-def run():
+def run(args=sys.argv[1:]):
     from ._main import run
     from . import _errors
     from ._vars import __appname__
+    from . import _config
+    from . import _ui
 
+    # Only parse --json, --human and --nohuman so UI can report errors.
+    ui = _ui.UI(_config.parse_early_args(args))
+
+    # Parse the rest of the args; report any errors as specified by early args.
     try:
-        run(sys.argv[1:])
-    except _errors.Error as e:
-        if str(e):
-            print(f'{__appname__}: {e}', file=sys.stderr)
-        sys.exit(e.exit_code)
-    except KeyboardInterrupt:
-        print(f'{__appname__}: Aborted', file=sys.stderr)
-        sys.exit(_errors.Code.ABORTED)
-    except BrokenPipeError:
-        print(f'{__appname__}: Broken pipe', file=sys.stderr)
-        # Prevent Python interpreter from printing redundant error message
-        # "BrokenPipeError: [Errno 32] Broken pipe" and exit with correct exit
-        # code.
-        # https://bugs.python.org/issue11380#msg248579
+        ui.cfg = _config.get_cfg(args)
+    except (_errors.CliError, _errors.ConfigError) as e:
+        ui.error(e)
+    else:
         try:
-            sys.stdout.flush()
-        finally:
+            run(ui)
+        except _errors.Error as e:
+            ui.error(e)
+        except KeyboardInterrupt:
+            ui.error(_errors.Error('Aborted', code=_errors.Code.ABORTED))
+        except BrokenPipeError:
+            ui.error(_errors.Error('Broken pipe', code=_errors.Code.BROKEN_PIPE),
+                     exit=False)
+            # Prevent Python interpreter from printing redundant error message
+            # "BrokenPipeError: [Errno 32] Broken pipe" and exit with correct exit
+            # code.
+            # https://bugs.python.org/issue11380#msg248579
             try:
-                sys.stdout.close()
+                sys.stdout.flush()
             finally:
                 try:
-                    sys.stderr.flush()
+                    sys.stdout.close()
                 finally:
-                    sys.stderr.close()
-                    sys.exit(_errors.Code.BROKEN_PIPE)
+                    try:
+                        sys.stderr.flush()
+                    finally:
+                        sys.stderr.close()
+                        sys.exit(_errors.Code.BROKEN_PIPE)
+    finally:
+        ui.terminate()
