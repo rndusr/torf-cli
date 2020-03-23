@@ -7,7 +7,6 @@ def test_CliError():
     for cls,args,kwargs in ((err.CliError, ('invalid argument: --foo',), {}),
                             (err.Error, ('invalid argument: --foo', err.Code.CLI), {}),
                             (err.Error, ('invalid argument: --foo',), {'code': err.Code.CLI})):
-        print(f'>>> {cls.__name__}({args}, {kwargs})')
         with pytest.raises(err.CliError) as exc_info:
             raise cls(*args, **kwargs)
         assert exc_info.value.exit_code is err.Code.CLI
@@ -18,7 +17,6 @@ def test_ConfigError():
     for cls,args,kwargs in ((err.ConfigError, ('config error',), {}),
                             (err.Error, ('config error', err.Code.CONFIG), {}),
                             (err.Error, ('config error',), {'code': err.Code.CONFIG})):
-        print(f'>>> {cls.__name__}({args}, {kwargs})')
         with pytest.raises(err.ConfigError) as exc_info:
             raise cls(*args, **kwargs)
         assert exc_info.value.exit_code is err.Code.CONFIG
@@ -31,7 +29,6 @@ def test_ReadError():
                             (err.Error, (torf.PathError('path/to/file', msg='No such file or directory'),), {}),
                             (err.Error, ('path/to/file: No such file or directory', err.Code.READ), {}),
                             (err.Error, ('path/to/file: No such file or directory',), {'code': err.Code.READ})):
-        print(f'>>> {cls.__name__}({args}, {kwargs})')
         with pytest.raises(err.ReadError) as exc_info:
             raise cls(*args, **kwargs)
         assert exc_info.value.exit_code is err.Code.READ
@@ -43,7 +40,6 @@ def test_WriteError():
                             (err.Error, (torf.WriteError(errno.ENOSPC, 'path/to/file'),), {}),
                             (err.Error, ('path/to/file: No space left on device', err.Code.WRITE), {}),
                             (err.Error, ('path/to/file: No space left on device',), {'code': err.Code.WRITE})):
-        print(f'>>> {cls.__name__}({args}, {kwargs})')
         with pytest.raises(err.WriteError) as exc_info:
             raise cls(*args, **kwargs)
         assert exc_info.value.exit_code is err.Code.WRITE
@@ -54,7 +50,6 @@ def test_VerifyError():
     for cls,args,kwargs in ((err.VerifyError, (), {'content': 'path/to/content', 'torrent': 'path/to/torrent'}),
                             (err.Error, ('path/to/content does not satisfy path/to/torrent', err.Code.VERIFY), {}),
                             (err.Error, ('path/to/content does not satisfy path/to/torrent',), {'code': err.Code.VERIFY})):
-        print(f'{cls.__name__}({args}, {kwargs})')
         with pytest.raises(err.VerifyError) as exc_info:
             raise cls(*args, **kwargs)
         assert exc_info.value.exit_code is err.Code.VERIFY

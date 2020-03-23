@@ -1,30 +1,40 @@
-from torfcli._main import run
+from torfcli import run
 from torfcli import _errors as err
+from torfcli import _vars
+
 import pytest
+from unittest.mock import patch
 import torf
 import os
 from datetime import datetime
 
 
-def test_nonexisting_input():
+def test_nonexisting_input(capsys):
     nonexisting_path = '/no/such/file'
-    with pytest.raises(err.ReadError, match=rf'^{nonexisting_path}: No such file or directory$'):
+    with patch('sys.exit') as mock_exit:
         run(['-i', nonexisting_path, '-o', 'out.torrent'])
+    mock_exit.assert_called_once_with(err.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {nonexisting_path}: No such file or directory\n'
 
-
-def test_existing_output(create_torrent, tmpdir):
+def test_existing_output(capsys, tmpdir, create_torrent):
     outfile = tmpdir.join('out.torrent')
     outfile.write('some existing file content')
     with create_torrent() as infile:
-        with pytest.raises(err.WriteError, match=rf'^{str(outfile)}: File exists$') as exc_info:
+        with patch('sys.exit') as mock_exit:
             run(['-i', infile, '-o', str(outfile)])
+        mock_exit.assert_called_once_with(err.Code.WRITE)
+        cap = capsys.readouterr()
+        assert cap.err == f'{_vars.__appname__}: {outfile}: File exists\n'
 
-
-def test_unwritable_output(create_torrent):
+def test_unwritable_output(capsys, create_torrent):
     unwritable_path = '/out.torrent'
     with create_torrent() as infile:
-        with pytest.raises(err.WriteError, match=rf'^{unwritable_path}: Permission denied$') as exc_info:
+        with patch('sys.exit') as mock_exit:
             run(['-i', infile, '-o', unwritable_path])
+        mock_exit.assert_called_once_with(err.Code.WRITE)
+        cap = capsys.readouterr()
+        assert cap.err == f'{_vars.__appname__}: {unwritable_path}: Permission denied\n'
 
 
 def test_no_changes(create_torrent, tmpdir, assert_torrents_equal):
@@ -140,7 +150,6 @@ def test_add_trackers(create_torrent, tmpdir, assert_torrents_equal):
              '--tracker', 'http://y',
              '-o', outfile, '-y'])
         new = torf.Torrent.read(outfile)
-        print(new.trackers)
         assert_torrents_equal(orig, new, trackers=[['http://foo', 'http://a', 'http://b'],
                                                    ['http://bar', 'http://x'],
                                                    ['http://y']])
@@ -153,13 +162,17 @@ def test_replace_trackers(create_torrent, tmpdir, assert_torrents_equal):
         new = torf.Torrent.read(outfile)
         assert_torrents_equal(orig, new, trackers=[['http://tracker10'], ['http://tracker20']])
 
-def test_invalid_tracker_url(create_torrent, tmpdir, assert_torrents_equal):
+def test_invalid_tracker_url(capsys, create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(trackers=['http://tracker1', 'http://tracker2']) as infile:
         orig = torf.Torrent.read(infile)
-        with pytest.raises(err.CliError, match=r'^not a url: Invalid URL$'):
+        with patch('sys.exit') as mock_exit:
             run(['-i', infile, '--tracker', 'not a url', '-o', outfile])
+        mock_exit.assert_called_once_with(err.Code.CLI)
+        cap = capsys.readouterr()
+        assert cap.err == f'{_vars.__appname__}: not a url: Invalid URL\n'
         assert not os.path.exists(outfile)
+
 
 
 def test_remove_webseeds(create_torrent, tmpdir, assert_torrents_equal):
@@ -186,12 +199,15 @@ def test_replace_webseeds(create_torrent, tmpdir, assert_torrents_equal):
         new = torf.Torrent.read(outfile)
         assert_torrents_equal(orig, new, webseeds=['http://webseed10', 'http://webseed20'])
 
-def test_invalid_webseed_url(create_torrent, tmpdir, assert_torrents_equal):
+def test_invalid_webseed_url(capsys, create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(webseeds=['http://webseed1', 'http://webseed2']) as infile:
         orig = torf.Torrent.read(infile)
-        with pytest.raises(err.CliError, match=r'^not a url: Invalid URL$'):
+        with patch('sys.exit') as mock_exit:
             run(['-i', infile, '--webseed', 'not a url', '-o', outfile])
+        mock_exit.assert_called_once_with(err.Code.CLI)
+        cap = capsys.readouterr()
+        assert cap.err == f'{_vars.__appname__}: not a url: Invalid URL\n'
         assert not os.path.exists(outfile)
 
 
@@ -211,12 +227,15 @@ def test_remove_creation_date(create_torrent, tmpdir, assert_torrents_equal):
         new = torf.Torrent.read(outfile)
         assert_torrents_equal(orig, new, creation_date=None)
 
-def test_invalid_creation_date(create_torrent, tmpdir, assert_torrents_equal):
+def test_invalid_creation_date(capsys, create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent() as infile:
         orig = torf.Torrent.read(infile)
-        with pytest.raises(err.CliError, match=r'^foo: Invalid date$'):
+        with patch('sys.exit') as mock_exit:
             run(['-i', infile, '--date', 'foo', '-o', outfile])
+        mock_exit.assert_called_once_with(err.Code.CLI)
+        cap = capsys.readouterr()
+        assert cap.err == f'{_vars.__appname__}: foo: Invalid date\n'
         assert not os.path.exists(outfile)
 
 

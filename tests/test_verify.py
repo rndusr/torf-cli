@@ -1,23 +1,28 @@
-from torfcli._main import run
+from torfcli import run
 from torfcli import _errors as err
+from torfcli import _vars
 
 import pytest
+from unittest.mock import patch
 import torf
 import os
 import re
-from unittest import mock
 
 
-def test_torrent_unreadable(mock_content):
-    with pytest.raises(err.ReadError, match=r'^nonexisting.torrent: No such file or directory$'):
+def test_torrent_unreadable(capsys, mock_content):
+    with patch('sys.exit') as mock_exit:
         run([str(mock_content), '-i', 'nonexisting.torrent'])
+    mock_exit.assert_called_once_with(err.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: nonexisting.torrent: No such file or directory\n'
 
 
 def test_skipping_files_with_increased_verbosity(mock_content, create_torrent):
     with create_torrent(path=mock_content) as torrent_file:
-        with mock.patch('torf.Torrent.verify') as mock_verify:
+        with patch('torf.Torrent.verify') as mock_verify:
             run([str(mock_content), '-i', torrent_file])
             assert mock_verify.call_args.kwargs['skip_file_on_first_error'] is False
+
             run([str(mock_content), '-i', torrent_file, '--verbose'])
             assert mock_verify.call_args.kwargs['skip_file_on_first_error'] is True
 
@@ -26,15 +31,15 @@ def test_skipping_files_with_increased_verbosity(mock_content, create_torrent):
 def test_PATH_unreadable(create_torrent, human_readable, hr_enabled, capsys, clear_ansi, regex, assert_no_ctrl):
     with create_torrent() as torrent_file:
         with human_readable(hr_enabled):
-            with pytest.raises(err.VerifyError) as exc_info:
+            with patch('sys.exit') as mock_exit:
                 run(['path/to/nothing', '-i', torrent_file])
-            assert str(exc_info.value) == f'path/to/nothing does not satisfy {torrent_file}'
+    mock_exit.assert_called_once_with(err.Code.VERIFY)
     cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: path/to/nothing does not satisfy {torrent_file}\n'
+
     if hr_enabled:
-        print(clear_ansi(cap.out))
         assert clear_ansi(cap.out) == regex(r'^\s*Error  path/to/nothing: Not a directory$', flags=re.MULTILINE)
     else:
-        print(repr(cap.out))
         assert_no_ctrl(cap.out)
         assert cap.out == regex(r'^Error\tpath/to/nothing: Not a directory$', flags=re.MULTILINE)
 
@@ -52,17 +57,16 @@ def test_singlefile_torrent__path_is_dir(tmp_path, create_torrent, human_readabl
         content_file = (content_path / 'some.file').write_bytes(b'some data')
         assert os.path.isfile(content_path) is False
 
-        with pytest.raises(err.VerifyError) as exc_info:
-            with human_readable(hr_enabled):
+        with human_readable(hr_enabled):
+            with patch('sys.exit') as mock_exit:
                 run([str(content_path), '-i', torrent_file])
-        assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
-
+    mock_exit.assert_called_once_with(err.Code.VERIFY)
     cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {content_path} does not satisfy {torrent_file}\n'
+
     if hr_enabled:
-        print(clear_ansi(cap.out))
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  {content_path}: Is a directory$', flags=re.MULTILINE)
     else:
-        print(repr(cap.out))
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Error\t{content_path}: Is a directory$', flags=re.MULTILINE)
 
@@ -76,18 +80,17 @@ def test_singlefile_torrent__wrong_size(tmp_path, create_torrent, human_readable
     with create_torrent(path=content_path) as torrent_file:
         content_path.write_text('some data!!!')
 
-        with pytest.raises(err.VerifyError) as exc_info:
-            with human_readable(hr_enabled):
+        with human_readable(hr_enabled):
+            with patch('sys.exit') as mock_exit:
                 run([str(content_path), '-i', torrent_file])
-        assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
-
+    mock_exit.assert_called_once_with(err.Code.VERIFY)
     cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {content_path} does not satisfy {torrent_file}\n'
+
     if hr_enabled:
-        print(clear_ansi(cap.out))
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  {content_path}: Too big: 12 instead of 9 bytes$',
                                             flags=re.MULTILINE)
     else:
-        print(repr(cap.out))
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Error\t{content_path}: Too big: 12 instead of 9 bytes$',
                                 flags=re.MULTILINE)
@@ -102,16 +105,16 @@ def test_singlefile_torrent__correct_size_but_corrupt(tmp_path, create_torrent, 
     with create_torrent(path=content_path) as torrent_file:
         content_path.write_text('somm date')
 
-        with pytest.raises(err.VerifyError) as exc_info:
-            with human_readable(hr_enabled):
+        with human_readable(hr_enabled):
+            with patch('sys.exit') as mock_exit:
                 run([str(content_path), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
+    mock_exit.assert_called_once_with(err.Code.VERIFY)
     cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {content_path} does not satisfy {torrent_file}\n'
+
     if hr_enabled:
-        print(clear_ansi(cap.out))
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  Corruption in piece 1$', flags=re.MULTILINE)
     else:
-        print(repr(cap.out))
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Error\tCorruption in piece 1$', flags=re.MULTILINE)
 
@@ -131,16 +134,16 @@ def test_multifile_torrent__path_is_file(tmp_path, create_torrent, human_readabl
         content_path.write_text('some data')
         assert os.path.isdir(content_path) is False
 
-        with pytest.raises(err.VerifyError) as exc_info:
-            with human_readable(hr_enabled):
+        with human_readable(hr_enabled):
+            with patch('sys.exit') as mock_exit:
                 run([str(content_path), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
+    mock_exit.assert_called_once_with(err.Code.VERIFY)
     cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {content_path} does not satisfy {torrent_file}\n'
+
     if hr_enabled:
-        print(clear_ansi(cap.out))
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  {content_path}: Not a directory$', flags=re.MULTILINE)
     else:
-        print(repr(cap.out))
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Error\t{content_path}: Not a directory$', flags=re.MULTILINE)
 
@@ -158,15 +161,14 @@ def test_multifile_torrent__missing_file(tmp_path, create_torrent, human_readabl
     with create_torrent(path=content_path) as torrent_file:
         os.remove(file1)
 
-        with pytest.raises(err.VerifyError) as exc_info:
-            with human_readable(hr_enabled):
+        with human_readable(hr_enabled):
+            with patch('sys.exit') as mock_exit:
                 run([str(content_path), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
-
+    mock_exit.assert_called_once_with(err.Code.VERIFY)
     cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {content_path} does not satisfy {torrent_file}\n'
+
     if hr_enabled:
-        print(clear_ansi(cap.out))
-        print(cap.out)
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  {file1}: No such file or directory$',
                                             flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  Corruption in piece 1, at least one of these files is corrupt:$',
@@ -174,7 +176,6 @@ def test_multifile_torrent__missing_file(tmp_path, create_torrent, human_readabl
         assert clear_ansi(cap.out) == regex(rf'^\s*      {file1}$', flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*      {file2}$', flags=re.MULTILINE)
     else:
-        print(repr(cap.out))
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Error\t{file1}: No such file or directory$', flags=re.MULTILINE)
         assert cap.out == regex((rf'^Error\tCorruption in piece 1, at least one of these files is corrupt:\t{file1}\t{file2}$'),
@@ -196,13 +197,14 @@ def test_multifile_torrent__wrong_size(tmp_path, create_torrent, human_readable,
         file2.write_text('some more other data')
         assert os.path.getsize(file2) != file2_size
 
-        with pytest.raises(err.VerifyError) as exc_info:
-            with human_readable(hr_enabled):
+        with human_readable(hr_enabled):
+            with patch('sys.exit') as mock_exit:
                 run([str(content_path), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
+    mock_exit.assert_called_once_with(err.Code.VERIFY)
     cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {content_path} does not satisfy {torrent_file}\n'
+
     if hr_enabled:
-        print(clear_ansi(cap.out))
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  {file2}: Too big: 20 instead of 15 bytes$',
                                             flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  Corruption in piece 1, at least one of these files is corrupt:$',
@@ -210,7 +212,6 @@ def test_multifile_torrent__wrong_size(tmp_path, create_torrent, human_readable,
         assert clear_ansi(cap.out) == regex(rf'^\s*      {file1}$', flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*      {file2}$', flags=re.MULTILINE)
     else:
-        print(repr(cap.out))
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Error\t{file2}: Too big: 20 instead of 15 bytes$', flags=re.MULTILINE)
         assert cap.out == regex((rf'^Error\tCorruption in piece 1, at least one of these files is corrupt:\t{file1}\t{file2}$'),
@@ -234,18 +235,18 @@ def test_multifile_torrent__correct_size_but_corrupt(tmp_path, create_torrent, h
         file1.write_bytes(file1_data)
         assert os.path.getsize(file1) == file1_size
 
-        with pytest.raises(err.VerifyError) as exc_info:
-            with human_readable(hr_enabled):
+        with human_readable(hr_enabled):
+            with patch('sys.exit') as mock_exit:
                 run([str(content_path), '-i', torrent_file])
-            assert str(exc_info.value) == f'{content_path} does not satisfy {torrent_file}'
+    mock_exit.assert_called_once_with(err.Code.VERIFY)
     cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {content_path} does not satisfy {torrent_file}\n'
+
     if hr_enabled:
-        print(clear_ansi(cap.out))
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  Corruption in piece 31, at least one of these files is corrupt:$',
                                             flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*      {file1}$', flags=re.MULTILINE)
     else:
-        print(repr(cap.out))
         assert_no_ctrl(cap.out)
         assert cap.out == regex((rf'^Error\tCorruption in piece 31, at least one of these files is corrupt:\t{file1}$'),
                                 flags=re.MULTILINE)
@@ -262,11 +263,9 @@ def test_success(tmp_path, create_torrent, human_readable, hr_enabled, capsys, c
 
     cap = capsys.readouterr()
     if hr_enabled:
-        print(clear_ansi(cap.out))
         assert clear_ansi(cap.out) == regex(rf'^\s*Progress  100.00 %  \|  \d+:\d+:\d+ total  \|  \s*\d+\.\d+ [KMGT]iB/s$',
                                             flags=re.MULTILINE)
     else:
-        print(repr(cap.out))
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Progress\t100\.000\t\d+\t\d+\t\d+\t\d+\t\d+\t{content_path}$',
                                 flags=re.MULTILINE)

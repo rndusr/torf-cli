@@ -1,26 +1,37 @@
-from torfcli._main import run
-from torfcli._errors import CliError
+from torfcli import run
+from torfcli import _errors
 from torfcli import _vars
+
 import pytest
+from unittest.mock import patch
 
 
-def test_no_arguments():
-    with pytest.raises(CliError,
-                       match=('^Not sure what to do '
-                              fr'\(see USAGE in `{_vars.__appname__} -h`\)$')):
+def test_no_arguments(capsys):
+    with patch('sys.exit') as mock_exit:
         run([])
+    mock_exit.assert_called_once_with(_errors.Code.CLI)
+    cap = capsys.readouterr()
+    assert cap.out == ''
+    assert cap.err == (f'{_vars.__appname__}: Not sure what to do '
+                       f'(see USAGE in `{_vars.__appname__} -h`)\n')
 
 
 def test_help(capsys):
     for arg in ('--help', '-h'):
-        run([arg])
+        with patch('sys.exit') as mock_exit:
+            run([arg])
+        mock_exit.assert_not_called()
         cap = capsys.readouterr()
         from torfcli._config import HELP_TEXT
         assert cap.out == HELP_TEXT + '\n'
+        assert cap.err == ''
 
 
 def test_version(capsys):
-    run(['--version'])
+    with patch('sys.exit') as mock_exit:
+        run(['--version'])
+    mock_exit.assert_not_called()
     cap = capsys.readouterr()
     from torfcli._config import VERSION_TEXT
     assert cap.out == VERSION_TEXT + '\n'
+    assert cap.err == ''

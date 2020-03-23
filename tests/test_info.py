@@ -1,6 +1,9 @@
-from torfcli._main import run
+from torfcli import run
 from torfcli import _errors as err
+from torfcli import _vars
+
 import pytest
+from unittest.mock import patch
 import os
 from datetime import datetime
 import errno
@@ -9,16 +12,21 @@ import re
 
 def test_nonexisting_torrent_file(capsys):
     nonexising_path = '/no/such/file'
-    with pytest.raises(err.ReadError, match=rf'^{nonexising_path}: No such file or directory$') as exc_info:
+    with patch('sys.exit') as mock_exit:
         run(['-i', nonexising_path])
+    mock_exit.assert_called_once_with(err.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {nonexising_path}: No such file or directory\n'
 
 
 def test_insufficient_permissions(capsys, create_torrent):
     with create_torrent() as torrent_file:
         os.chmod(torrent_file, 0o000)
-        with pytest.raises(err.ReadError, match=rf'^{torrent_file}: Permission denied$') as exc_info:
+        with patch('sys.exit') as mock_exit:
             run(['-i', torrent_file])
-
+        mock_exit.assert_called_once_with(err.Code.READ)
+        cap = capsys.readouterr()
+        assert cap.err == f'{_vars.__appname__}: {torrent_file}: Permission denied\n'
 
 def test_magnet(capsys, create_torrent, human_readable, clear_ansi, regex):
     with create_torrent(name='foo') as torrent_file:

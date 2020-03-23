@@ -1,6 +1,7 @@
-from torfcli._main import run
+from torfcli import run
 from torfcli import _errors as err
-from torfcli._vars import __version__
+from torfcli import _vars
+
 import pytest
 from unittest.mock import patch, DEFAULT
 import os
@@ -41,7 +42,7 @@ def test_default_torrent_filepath(capsys, mock_content, human_readable, hr_enabl
           assert out_cleared == regex(rf'^\s*Name  My Torrent$', flags=re.MULTILINE)
           assert out_cleared == regex(rf'^\s*File Count  3$', flags=re.MULTILINE)
           assert out_cleared == regex(rf'^\s*Info Hash  {t.infohash}$', flags=re.MULTILINE)
-          assert out_cleared == regex(rf'^\s*Created By  torf {re.escape(__version__)}$', flags=re.MULTILINE)
+          assert out_cleared == regex(rf'^\s*Created By  torf {re.escape(_vars.__version__)}$', flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Magnet\tmagnet:\?xt=urn:btih:{t.infohash}&dn=My\+Torrent&xl=\d+$', flags=re.MULTILINE)
@@ -49,7 +50,7 @@ def test_default_torrent_filepath(capsys, mock_content, human_readable, hr_enabl
         assert cap.out == regex(rf'^Name\tMy Torrent$', flags=re.MULTILINE)
         assert cap.out == regex(rf'^File Count\t3$', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Info Hash\t{t.infohash}$', flags=re.MULTILINE)
-        assert cap.out == regex(rf'^Created By\ttorf {re.escape(__version__)}$', flags=re.MULTILINE)
+        assert cap.out == regex(rf'^Created By\ttorf {re.escape(_vars.__version__)}$', flags=re.MULTILINE)
 
 
 def test_user_given_torrent_filepath(capsys, mock_content):
@@ -81,21 +82,32 @@ def test_user_given_torrent_filepath(capsys, mock_content):
 def test_content_path_is_empty_directory(capsys, tmp_path, human_readable, hr_enabled):
     (tmp_path / 'empty').mkdir()
     with human_readable(hr_enabled):
-        with pytest.raises(err.ReadError, match=rf'^{tmp_path / "empty"}: Empty or all files excluded$') as exc_info:
+        with patch('sys.exit') as mock_exit:
             run([str(tmp_path / 'empty')])
+    mock_exit.assert_called_once_with(err.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {tmp_path / "empty"}: Empty or all files excluded\n'
 
 @pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
 def test_content_path_is_empty_file(capsys, tmp_path, human_readable, hr_enabled):
     (tmp_path / 'empty').write_bytes(b'')
     with human_readable(hr_enabled):
-        with pytest.raises(err.ReadError, match=rf'^{tmp_path / "empty"}: Empty or all files excluded$') as exc_info:
+        with patch('sys.exit') as mock_exit:
             run([str(tmp_path / 'empty')])
+    mock_exit.assert_called_once_with(err.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {tmp_path / "empty"}: Empty or all files excluded\n'
 
-def test_content_path_doesnt_exist(capsys):
-    with pytest.raises(err.ReadError, match=r'^/path/doesnt/exist: No such file or directory$') as exc_info:
-        run(['/path/doesnt/exist'])
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_content_path_doesnt_exist(capsys, human_readable, hr_enabled):
+    with human_readable(hr_enabled):
+        with patch('sys.exit') as mock_exit:
+            run(['/path/doesnt/exist'])
+    mock_exit.assert_called_once_with(err.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: /path/doesnt/exist: No such file or directory\n'
 
-def test_torrent_filepath_exists(capsys, mock_content):
+def test_torrent_filepath_exists(capsys, mock_content, human_readable):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
@@ -103,8 +115,29 @@ def test_torrent_filepath_exists(capsys, mock_content):
     with open(exp_torrent_filepath, 'wb') as f:
         f.write(b'<torrent data>')
 
-    with pytest.raises(err.WriteError, match=rf'^{exp_torrent_filepath}: File exists$') as exc_info:
-        run([content_path, '--out', exp_torrent_filepath])
+    with human_readable(False):
+        with patch('sys.exit') as mock_exit:
+            run([content_path, '--out', exp_torrent_filepath])
+    mock_exit.assert_called_once_with(err.Code.WRITE)
+    cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {exp_torrent_filepath}: File exists\n'
+
+    with human_readable(True):
+        with patch('torfcli._ui._HumanFormatter.dialog_yes_no') as mock_dialog:
+            with patch('sys.exit') as mock_exit:
+                mock_dialog.return_value = False
+                run([content_path, '--out', exp_torrent_filepath])
+            mock_exit.assert_called_once_with(err.Code.WRITE)
+            cap = capsys.readouterr()
+            assert cap.err == f'{_vars.__appname__}: {exp_torrent_filepath}: File exists\n'
+
+            with patch('sys.exit') as mock_exit:
+                mock_dialog.return_value = True
+                run([content_path, '--out', exp_torrent_filepath])
+            mock_exit.assert_not_called()
+            cap = capsys.readouterr()
+            assert cap.err == ''
+            assert torf.Torrent.read(exp_torrent_filepath).name == mock_content.basename
 
 
 ### Options
@@ -199,8 +232,11 @@ def test_exclude_everything(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    with pytest.raises(err.ReadError, match=rf'^{content_path}: Empty or all files excluded$') as exc_info:
+    with patch('sys.exit') as mock_exit:
         run([content_path, '--exclude', '*'])
+    mock_exit.assert_called_once_with(err.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: {content_path}: Empty or all files excluded\n'
 
 
 def test_name_option(capsys, mock_content):
@@ -380,10 +416,11 @@ def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
     with patch.multiple('torfcli._main', _hash_pieces=DEFAULT, _write_torrent=DEFAULT):
         factor = 1.234
         exp_invalid_piece_size = int(factor*2**20)
-        exp_error = rf'^Piece size must be a power of 2: {exp_invalid_piece_size}$'
-        with pytest.raises(err.CliError, match=exp_error):
+        with patch('sys.exit') as mock_exit:
             run([content_path, '--max-piece-size', str(factor)])
-
+        mock_exit.assert_called_once_with(err.Code.CLI)
+        cap = capsys.readouterr()
+        assert cap.err == f'{_vars.__appname__}: Piece size must be a power of 2: {exp_invalid_piece_size}\n'
 
 def test_default_date(capsys, mock_content):
     content_path = str(mock_content)
@@ -485,8 +522,11 @@ def test_invalid_date(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    with pytest.raises(err.CliError, match=r'^foo: Invalid date$'):
+    with patch('sys.exit') as mock_exit:
         run([content_path, '--date', 'foo'])
+    mock_exit.assert_called_once_with(err.Code.CLI)
+    cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: foo: Invalid date\n'
 
 
 def test_nodate_option(capsys, mock_content):
