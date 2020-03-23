@@ -174,7 +174,8 @@ Produce more output or be more thorough.
   them after the first corrupt piece.
 
 *--json*, *-j*::
-Print torrent information as JSON.  Progress is not reported.
+Print a JSON object to stdout that contains all the torrent information and
+errors.  Progress is not reported.
 
 *--human*, *-u*::
 Display information in human-readable output even if stdout is not a TTY.  See
