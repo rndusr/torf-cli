@@ -21,6 +21,7 @@ import json
 
 from . import _util
 from . import _errors as err
+from . import _vars
 from . import _term
 
 
@@ -53,6 +54,14 @@ class UI:
             self._fmt = _HumanFormatter(cfg)
         else:
             self._fmt = _MachineFormatter(cfg)
+
+    def error(self, exc, exit=True):
+        if self._cfg['json']:
+            self.info('Error', exc)
+        else:
+            sys.stderr.write(f'{_vars.__appname__}: {exc}\n')
+        if exit:
+            sys.exit(getattr(exc, 'exit_code', err.Code.GENERIC))
 
     def info(self, key, value, newline=True):
         return self._fmt.info(key, value, newline=newline)
