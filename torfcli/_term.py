@@ -46,7 +46,7 @@ def getch():
         return sys.stdin.read(1)
 
 class _raw_mode():
-    _old_term_settings = None
+    _orig_attrs = None
     def enable(self):
         try:
             fd = sys.stdin.fileno()
