@@ -27,19 +27,27 @@ from . import _term
 class UI:
     """Universal abstraction layer to allow different UIs"""
 
+    def __init__(self, cfg=None):
+        if cfg is not None:
+            self.cfg = cfg
+
     def _human(self):
-        if self._cfg['nohuman']:
+        if self._cfg.get('nohuman'):
             return False
-        elif self._cfg['human']:
+        elif self._cfg.get('human'):
             return True
         elif sys.stdout.isatty():
             return True
         else:
             return False
 
-    def __init__(self, cfg):
+    @property
+    def cfg(self):
+        return self._cfg
+    @cfg.setter
+    def cfg(self, cfg):
         self._cfg = cfg
-        if cfg['json']:
+        if cfg.get('json'):
             self._fmt = _JSONFormatter(cfg)
         elif self._human():
             self._fmt = _HumanFormatter(cfg)
@@ -105,7 +113,9 @@ class UI:
                     raise err.WriteError(f'{filepath}: File exists')
 
     def terminate(self):
-        self._fmt.terminate()
+        fmt = getattr(self, '_fmt', None)
+        if fmt:
+            fmt.terminate()
 
 
 class _FormatterBase:
