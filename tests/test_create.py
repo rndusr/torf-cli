@@ -398,8 +398,7 @@ def test_default_date(capsys, mock_content):
 
     cap = capsys.readouterr()
     exp_dates = [int(now.timestamp()), int((now + timedelta(seconds=1)).timestamp())]
-    assert (f'Created\t{exp_dates[0]}' in cap.out or
-            f'Created\t{exp_dates[1]}' in cap.out)
+    assert any(f'Created\t{exp_date}' in cap.out for exp_date in exp_dates)
 
 
 def test_date_today(capsys, mock_content):
@@ -432,7 +431,8 @@ def test_date_now(capsys, mock_content):
 
     cap = capsys.readouterr()
     exp_date = int(now.timestamp())
-    assert f'Created\t{exp_date}' in cap.out
+    exp_dates = [int(now.timestamp()), int((now + timedelta(seconds=1)).timestamp())]
+    assert any(f'Created\t{exp_date}' in cap.out for exp_date in exp_dates)
 
 
 def test_user_given_date(capsys, mock_content):
