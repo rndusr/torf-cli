@@ -279,7 +279,12 @@ class _JSONFormatter(_MachineFormatter):
         # Join multiple values with a tab character
         if not isinstance(value, str) and isinstance(value, abc.Iterable):
             value = tuple(value)
-        self._info[key] = value
+        if key == 'Error':
+            errors = self._info.get(key, [])
+            errors.append(value)
+            self._info[key] = errors
+        else:
+            self._info[key] = value
 
     def terminate(self):
         sys.stdout.write(json.dumps(self._info, allow_nan=False, indent=4, default=str))
