@@ -79,7 +79,8 @@ ARGUMENTS
 
 class CLIParser(argparse.ArgumentParser):
     def error(self, msg):
-        raise _errors.CliError(msg.capitalize())
+        msg = msg[0].upper() + msg[1:]
+        raise _errors.CliError(msg)
 
 _cliparser = CLIParser(add_help=False)
 
