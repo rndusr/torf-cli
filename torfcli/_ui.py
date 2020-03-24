@@ -205,7 +205,7 @@ class _HumanFormatter(_FormatterBase):
             sys.stdout.write(f'{label}{sep}{value}\n')
         else:
             sys.stdout.write(f'{label}{sep}{value}')
-            sys.stdout.flush()
+            _util.flush(sys.stdout)
 
     def infos(self, pairs):
         for key, value in pairs:
@@ -219,7 +219,7 @@ class _HumanFormatter(_FormatterBase):
     def dialog_yes_no(self, question):
         while True:
             sys.stdout.write(f'{question} [y|n] ')
-            sys.stdout.flush()
+            _util.flush(sys.stdout)
             key = _term.getch()
             _term.echo('erase_line', 'move_pos1')
             answer = self.DIALOG_YES_NO_ANSWERS.get(key, None)
@@ -255,7 +255,7 @@ class _MachineFormatter(_FormatterBase):
         if not isinstance(value, str) and isinstance(value, abc.Iterable):
             value = '\t'.join(str(v) for v in value)
         sys.stdout.write(f'{key}\t{value}\n')
-        sys.stdout.flush()
+        _util.flush(sys.stdout)
 
     def infos(self, pairs):
         for key, value in pairs:
@@ -284,7 +284,7 @@ class _JSONFormatter(_MachineFormatter):
     def terminate(self):
         sys.stdout.write(json.dumps(self._info, allow_nan=False, indent=4, default=str))
         sys.stdout.write('\n')
-        sys.stdout.flush()
+        _util.flush(sys.stdout)
 
 
 class _StatusReporterBase():

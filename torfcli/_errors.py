@@ -23,7 +23,6 @@ class Code(IntEnum):
     WRITE       = 5
     VERIFY      = 6
     ABORTED     = 128
-    BROKEN_PIPE = 129
 
 
 class Error(Exception):
