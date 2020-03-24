@@ -12,7 +12,7 @@
 import sys
 
 def run(args=sys.argv[1:]):
-    from ._main import run
+    from . import _main
     from . import _errors
     from ._vars import __appname__
     from . import _config
@@ -28,7 +28,7 @@ def run(args=sys.argv[1:]):
         ui.error(e)
     else:
         try:
-            run(ui)
+            _main.run(ui)
         except _errors.Error as e:
             ui.error(e)
         except KeyboardInterrupt:
