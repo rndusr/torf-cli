@@ -11,6 +11,8 @@
 
 import datetime
 import time
+import contextlib
+import sys
 
 import torf
 
@@ -125,3 +127,29 @@ def bytes2string(b, plain_bytes=False):
         return f'{string} {prefix}B / {b:,} B'
     else:
         return f'{string} {prefix}B'
+
+
+@contextlib.contextmanager
+def caught_BrokenPipeError():
+    try:
+        yield
+    except BrokenPipeError:
+        # Prevent Python interpreter from printing redundant error message
+        # "BrokenPipeError: [Errno 32] Broken pipe" and exit with correct exit
+        # code.
+        # https://bugs.python.org/issue11380#msg248579
+        try:
+            sys.stdout.flush()
+        finally:
+            try:
+                sys.stdout.close()
+            finally:
+                try:
+                    sys.stderr.flush()
+                finally:
+                    sys.stderr.close()
+                    sys.exit(0)
+
+def flush(f):
+    with caught_BrokenPipeError():
+        f.flush()
