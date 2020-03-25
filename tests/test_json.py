@@ -6,8 +6,6 @@ import pytest
 from unittest.mock import patch
 import json
 import time
-import io
-import sys
 
 
 def test_json_contains_standard_fields(capsys, mock_content):
