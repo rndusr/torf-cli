@@ -44,7 +44,7 @@ def run(ui):
 
 def _info_mode(ui, cfg):
     try:
-        torrent = torf.Torrent.read(cfg['in'])
+        torrent = torf.Torrent.read(cfg['in'], validate=cfg['_validate'])
     except torf.TorfError as e:
         raise _errors.Error(e)
     else:
@@ -85,7 +85,7 @@ def _create_mode(ui, cfg):
 
 def _edit_mode(ui, cfg):
     try:
-        torrent = torf.Torrent.read(cfg['in'])
+        torrent = torf.Torrent.read(cfg['in'], validate=cfg['_validate'])
     except torf.TorfError as e:
         raise _errors.Error(e)
 
@@ -153,7 +153,7 @@ def _edit_mode(ui, cfg):
 
 def _verify_mode(ui, cfg):
     try:
-        torrent = torf.Torrent.read(cfg['in'])
+        torrent = torf.Torrent.read(cfg['in'], validate=cfg['_validate'])
     except torf.TorfError as e:
         raise _errors.Error(e)
     else:

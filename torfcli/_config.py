@@ -173,6 +173,9 @@ def parse_args(args):
             except torf.URLError as e:
                 raise _errors.CliError(e)
 
+    # Auto-detect metainfo validation based on other options
+    cfg['_validate'] = not cfg['metainfo'] or cfg['verbose'] <= 0
+
     return cfg
 
 
