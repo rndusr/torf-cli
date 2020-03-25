@@ -69,7 +69,8 @@ ARGUMENTS
     --profile, -z PROFILE  Use options from PROFILE
 
     --verbose, -v          Increase verbosity
-    --json, -j             Print torrent information as JSON
+    --json, -j             Print a single JSON object
+    --metainfo, -m         Print torrent metainfo as JSON object
     --human, -u            Force human-readable output
     --nohuman, -U          Force machine-readable output
     --help, -h             Show this help screen and exit
@@ -116,6 +117,7 @@ _cliparser.add_argument('--profile', '-z', default=[], action='append')
 
 _cliparser.add_argument('--verbose', '-v', action='count', default=0)
 _cliparser.add_argument('--json', '-j', action='store_true')
+_cliparser.add_argument('--metainfo', '-m', action='store_true')
 _cliparser.add_argument('--human', '-u', action='store_true')
 _cliparser.add_argument('--nohuman', '-U', action='store_true')
 _cliparser.add_argument('--yes', '-y', action='store_true')
