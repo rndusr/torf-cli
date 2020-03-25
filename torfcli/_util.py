@@ -13,8 +13,10 @@ import datetime
 import time
 import contextlib
 import sys
-
+import json
 import torf
+import copy
+import base64
 
 
 def get_torrent_filepath(torrent, cfg):
@@ -153,3 +155,61 @@ def caught_BrokenPipeError():
 def flush(f):
     with caught_BrokenPipeError():
         f.flush()
+
+
+_main_fields = ('announce', 'announce-list', 'comment',
+                'created by', 'creation date', 'encoding',
+                'url-list', 'httpseed')
+_info_fields = ('name', 'piece length', 'private', 'length', 'md5sum')
+_files_fields = ('length', 'path', 'md5sum')
+def metainfo(dct, all_fields=False, remove_pieces=True):
+    if all_fields and not remove_pieces:
+        # Don't remove anything
+        new = copy.deepcopy(dct)
+    elif all_fields:
+        # Remove only "pieces"
+        new = copy.deepcopy(dct)
+        if 'pieces' in new.get('info', {}):
+            del new['info']['pieces']
+    else:
+        # Copy standard fields, ignore the rest
+        new = {}
+        # Copy main fields
+        for f in _main_fields:
+            if f in dct:
+                new[f] = dct[f]
+
+        # Copy all "info" fields except for "files"
+        if 'info' in dct:
+            new['info'] = {}
+            for f in _info_fields:
+                if f in dct['info']:
+                    new[f] = dct['info'][f]
+
+        # Copy "files", but only standard fields
+        new_files = []
+        for file in dct['info'].get('files', ()):
+            new_file = {}
+            for f in _files_fields:
+                if f in file:
+                    new_file[f] = file[f]
+            if new_file:
+                new_files.append(new_file)
+        if new_files:
+            new['info']['files'] = new_files
+
+    if 'info' in new and not new['info']:
+        del new['info']
+
+    return new
+
+
+def json_dumps(obj):
+    def default(obj):
+        if isinstance(obj, datetime.datetime):
+            return int(obj.timestamp())
+        elif isinstance(obj, (bytes, bytearray)):
+            return base64.standard_b64encode(obj).decode()
+        else:
+            return str(obj)
+    return json.dumps(obj, allow_nan=False, indent=4, default=default) + '\n'
