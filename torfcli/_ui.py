@@ -107,6 +107,7 @@ class UI:
     def StatusReporter(self):
         if self._cfg['json']:
             return _JSONStatusReporter(self)
+            return _QuietStatusReporter(self)
         elif self._human():
             return _HumanStatusReporter(self)
         else:
@@ -445,7 +446,7 @@ class _MachineStatusReporter(_StatusReporterBase):
         else:
             return str(exception)
 
-class _JSONStatusReporter(_MachineStatusReporter):
+class _QuietStatusReporter(_MachineStatusReporter):
     def generate_callback(self, torrent, filepath, pieces_done, pieces_total):
         pass
 
