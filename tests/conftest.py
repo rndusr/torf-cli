@@ -31,9 +31,13 @@ def regex():
 
 @pytest.fixture(autouse=True)
 def change_cwd(tmpdir):
+    orig_dir = os.getcwd()
     os.chdir(str(tmpdir))
-    yield
-    shutil.rmtree(str(tmpdir))
+    try:
+        yield
+    finally:
+        shutil.rmtree(str(tmpdir))
+        os.chdir(orig_dir)
 
 
 @pytest.fixture(autouse=True)
