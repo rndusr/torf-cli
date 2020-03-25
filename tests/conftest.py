@@ -106,10 +106,10 @@ def _create_torrent(tmpdir, mock_content, **kwargs):
           'comment': 'Original Comment',
           'created_by': 'Original Creator'}
     kw.update(kwargs)
+    t = torf.Torrent(**kw)
+    t.generate()
+    t.write(torrent_file)
     try:
-        t = torf.Torrent(**kw)
-        t.generate()
-        t.write(torrent_file)
         yield torrent_file
     finally:
         if os.path.exists(torrent_file):
