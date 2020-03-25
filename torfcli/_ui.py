@@ -69,7 +69,13 @@ class UI:
     def infos(self, pairs):
         return self._fmt.infos(pairs)
 
-    def show_torrent_info(self, torrent):
+    def show_torrent(self, torrent):
+        if self._cfg['metainfo']:
+            self._show_torrent_metainfo(torrent)
+        else:
+            self._show_torrent_info(torrent)
+
+    def _show_torrent_info(self, torrent):
         info = self.info
         info('Name', torrent.name)
         if torrent.is_ready:
@@ -104,9 +110,21 @@ class UI:
             info('Exclude', torrent.exclude_globs)
         info('Files', self._fmt.files(torrent))
 
+    def _show_torrent_metainfo(self, torrent):
+        if self._cfg['verbose'] <= 0:
+            # Show only standard fields
+            mi = _util.metainfo(torrent.metainfo, all_fields=False, remove_pieces=True)
+        elif self._cfg['verbose'] == 1:
+            # Show all fields except for ['info']['pieces']
+            mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=True)
+        elif self._cfg['verbose'] >= 2:
+            # Show all fields
+            mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=False)
+        sys.stdout.write(_util.json_dumps(mi))
+        _util.flush(sys.stdout)
+
     def StatusReporter(self):
-        if self._cfg['json']:
-            return _JSONStatusReporter(self)
+        if self._cfg['json'] or self._cfg['metainfo']:
             return _QuietStatusReporter(self)
         elif self._human():
             return _HumanStatusReporter(self)

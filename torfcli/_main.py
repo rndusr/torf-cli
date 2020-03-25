@@ -48,7 +48,7 @@ def _info_mode(ui, cfg):
     except torf.TorfError as e:
         raise _errors.Error(e)
     else:
-        ui.show_torrent_info(torrent)
+        ui.show_torrent(torrent)
 
 def _create_mode(ui, cfg):
     trackers = [tier.split(',') for tier in cfg['tracker']]
@@ -79,7 +79,7 @@ def _create_mode(ui, cfg):
         torrent.piece_size = cfg['max_piece_size']
 
     ui.check_output_file_exists(_util.get_torrent_filepath(torrent, cfg))
-    ui.show_torrent_info(torrent)
+    ui.show_torrent(torrent)
     _hash_pieces(ui, torrent)
     _write_torrent(ui, torrent, cfg)
 
@@ -142,13 +142,13 @@ def _edit_mode(ui, cfg):
             # do that after
             if cfg['name']:
                 torrent.name = cfg['name']
-            ui.show_torrent_info(torrent)
+            ui.show_torrent(torrent)
             _hash_pieces(ui, torrent)
 
     if not cfg['PATH']:
         if cfg['name']:
             torrent.name = cfg['name']
-        ui.show_torrent_info(torrent)
+        ui.show_torrent(torrent)
     _write_torrent(ui, torrent, cfg)
 
 def _verify_mode(ui, cfg):
@@ -157,7 +157,7 @@ def _verify_mode(ui, cfg):
     except torf.TorfError as e:
         raise _errors.Error(e)
     else:
-        ui.show_torrent_info(torrent)
+        ui.show_torrent(torrent)
         ui.info('Path', cfg['PATH'])
         ui.info('Info Hash', torrent.infohash)
 
