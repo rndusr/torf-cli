@@ -17,7 +17,6 @@ import os
 import time
 import datetime
 import torf
-import json
 
 from . import _util
 from . import _errors as err
@@ -306,8 +305,7 @@ class _JSONFormatter(_MachineFormatter):
             self._info[key] = value
 
     def terminate(self):
-        sys.stdout.write(json.dumps(self._info, allow_nan=False, indent=4, default=str))
-        sys.stdout.write('\n')
+        sys.stdout.write(_util.json_dumps(self._info))
         _util.flush(sys.stdout)
 
 
