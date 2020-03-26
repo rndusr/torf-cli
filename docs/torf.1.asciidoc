@@ -167,11 +167,14 @@ Use predefined arguments specified in _PROFILE_.  This option may be given
 multiple times.  See *CONFIGURATION FILE*.
 
 *--verbose*, *-v*::
-Produce more output or be more thorough.
+Produce more output or be more thorough.  This option may be given multiple
+times.
 +
-* Display file and other sizes as precise numbers.
+* Display bytes with and without unit prefix, e.g. "1 MiB / 1,048,576 B".
 * When verifying, corrupt files are always read to the end instead of skipping
   them after the first corrupt piece.
++
+Any other effects are explained in the relevant arguments' documentation.
 
 *--json*, *-j*::
 Print a JSON object to stdout that contains all the torrent information and
