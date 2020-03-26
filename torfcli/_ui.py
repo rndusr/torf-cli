@@ -298,18 +298,19 @@ class _MetainfoFormatter(_JSONFormatter):
         pass
 
     def terminate(self, torrent):
-        if torrent is not None:
-            if self._cfg['verbose'] <= 0:
-                # Show only standard fields
-                mi = _util.metainfo(torrent.metainfo, all_fields=False, remove_pieces=True)
-            elif self._cfg['verbose'] == 1:
-                # Show all fields except for ['info']['pieces']
-                mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=True)
-            elif self._cfg['verbose'] >= 2:
-                # Show all fields
-                mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=False)
-            sys.stdout.write(_util.json_dumps(mi))
-            _util.flush(sys.stdout)
+        if torrent is None:
+            mi = {}
+        elif self._cfg['verbose'] <= 0:
+            # Show only standard fields
+            mi = _util.metainfo(torrent.metainfo, all_fields=False, remove_pieces=True)
+        elif self._cfg['verbose'] == 1:
+            # Show all fields except for ['info']['pieces']
+            mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=True)
+        elif self._cfg['verbose'] >= 2:
+            # Show all fields
+            mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=False)
+        sys.stdout.write(_util.json_dumps(mi))
+        _util.flush(sys.stdout)
 
 
 class _StatusReporterBase():

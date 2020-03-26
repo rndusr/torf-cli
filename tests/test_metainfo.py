@@ -72,7 +72,7 @@ def test_metainfo_does_not_need_to_be_valid_with_verbose_option(capsys, tmp_path
     mock_exit.assert_called_once_with(err.Code.READ)
     cap = capsys.readouterr()
     assert cap.err == f"{_vars.__appname__}: Invalid metainfo: Missing 'info'\n"
-    assert cap.out == ''
+    assert json.loads(cap.out) == {}
 
     run(['-i', str(tmp_path / 'nonstandard.torrent'), '--metainfo', '--verbose'])
     cap = capsys.readouterr()
@@ -95,8 +95,8 @@ def test_metainfo_with_unreadable_torrent(capsys):
         run(['-i', 'no/such/path.torrent', '--metainfo'])
     mock_exit.assert_called_once_with(err.Code.READ)
     cap = capsys.readouterr()
-    assert cap.out == ''
     assert cap.err == f'{_vars.__appname__}: no/such/path.torrent: No such file or directory\n'
+    assert json.loads(cap.out) == {}
 
 def test_metainfo_when_creating_torrent(capsys, mock_content):
     run([str(mock_content), '--metainfo', '-vv'])
@@ -140,4 +140,4 @@ def test_metainfo_when_verifying_torrent(capsys, create_torrent, mock_content, t
     mock_exit.assert_called_once_with(err.Code.VERIFY)
     cap = capsys.readouterr()
     assert cap.err == f'{_vars.__appname__}: {wrong_content} does not satisfy {torrent_file}\n'
-    assert cap.out == ''
+    assert json.loads(cap.out) == {}
