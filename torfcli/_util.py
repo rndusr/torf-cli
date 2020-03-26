@@ -17,7 +17,7 @@ import json
 import torf
 import copy
 import base64
-
+from collections import abc
 
 def get_torrent_filepath(torrent, cfg):
     if cfg['out']:
@@ -157,6 +157,19 @@ def flush(f):
         f.flush()
 
 
+# torf.Torrent.metainfo stores boolean values (i.e. "private") as True/False
+# and JSON converts them to true/false, but bencode doesn't know booleans
+# and uses integers (1/0) instead.
+def bool2int(obj):
+    if isinstance(obj, bool):
+        return int(obj)
+    elif isinstance(obj, abc.Mapping):
+        return {k:bool2int(v) for k,v in obj.items()}
+    elif isinstance(obj, abc.Iterable) and not isinstance(obj, (str, bytes, bytearray)):
+        return [bool2int(item) for item in obj]
+    else:
+        return obj
+
 _main_fields = ('announce', 'announce-list', 'comment',
                 'created by', 'creation date', 'encoding',
                 'url-list', 'httpseed')
@@ -201,7 +214,7 @@ def metainfo(dct, all_fields=False, remove_pieces=True):
     if 'info' in new and not new['info']:
         del new['info']
 
-    return new
+    return bool2int(new)
 
 
 def json_dumps(obj):

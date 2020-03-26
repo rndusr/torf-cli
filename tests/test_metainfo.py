@@ -16,7 +16,8 @@ def nonstandard_torrent(tmp_path):
     (tmp_path / 'content' / 'dir').mkdir()
     (tmp_path / 'content' / 'dir' / 'file3').write_text('baz')
 
-    t = torf.Torrent(path=tmp_path / 'content')
+    t = torf.Torrent(path=tmp_path / 'content', private=True,
+                     trackers=('https://foo.example.org',))
     t.metainfo['foo'] = 'bar'
     t.metainfo['info']['baz'] = (1, 2, 3)
     t.metainfo['info']['files'][0]['sneaky'] = 'pete'
@@ -29,8 +30,10 @@ def test_metainfo_with_verbosity_level_zero(capsys, nonstandard_torrent):
     cap = capsys.readouterr()
     assert cap.err == ''
     assert json.loads(cap.out) == {'created by': f'torf {torf.__version__}',
+                                   'announce': 'https://foo.example.org',
                                    'info': {'name': 'content',
                                             'piece length': 16384,
+                                            'private': 1,
                                             'files': [{'length': 3, 'path': ['dir', 'file3']},
                                                       {'length': 3, 'path': ['file1']},
                                                       {'length': 3, 'path': ['file2']}]}}
@@ -40,8 +43,10 @@ def test_metainfo_with_verbosity_level_one(capsys, nonstandard_torrent):
     cap = capsys.readouterr()
     assert cap.err == ''
     assert json.loads(cap.out) == {'created by': f'torf {torf.__version__}',
+                                   'announce': 'https://foo.example.org',
                                    'foo': 'bar',
                                    'info': {'baz': [1, 2, 3],
+                                            'private': 1,
                                             'files': [{'length': 3, 'path': ['dir', 'file3'], 'sneaky': 'pete'},
                                                       {'length': 3, 'path': ['file1']},
                                                       {'length': 3, 'path': ['file2']}],
@@ -53,14 +58,23 @@ def test_metainfo_with_verbosity_level_two(capsys, nonstandard_torrent):
     cap = capsys.readouterr()
     assert cap.err == ''
     assert json.loads(cap.out) == {'created by': f'torf {torf.__version__}',
+                                   'announce': 'https://foo.example.org',
                                    'foo': 'bar',
                                    'info': {'baz': [1, 2, 3],
+                                            'private': 1,
                                             'files': [{'length': 3, 'path': ['dir', 'file3'], 'sneaky': 'pete'},
                                                       {'length': 3, 'path': ['file1']},
                                                       {'length': 3, 'path': ['file2']}],
                                             'name': 'content',
                                             'piece length': 16384,
                                             'pieces': 'YscFPSkTuTXkBSgIyyaqj/HVRXU='}}
+
+def test_metainfo_uses_one_and_zero_for_boolean_values(capsys, create_torrent):
+    with create_torrent(private=True) as torrent_file:
+        run(['-i', torrent_file, '--metainfo'])
+    cap = capsys.readouterr()
+    assert cap.err == ''
+    assert json.loads(cap.out)['info']['private'] == 1
 
 def test_metainfo_does_not_need_to_be_valid_with_verbose_option(capsys, tmp_path):
     with open(tmp_path / 'nonstandard.torrent', 'wb') as f:
