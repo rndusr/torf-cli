@@ -732,17 +732,35 @@ multiple times.  See <strong>CONFIGURATION FILE</strong>.</p>
 </dd>
 <dt class="hdlist1"><strong>--verbose</strong>, <strong>-v</strong></dt>
 <dd>
-<p>Produce more output or be more thorough.</p>
+<p>Produce more output or be more thorough.  This option may be given multiple
+times.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Display file and other sizes as precise numbers.</p>
+<p>Display bytes with and without unit prefix, e.g. "1 MiB / 1,048,576 B".</p>
 </li>
 <li>
 <p>When verifying, corrupt files are always read to the end instead of skipping
 them after the first corrupt piece.</p>
+<div class="paragraph">
+<p>Any other effects are explained in the relevant arguments' documentation.</p>
+</div>
 </li>
 </ul>
+</div>
+</dd>
+<dt class="hdlist1"><strong>--json</strong>, <strong>-j</strong></dt>
+<dd>
+<p>Print information and errors as a JSON object.  Progress is not reported.</p>
+</dd>
+<dt class="hdlist1"><strong>--metainfo</strong>, <strong>-m</strong></dt>
+<dd>
+<p>Print the torrent&#8217;s metainfo as a JSON object.  Progress is not reported.
+Errors are reported normally on stderr.</p>
+<div class="paragraph">
+<p>Unless --verbose is given, any non-standard fields are excluded and metainfo
+that doesn&#8217;t represent a valid torrent results in an error.  Unless --verbose is
+given twice, the "pieces" field is excluded.</p>
 </div>
 </dd>
 <dt class="hdlist1"><strong>--human</strong>, <strong>-u</strong></dt>
@@ -1032,7 +1050,7 @@ raw bytes for sizes, etc).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-03-21 16:30:08 +0100
+Last updated 2020-03-26 14:18:53 +0100
 </div>
 </div>
 </body>

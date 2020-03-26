@@ -2,12 +2,12 @@
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
 .\" Generator: Asciidoctor 2.0.10
-.\"      Date: 2020-03-21
+.\"      Date: 2020-03-26
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2020-03-21" "\ \&" "\ \&"
+.TH "TORF" "1" "2020-03-26" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -385,7 +385,8 @@ multiple times.  See \fBCONFIGURATION FILE\fP.
 .sp
 \fB\-\-verbose\fP, \fB\-v\fP
 .RS 4
-Produce more output or be more thorough.
+Produce more output or be more thorough.  This option may be given multiple
+times.
 .sp
 .RS 4
 .ie n \{\
@@ -395,7 +396,7 @@ Produce more output or be more thorough.
 .  sp -1
 .  IP \(bu 2.3
 .\}
-Display file and other sizes as precise numbers.
+Display bytes with and without unit prefix, e.g. "1 MiB / 1,048,576 B".
 .RE
 .sp
 .RS 4
@@ -408,7 +409,24 @@ Display file and other sizes as precise numbers.
 .\}
 When verifying, corrupt files are always read to the end instead of skipping
 them after the first corrupt piece.
+.sp
+Any other effects are explained in the relevant arguments\(aq documentation.
 .RE
+.RE
+.sp
+\fB\-\-json\fP, \fB\-j\fP
+.RS 4
+Print information and errors as a JSON object.  Progress is not reported.
+.RE
+.sp
+\fB\-\-metainfo\fP, \fB\-m\fP
+.RS 4
+Print the torrent\(cqs metainfo as a JSON object.  Progress is not reported.
+Errors are reported normally on stderr.
+.sp
+Unless \-\-verbose is given, any non\-standard fields are excluded and metainfo
+that doesn\(cqt represent a valid torrent results in an error.  Unless \-\-verbose is
+given twice, the "pieces" field is excluded.
 .RE
 .sp
 \fB\-\-human\fP, \fB\-u\fP
