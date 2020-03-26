@@ -30,7 +30,7 @@ USAGE
     {_vars.__appname__} PATH [OPTIONS] [-o TORRENT]         # Create torrent
     {_vars.__appname__} -i TORRENT                          # Display torrent
     {_vars.__appname__} -i TORRENT [OPTIONS] -o NEWTORRENT  # Edit torrent
-    {_vars.__appname__} PATH -i TORRENT                     # Verify torrent
+    {_vars.__appname__} -i TORRENT PATH                     # Verify torrent
 
 ARGUMENTS
     PATH                   Path to torrent's content
