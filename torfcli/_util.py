@@ -184,7 +184,7 @@ def metainfo(dct, all_fields=False, remove_pieces=True):
             new['info'] = {}
             for f in _info_fields:
                 if f in dct['info']:
-                    new[f] = dct['info'][f]
+                    new['info'][f] = dct['info'][f]
 
         # Copy "files", but only standard fields
         new_files = []
