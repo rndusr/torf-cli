@@ -21,16 +21,17 @@ def run(args=sys.argv[1:]):
     ui = _ui.UI(_config.parse_early_args(args))
 
     # Parse the rest of the args; report any errors as specified by early args.
+    torrent = None
     try:
         ui.cfg = _config.get_cfg(args)
     except (_errors.CliError, _errors.ConfigError) as e:
         ui.error(e)
     else:
         try:
-            _main.run(ui)
+            torrent = _main.run(ui)
         except _errors.Error as e:
             ui.error(e)
         except KeyboardInterrupt:
             ui.error(_errors.Error('Aborted', code=_errors.Code.ABORTED))
     finally:
-        ui.terminate()
+        ui.terminate(torrent)

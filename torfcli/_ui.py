@@ -49,6 +49,8 @@ class UI:
         self._cfg = cfg
         if cfg.get('json'):
             self._fmt = _JSONFormatter(cfg)
+        elif cfg.get('metainfo'):
+            self._fmt = _MetainfoFormatter(cfg)
         elif self._human():
             self._fmt = _HumanFormatter(cfg)
         else:
@@ -69,12 +71,6 @@ class UI:
         return self._fmt.infos(pairs)
 
     def show_torrent(self, torrent):
-        if self._cfg['metainfo']:
-            self._show_torrent_metainfo(torrent)
-        else:
-            self._show_torrent_info(torrent)
-
-    def _show_torrent_info(self, torrent):
         info = self.info
         info('Name', torrent.name)
         if torrent.is_ready:
@@ -109,19 +105,6 @@ class UI:
             info('Exclude', torrent.exclude_globs)
         info('Files', self._fmt.files(torrent))
 
-    def _show_torrent_metainfo(self, torrent):
-        if self._cfg['verbose'] <= 0:
-            # Show only standard fields
-            mi = _util.metainfo(torrent.metainfo, all_fields=False, remove_pieces=True)
-        elif self._cfg['verbose'] == 1:
-            # Show all fields except for ['info']['pieces']
-            mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=True)
-        elif self._cfg['verbose'] >= 2:
-            # Show all fields
-            mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=False)
-        sys.stdout.write(_util.json_dumps(mi))
-        _util.flush(sys.stdout)
-
     def StatusReporter(self):
         if self._cfg['json'] or self._cfg['metainfo']:
             return _QuietStatusReporter(self)
@@ -139,10 +122,10 @@ class UI:
                       not self._fmt.dialog_yes_no(f'{filepath}: Overwrite file?')):
                     raise err.WriteError(f'{filepath}: File exists')
 
-    def terminate(self):
+    def terminate(self, torrent):
         fmt = getattr(self, '_fmt', None)
         if fmt:
-            fmt.terminate()
+            fmt.terminate(torrent)
 
 
 class _FormatterBase:
@@ -155,7 +138,7 @@ class _FormatterBase:
     def httpseeds(self, torrent):
         return torrent.httpseeds
 
-    def terminate(self):
+    def terminate(self, torrent):
         pass
 
 class _HumanFormatter(_FormatterBase):
@@ -304,9 +287,28 @@ class _JSONFormatter(_MachineFormatter):
         else:
             self._info[key] = value
 
-    def terminate(self):
+    def terminate(self, torrent):
         sys.stdout.write(_util.json_dumps(self._info))
         _util.flush(sys.stdout)
+
+
+class _MetainfoFormatter(_JSONFormatter):
+    def info(self, key, value, newline=None):
+        pass
+
+    def terminate(self, torrent):
+        if torrent is not None:
+            if self._cfg['verbose'] <= 0:
+                # Show only standard fields
+                mi = _util.metainfo(torrent.metainfo, all_fields=False, remove_pieces=True)
+            elif self._cfg['verbose'] == 1:
+                # Show all fields except for ['info']['pieces']
+                mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=True)
+            elif self._cfg['verbose'] >= 2:
+                # Show all fields
+                mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=False)
+            sys.stdout.write(_util.json_dumps(mi))
+            _util.flush(sys.stdout)
 
 
 class _StatusReporterBase():

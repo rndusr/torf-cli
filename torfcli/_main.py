@@ -32,13 +32,13 @@ def run(ui):
     else:
         # Figure out our modus operandi
         if cfg['PATH'] and not cfg['in']:
-            _create_mode(ui, cfg)
+            return _create_mode(ui, cfg)
         elif not cfg['PATH'] and not cfg['out'] and cfg['in']:
-            _info_mode(ui, cfg)
+            return _info_mode(ui, cfg)
         elif cfg['out'] and cfg['in']:
-            _edit_mode(ui, cfg)
+            return _edit_mode(ui, cfg)
         elif cfg['PATH'] and not cfg['out'] and cfg['in']:
-            _verify_mode(ui, cfg)
+            return _verify_mode(ui, cfg)
         else:
             raise _errors.CliError(f'Not sure what to do (see USAGE in `{_vars.__appname__} -h`)')
 
@@ -49,6 +49,7 @@ def _info_mode(ui, cfg):
         raise _errors.Error(e)
     else:
         ui.show_torrent(torrent)
+        return torrent
 
 def _create_mode(ui, cfg):
     trackers = [tier.split(',') for tier in cfg['tracker']]
@@ -82,6 +83,7 @@ def _create_mode(ui, cfg):
     ui.show_torrent(torrent)
     _hash_pieces(ui, torrent)
     _write_torrent(ui, torrent, cfg)
+    return torrent
 
 def _edit_mode(ui, cfg):
     try:
@@ -150,6 +152,7 @@ def _edit_mode(ui, cfg):
             torrent.name = cfg['name']
         ui.show_torrent(torrent)
     _write_torrent(ui, torrent, cfg)
+    return torrent
 
 def _verify_mode(ui, cfg):
     try:
@@ -177,6 +180,7 @@ def _verify_mode(ui, cfg):
             sr.keep_progress_summary()
             if not success:
                 raise _errors.VerifyError(content=cfg["PATH"], torrent=cfg["in"])
+    return torrent
 
 def _hash_pieces(ui, torrent):
     with ui.StatusReporter() as sr:
