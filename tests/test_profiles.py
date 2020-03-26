@@ -72,7 +72,7 @@ def test_overloading_values(cfgfile, mock_content, mock_create_mode):
     run([str(mock_content), '--profile', 'bar', '--profile', 'baz'])
     cfg = mock_create_mode.call_args[0][1]
     assert cfg['comment'] == 'Baz'
-    assert cfg['private'] == False
+    assert cfg['private'] == None
     assert cfg['yes'] == True
     assert cfg['xseed'] == True
 

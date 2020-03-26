@@ -56,7 +56,7 @@ def test_noconfig_option(cfgfile, mock_content, mock_create_mode):
     '''))
     run([str(mock_content), '--noconfig'])
     cfg = mock_create_mode.call_args[0][1]
-    assert cfg['private'] == False
+    assert cfg['private'] == None
     assert cfg['comment'] == None
 
 

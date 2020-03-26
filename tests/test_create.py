@@ -283,6 +283,17 @@ def test_noprivate_option(capsys, mock_content):
     assert 'Private\tno' in cap.out
 
 
+def test_missing_private_option_does_not_set_private_field(capsys, mock_content):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    run([content_path])
+    t = torf.Torrent.read(exp_torrent_filepath)
+    assert 'private' not in t.metainfo['info']
+    assert t.private == False
+
+
 def test_source_option(capsys, mock_content):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
