@@ -162,7 +162,10 @@ def _verify_mode(ui, cfg):
     else:
         ui.show_torrent(torrent)
         ui.info('Path', cfg['PATH'])
-        ui.info('Info Hash', torrent.infohash)
+        try:
+            ui.info('Info Hash', torrent.infohash)
+        except torf.TorfError as e:
+            raise _errors.Error(e)
 
     with ui.StatusReporter() as sr:
         skip_files = cfg['verbose'] > 0
@@ -195,7 +198,10 @@ def _hash_pieces(ui, torrent):
         else:
             sr.keep_progress_summary()
             if success:
-                ui.info('Info Hash', torrent.infohash)
+                try:
+                    ui.info('Info Hash', torrent.infohash)
+                except torf.TorfError as e:
+                    raise _errors.Error(e)
 
 def _write_torrent(ui, torrent, cfg):
     if not torrent.is_ready:
