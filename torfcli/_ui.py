@@ -268,6 +268,7 @@ class _MachineFormatter(_FormatterBase):
 
 class _JSONFormatter(_MachineFormatter):
     def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._info = {}
 
     def private(self, torrent):
