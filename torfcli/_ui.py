@@ -64,6 +64,9 @@ class UI:
         if exit:
             sys.exit(getattr(exc, 'exit_code', err.Code.GENERIC))
 
+    def warn(self, msg):
+        sys.stderr.write(f'{_vars.__appname__}: WARNING: {msg}\n')
+
     def info(self, key, value, newline=True):
         return self._fmt.info(key, value, newline=newline)
 
