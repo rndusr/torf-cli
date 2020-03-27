@@ -204,16 +204,18 @@ def _hash_pieces(ui, torrent):
                     raise _errors.Error(e)
 
 def _write_torrent(ui, torrent, cfg):
-    if not torrent.is_ready:
-        raise _errors.WriteError('Attempt to write incomplete torrent. '
-                                 'Please report this as a bug.')
-    if not cfg['nomagnet']:
-        ui.info('Magnet', torrent.magnet())
-    if not cfg['notorrent']:
-        filepath = _util.get_torrent_filepath(torrent, cfg)
-        try:
-            torrent.write(filepath, overwrite=True)
-        except torf.TorfError as e:
-            raise _errors.Error(e)
-        else:
-            ui.info('Torrent', filepath)
+    try:
+        torrent.validate()
+    except torf.TorfError as e:
+        raise _errors.Error(e)
+    else:
+        if not cfg['nomagnet']:
+            ui.info('Magnet', torrent.magnet())
+        if not cfg['notorrent']:
+            filepath = _util.get_torrent_filepath(torrent, cfg)
+            try:
+                torrent.write(filepath, overwrite=True)
+            except torf.TorfError as e:
+                raise _errors.Error(e)
+            else:
+                ui.info('Torrent', filepath)
