@@ -85,8 +85,6 @@ class UI:
         if torrent.source:
             info('Source', torrent.source)
         info('Private', self._fmt.private(torrent))
-        if not self._cfg['nomagnet'] and torrent.is_ready:
-            info('Magnet', torrent.magnet())
         if torrent.trackers:
             info('Tracker' + ('s' if len(torrent.trackers) > 1 else ''),
                  self._fmt.trackers(torrent))
