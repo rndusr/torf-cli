@@ -49,6 +49,10 @@ def _info_mode(ui, cfg):
         raise _errors.Error(e)
     else:
         ui.show_torrent(torrent)
+        try:
+            ui.info('Magnet', torrent.magnet())
+        except torf.TorfError as e:
+            ui.warn(e)
         return torrent
 
 def _create_mode(ui, cfg):
@@ -218,3 +222,5 @@ def _write_torrent(ui, torrent, cfg):
                 raise _errors.Error(e)
             else:
                 ui.info('Torrent', filepath)
+        if torrent.private and not torrent.trackers:
+            ui.warn('Torrent is private and has no trackers')
