@@ -176,16 +176,27 @@ _main_fields = ('announce', 'announce-list', 'comment',
 _info_fields = ('name', 'piece length', 'private', 'length', 'md5sum')
 _files_fields = ('length', 'path', 'md5sum')
 def metainfo(dct, all_fields=False, remove_pieces=True):
-    if all_fields and not remove_pieces:
-        # Don't remove anything
-        new = copy.deepcopy(dct)
-    elif all_fields:
-        # Remove only "pieces"
-        new = copy.deepcopy(dct)
+
+    def copy(obj, only=(), exclude=()):
+        if isinstance(obj, abc.Mapping):
+            cp = type(obj)()
+            for k,v in sorted(obj.items()):
+                if k not in exclude and (not only or k in only):
+                    cp[k] = copy(v)
+            return cp
+        elif isinstance(obj, abc.Iterable) and not isinstance(obj, (str, bytes, bytearray)):
+            return [copy(v) for v in obj]
+        else:
+            return obj
+
+    # Make order-preserving copy
+    new = copy(dct)
+
+    if remove_pieces:
         if 'pieces' in new.get('info', {}):
             del new['info']['pieces']
-    else:
-        # Copy standard fields, ignore the rest
+    if not all_fields:
+        # Remove non-standard fields
         new = {}
         # Copy main fields
         for f in _main_fields:
@@ -215,7 +226,6 @@ def metainfo(dct, all_fields=False, remove_pieces=True):
         del new['info']
 
     return bool2int(new)
-
 
 def json_dumps(obj):
     def default(obj):
