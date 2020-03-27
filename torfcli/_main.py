@@ -140,8 +140,8 @@ def _edit_mode(ui, cfg):
         except torf.TorfError as e:
             raise _errors.Error(e)
         else:
-            # Setting torrent.path overwrites torrent.name, so it's important to
-            # do that after
+            # Setting torrent.path overwrites torrent.name, so we must set any
+            # custom name after setting path
             if cfg['name']:
                 torrent.name = cfg['name']
             ui.show_torrent(torrent)
