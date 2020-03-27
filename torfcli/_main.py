@@ -146,8 +146,7 @@ def _edit_mode(ui, cfg):
                 torrent.name = cfg['name']
             ui.show_torrent(torrent)
             _hash_pieces(ui, torrent)
-
-    if not cfg['PATH']:
+    else:
         if cfg['name']:
             torrent.name = cfg['name']
         ui.show_torrent(torrent)
