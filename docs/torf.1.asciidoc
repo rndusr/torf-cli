@@ -180,12 +180,14 @@ Any other effects are explained in the relevant arguments' documentation.
 Print information and errors as a JSON object.  Progress is not reported.
 
 *--metainfo*, *-m*::
-Print the torrent's metainfo as a JSON object.  Progress is not reported.
-Errors are reported normally on stderr.
+
+Print the torrent's metainfo as a JSON object.  Byte strings (e.g. "pieces" in
+the "info" section) are encoded in Base64.  Progress is not reported.  Errors
+are reported normally on stderr.
 +
 Unless --verbose is given, any non-standard fields are excluded and metainfo
 that doesn't represent a valid torrent results in an error.  Unless --verbose is
-given twice, the "pieces" field is excluded.
+given twice, the "pieces" field in the "info" section is excluded.
 
 *--human*, *-u*::
 Display information in human-readable output even if stdout is not a TTY.  See
