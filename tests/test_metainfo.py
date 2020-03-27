@@ -90,7 +90,7 @@ def test_metainfo_does_not_need_to_be_valid_with_verbose_option(capsys, tmp_path
 
     run(['-i', str(tmp_path / 'nonstandard.torrent'), '--metainfo', '--verbose'])
     cap = capsys.readouterr()
-    assert cap.err == ''
+    assert cap.err == f"{_vars.__appname__}: WARNING: Invalid metainfo: Missing 'name' in ['info']\n"
     assert json.loads(cap.out) == {"2": 3,
                                    "this": ["is", "not"],
                                    "valid": {"is": "ok",
@@ -98,7 +98,7 @@ def test_metainfo_does_not_need_to_be_valid_with_verbose_option(capsys, tmp_path
 
     run(['-i', str(tmp_path / 'nonstandard.torrent'), '--metainfo', '--verbose', '--verbose'])
     cap = capsys.readouterr()
-    assert cap.err == ''
+    assert cap.err == f"{_vars.__appname__}: WARNING: Invalid metainfo: Missing 'name' in ['info']\n"
     assert json.loads(cap.out) == {"2": 3,
                                    "this": ["is", "not"],
                                    "valid": {"is": "ok",

@@ -88,6 +88,16 @@ def test_add_private(create_torrent, tmpdir, assert_torrents_equal):
         new = torf.Torrent.read(outfile)
         assert_torrents_equal(orig, new, private=True)
 
+def test_add_private_and_remove_all_trackers(create_torrent, tmpdir, assert_torrents_equal, capsys):
+    outfile = str(tmpdir.join('out.torrent'))
+    with create_torrent(private=False) as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile, '--private', '--notracker', '-o', outfile])
+        cap = capsys.readouterr()
+        assert cap.err == f'{_vars.__appname__}: WARNING: Torrent is private and has no trackers\n'
+        new = torf.Torrent.read(outfile)
+        assert_torrents_equal(orig, new, private=True, trackers=())
+
 
 def test_edit_source(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))

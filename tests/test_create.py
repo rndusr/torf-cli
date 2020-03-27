@@ -268,12 +268,10 @@ def test_private_option(capsys, mock_content):
     assert 'Private\tyes' in cap.out
 
 def test_private_enabled_and_no_trackers_given(capsys, mock_content):
-    with patch('sys.exit') as mock_exit:
-        run([str(mock_content), '--private'])
-    mock_exit.assert_called_once_with(err.Code.READ)
+    run([str(mock_content), '--private'])
     cap = capsys.readouterr()
-    assert cap.err == (f'{_vars.__appname__}: Invalid metainfo: '
-                       'Torrent is private but no announce URLs are specified\n')
+    assert cap.err == f'{_vars.__appname__}: WARNING: Torrent is private and has no trackers\n'
+    assert os.path.exists(str(mock_content) + '.torrent')
 
 def test_noprivate_option(capsys, mock_content):
     content_path = str(mock_content)
