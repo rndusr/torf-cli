@@ -34,8 +34,11 @@ USAGE
 
 ARGUMENTS
     PATH                   Path to torrent's content
-    --exclude, -e EXCLUDE  File matching pattern that is used to exclude
-                           files in PATH
+    --exclude, -e PATTERN  Glob pattern that is used to exclude files
+                           (e.g. "*.txt")
+    --exclude-regex, -er PATTERN
+                           Regular expression that is used to exclude files
+                           (e.g. ".*\.txt$")
     --in, -i TORRENT       Read metainfo from TORRENT
     --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
     --name, -n NAME        Torrent name (default: basename of PATH)
@@ -87,6 +90,7 @@ _cliparser = CLIParser(add_help=False)
 
 _cliparser.add_argument('PATH', nargs='?')
 _cliparser.add_argument('--exclude', '-e', default=[], action='append')
+_cliparser.add_argument('--exclude-regex', '-er', default=[], action='append')
 _cliparser.add_argument('--in', '-i', default='')
 _cliparser.add_argument('--out', '-o', default='')
 

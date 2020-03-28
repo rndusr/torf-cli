@@ -197,7 +197,7 @@ def test_yes_option(capsys, mock_content):
     assert f'Torrent\t{exp_torrent_filename}' in cap.out
 
 
-def test_single_exclude(capsys, mock_content):
+def test_exclude_glob(capsys, mock_content):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
@@ -212,18 +212,33 @@ def test_single_exclude(capsys, mock_content):
     assert 'File Count\t2' in cap.out
 
 
+def test_excludes_regex(capsys, mock_content):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    run([content_path, '--exclude-regex', r'.*\.jpg$'])
+
+    t = torf.Torrent.read(exp_torrent_filepath)
+    assert len(tuple(t.files)) == 2
+
+    cap = capsys.readouterr()
+    assert 'Exclude\t.*\\.jpg$' in cap.out
+    assert 'File Count\t2' in cap.out
+
+
 def test_multiple_excludes(capsys, mock_content):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    run([content_path, '--exclude', '*.jpg', '--exclude', '*.txt'])
+    run([content_path, '--exclude', '*.jpg', '--exclude-regex', 'txt$'])
 
     t = torf.Torrent.read(exp_torrent_filepath)
     assert len(tuple(t.files)) == 1
 
     cap = capsys.readouterr()
-    assert 'Exclude\t*.jpg\t*.txt' in cap.out
+    assert 'Exclude\t*.jpg\ttxt$' in cap.out
     assert 'File Count\t1' in cap.out
 
 

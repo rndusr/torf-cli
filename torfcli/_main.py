@@ -62,6 +62,7 @@ def _create_mode(ui, cfg):
             path=cfg['PATH'],
             name=cfg['name'] or None,
             exclude_globs=cfg['exclude'],
+            exclude_regexs=cfg['exclude_regex'],
             trackers=() if cfg['notracker'] else trackers,
             webseeds=() if cfg['nowebseed'] else cfg['webseed'],
             private=False if cfg['noprivate'] else cfg['private'],

@@ -102,8 +102,10 @@ class UI:
         if torrent.piece_size:
             info('Piece Count', torrent.pieces)
         info('File Count', len(torrent.files))
-        if torrent.exclude_globs:
-            info('Exclude', torrent.exclude_globs)
+        patterns = [p for p in torrent.exclude_globs]
+        patterns.extend(r.pattern for r in torrent.exclude_regexs)
+        if patterns:
+            info('Exclude', patterns)
         info('Files', self._fmt.files(torrent))
 
     def StatusReporter(self):

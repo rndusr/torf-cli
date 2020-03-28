@@ -45,10 +45,13 @@ Options that start with *--no* take precedence.
 _PATH_::
     The path to the torrent's content.
 
-*--exclude*, *-e* _EXCLUDE_::
-Exclude files from _PATH_ that match the pattern _EXCLUDE_.  This option may be
-given multiple times.  It is ignored if _PATH_ is not a directory.  See
-*EXCLUDING FILES*.
+*--exclude*, *-e* _PATTERN_::
+Exclude files from _PATH_ that match the glob pattern _PATTERN_.  This option
+may be given multiple times.  See *EXCLUDING FILES*.
+
+*--exclude-regex*, *-er* _PATTERN_::
+Exclude files from _PATH_ that match the regular expression _PATTERN_.  This
+option may be given multiple times.  See *EXCLUDING FILES*.
 
 *--in*, *-i* _TORRENT_::
 Read metainfo from _TORRENT_.
@@ -233,24 +236,23 @@ Check if "`path/to/foo`" contains valid data as specified in "`bar.torrent`":
 
 == EXCLUDING FILES
 
-The *--exclude* option takes a pattern that is matched against each file path
-beneath _PATH_.  Files that match are not included in the torrent.  Matching is
-case-insensitive.
+The *--exclude* option takes a glob pattern that is matched against each file
+path beneath _PATH_.  Files that match are not included in the torrent.
+Matching is case-insensitive.
 
-Each file path starts with the basename of _PATH_, e.g. if _PATH_ is
+The *--exclude-regex* option takes a regular expression pattern that is matched
+against each file path beneath _PATH_.  Files that match are not included in the
+torrent.  Matching is case-sensitive.
+
+File paths start with the last segment of _PATH_, e.g. if _PATH_ is
 "`/home/foo/bar`", each file path starts with "`bar/`".
-
-A file path matches if any of its directories or its file name match, e.g. the
-pattern "`foo`" matches the paths "`foo/bar/baz`", "`bar/foo/baz`" and
-"`bar/baz/foo`".
-
-A pattern must describe the full directory or file name, e.g. the pattern
-"`bar`" does not match the path "`foo/barr`", but the patterns "`bar?`" and
-"`bar*`" match.
 
 Empty directories and empty files are automatically excluded.
 
-Patterns support these wildcard characters:
+Regular expressions should be identical for simple patterns.  See
+https://docs.python.org/3/library/re.html for the complete documentation.
+
+Glob patterns support these wildcard characters:
 
 [%autowidth, frame=none, grid=none, cols=">,<"]
 |===

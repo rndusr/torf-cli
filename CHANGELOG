@@ -6,6 +6,9 @@
   - New option: --json prints a JSON object of the regular output.
   - New option: --verbose shows file sizes in plain bytes, verifies file
     content more thoroughly, etc.
+  - New option: --exclude-regex that excludes files with regular expressions.
+  - Patterns for the --exclude* options are now matched against the complete
+    relative path within the torrent instead of individual path segments.
   - Support for multiple tiers of announce URLs when creating torrents.
   - Exit codes have changed and are now properly documented in the man page.
   - Fix --max-piece-size to allow piece sizes larger than 16 MiB.
