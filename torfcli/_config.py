@@ -175,6 +175,15 @@ def parse_args(args):
         except torf.URLError as e:
             raise _errors.CliError(e)
 
+    # Validate regular expressions
+    import re
+    for regex in cfg['exclude_regex']:
+        try:
+            re.compile(regex)
+        except re.error as e:
+            raise _errors.CliError(f'Invalid regular expression: {regex}: '
+                                   f'{str(e)[0].upper()}{str(e)[1:]}')
+
     # Auto-detect metainfo validation based on other options
     cfg['_validate'] = not cfg['metainfo'] or cfg['verbose'] <= 0
 

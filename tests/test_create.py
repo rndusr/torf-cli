@@ -217,12 +217,18 @@ def test_excludes_regex(capsys, mock_content):
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
     exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
 
-    run([content_path, '--exclude-regex', r'.*\.jpg$'])
+    with patch('sys.exit') as mock_exit:
+        run([content_path, '--exclude-regex', '*'])
+    mock_exit.assert_called_once_with(err.Code.CLI)
+    cap = capsys.readouterr()
+    assert cap.out == ''
+    assert cap.err == f'{_vars.__appname__}: Invalid regular expression: *: Nothing to repeat at position 0\n'
 
+    run([content_path, '--exclude-regex', r'.*\.jpg$'])
     t = torf.Torrent.read(exp_torrent_filepath)
     assert len(tuple(t.files)) == 2
-
     cap = capsys.readouterr()
+    assert cap.err == ''
     assert 'Exclude\t.*\\.jpg$' in cap.out
     assert 'File Count\t2' in cap.out
 
