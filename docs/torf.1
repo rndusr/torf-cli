@@ -2,12 +2,12 @@
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
 .\" Generator: Asciidoctor 2.0.10
-.\"      Date: 2020-03-26
+.\"      Date: 2020-03-28
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2020-03-26" "\ \&" "\ \&"
+.TH "TORF" "1" "2020-03-28" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -122,11 +122,16 @@ Options that start with \fB\-\-no\fP take precedence.
 The path to the torrent\(cqs content.
 .RE
 .sp
-\fB\-\-exclude\fP, \fB\-e\fP \fIEXCLUDE\fP
+\fB\-\-exclude\fP, \fB\-e\fP \fIPATTERN\fP
 .RS 4
-Exclude files from \fIPATH\fP that match the pattern \fIEXCLUDE\fP.  This option may be
-given multiple times.  It is ignored if \fIPATH\fP is not a directory.  See
-\fBEXCLUDING FILES\fP.
+Exclude files from \fIPATH\fP that match the glob pattern \fIPATTERN\fP.  This option
+may be given multiple times.  See \fBEXCLUDING FILES\fP.
+.RE
+.sp
+\fB\-\-exclude\-regex\fP, \fB\-er\fP \fIPATTERN\fP
+.RS 4
+Exclude files from \fIPATH\fP that match the regular expression \fIPATTERN\fP.  This
+option may be given multiple times.  See \fBEXCLUDING FILES\fP.
 .RE
 .sp
 \fB\-\-in\fP, \fB\-i\fP \fITORRENT\fP
@@ -409,7 +414,16 @@ Display bytes with and without unit prefix, e.g. "1 MiB / 1,048,576 B".
 .\}
 When verifying, corrupt files are always read to the end instead of skipping
 them after the first corrupt piece.
+.RE
 .sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
 Any other effects are explained in the relevant arguments\(aq documentation.
 .RE
 .RE
@@ -421,12 +435,13 @@ Print information and errors as a JSON object.  Progress is not reported.
 .sp
 \fB\-\-metainfo\fP, \fB\-m\fP
 .RS 4
-Print the torrent\(cqs metainfo as a JSON object.  Progress is not reported.
-Errors are reported normally on stderr.
+Print the torrent\(cqs metainfo as a JSON object.  Byte strings (e.g. "pieces" in
+the "info" section) are encoded in Base64.  Progress is not reported.  Errors
+are reported normally on stderr.
 .sp
-Unless \-\-verbose is given, any non\-standard fields are excluded and metainfo
-that doesn\(cqt represent a valid torrent results in an error.  Unless \-\-verbose is
-given twice, the "pieces" field is excluded.
+Unless \fB\-\-verbose\fP is given, any non\-standard fields are excluded and metainfo
+that doesn\(cqt represent a valid torrent results in an error.  Unless \fB\-\-verbose\fP
+is given twice, the "pieces" field in the "info" section is excluded.
 .RE
 .sp
 \fB\-\-human\fP, \fB\-u\fP
@@ -497,24 +512,25 @@ $ torf \-i bar.torrent path/to/foo
 .if n .RE
 .SH "EXCLUDING FILES"
 .sp
-The \fB\-\-exclude\fP option takes a pattern that is matched against each file path
-beneath \fIPATH\fP.  Files that match are not included in the torrent.  Matching is
-case\-insensitive.
+The \fB\-\-exclude\fP option takes a glob pattern that is matched against each file
+path beneath \fIPATH\fP.  Files that match are not included in the torrent.
+Matching is case\-insensitive.
 .sp
-Each file path starts with the basename of \fIPATH\fP, e.g. if \fIPATH\fP is
-\(lq/home/foo/bar\(rq, each file path starts with \(lqbar/\(rq.
+The \fB\-\-exclude\-regex\fP option takes a regular expression pattern that is matched
+against each file path beneath \fIPATH\fP.  Files that match are not included in the
+torrent.  Matching is case\-sensitive.
 .sp
-A file path matches if any of its directories or its file name match, e.g. the
-pattern \(lqfoo\(rq matches the paths \(lqfoo/bar/baz\(rq, \(lqbar/foo/baz\(rq and
-\(lqbar/baz/foo\(rq.
-.sp
-A pattern must describe the full directory or file name, e.g. the pattern
-\(lqbar\(rq does not match the path \(lqfoo/barr\(rq, but the patterns \(lqbar?\(rq and
-\(lqbar*\(rq match.
+File paths start with the torrent\(cqs name (usually the last segment of \fIPATH\fP),
+e.g. if \fIPATH\fP is \(lq/home/foo/bar\(rq, each file path starts with \(lqbar/\(rq
 .sp
 Empty directories and empty files are automatically excluded.
 .sp
-Patterns support these wildcard characters:
+Regular expressions should be identical for simple patterns.  See
+.URL "https://docs.python.org/3/library/re.html#regular\-expression\-syntax" "" " "
+for the
+complete documentation.
+.sp
+Glob patterns support these wildcard characters:
 .TS
 allbox tab(:);
 lt lt.
@@ -695,11 +711,6 @@ Error while verifying a torrent\(cqs content
 128
 .RS 4
 Aborted by SIGINT (typically Ctrl\-c was pressed)
-.RE
-.sp
-129
-.RS 4
-Broken pipe (stdout was closed before we could flush it)
 .RE
 .SH "REPORTING BUGS"
 .sp

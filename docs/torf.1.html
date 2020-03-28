@@ -513,11 +513,15 @@ Verify that the content in <em>PATH</em> matches the metadata in the torrent fil
 <dd>
 <p>The path to the torrent&#8217;s content.</p>
 </dd>
-<dt class="hdlist1"><strong>--exclude</strong>, <strong>-e</strong> <em>EXCLUDE</em></dt>
+<dt class="hdlist1"><strong>--exclude</strong>, <strong>-e</strong> <em>PATTERN</em></dt>
 <dd>
-<p>Exclude files from <em>PATH</em> that match the pattern <em>EXCLUDE</em>.  This option may be
-given multiple times.  It is ignored if <em>PATH</em> is not a directory.  See
-<strong>EXCLUDING FILES</strong>.</p>
+<p>Exclude files from <em>PATH</em> that match the glob pattern <em>PATTERN</em>.  This option
+may be given multiple times.  See <strong>EXCLUDING FILES</strong>.</p>
+</dd>
+<dt class="hdlist1"><strong>--exclude-regex</strong>, <strong>-er</strong> <em>PATTERN</em></dt>
+<dd>
+<p>Exclude files from <em>PATH</em> that match the regular expression <em>PATTERN</em>.  This
+option may be given multiple times.  See <strong>EXCLUDING FILES</strong>.</p>
 </dd>
 <dt class="hdlist1"><strong>--in</strong>, <strong>-i</strong> <em>TORRENT</em></dt>
 <dd>
@@ -742,9 +746,9 @@ times.</p>
 <li>
 <p>When verifying, corrupt files are always read to the end instead of skipping
 them after the first corrupt piece.</p>
-<div class="paragraph">
+</li>
+<li>
 <p>Any other effects are explained in the relevant arguments' documentation.</p>
-</div>
 </li>
 </ul>
 </div>
@@ -755,12 +759,13 @@ them after the first corrupt piece.</p>
 </dd>
 <dt class="hdlist1"><strong>--metainfo</strong>, <strong>-m</strong></dt>
 <dd>
-<p>Print the torrent&#8217;s metainfo as a JSON object.  Progress is not reported.
-Errors are reported normally on stderr.</p>
+<p>Print the torrent&#8217;s metainfo as a JSON object.  Byte strings (e.g. "pieces" in
+the "info" section) are encoded in Base64.  Progress is not reported.  Errors
+are reported normally on stderr.</p>
 <div class="paragraph">
-<p>Unless --verbose is given, any non-standard fields are excluded and metainfo
-that doesn&#8217;t represent a valid torrent results in an error.  Unless --verbose is
-given twice, the "pieces" field is excluded.</p>
+<p>Unless <strong>--verbose</strong> is given, any non-standard fields are excluded and metainfo
+that doesn&#8217;t represent a valid torrent results in an error.  Unless <strong>--verbose</strong>
+is given twice, the "pieces" field in the "info" section is excluded.</p>
 </div>
 </dd>
 <dt class="hdlist1"><strong>--human</strong>, <strong>-u</strong></dt>
@@ -838,29 +843,29 @@ given twice, the "pieces" field is excluded.</p>
 <h2 id="_excluding_files">EXCLUDING FILES</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The <strong>--exclude</strong> option takes a pattern that is matched against each file path
-beneath <em>PATH</em>.  Files that match are not included in the torrent.  Matching is
-case-insensitive.</p>
+<p>The <strong>--exclude</strong> option takes a glob pattern that is matched against each file
+path beneath <em>PATH</em>.  Files that match are not included in the torrent.
+Matching is case-insensitive.</p>
 </div>
 <div class="paragraph">
-<p>Each file path starts with the basename of <em>PATH</em>, e.g. if <em>PATH</em> is
-&#8220;/home/foo/bar&#8221;, each file path starts with &#8220;bar/&#8221;.</p>
+<p>The <strong>--exclude-regex</strong> option takes a regular expression pattern that is matched
+against each file path beneath <em>PATH</em>.  Files that match are not included in the
+torrent.  Matching is case-sensitive.</p>
 </div>
 <div class="paragraph">
-<p>A file path matches if any of its directories or its file name match, e.g. the
-pattern &#8220;foo&#8221; matches the paths &#8220;foo/bar/baz&#8221;, &#8220;bar/foo/baz&#8221; and
-&#8220;bar/baz/foo&#8221;.</p>
-</div>
-<div class="paragraph">
-<p>A pattern must describe the full directory or file name, e.g. the pattern
-&#8220;bar&#8221; does not match the path &#8220;foo/barr&#8221;, but the patterns &#8220;bar?&#8221; and
-&#8220;bar*&#8221; match.</p>
+<p>File paths start with the torrent&#8217;s name (usually the last segment of <em>PATH</em>),
+e.g. if <em>PATH</em> is &#8220;/home/foo/bar&#8221;, each file path starts with &#8220;bar/&#8221;</p>
 </div>
 <div class="paragraph">
 <p>Empty directories and empty files are automatically excluded.</p>
 </div>
 <div class="paragraph">
-<p>Patterns support these wildcard characters:</p>
+<p>Regular expressions should be identical for simple patterns.  See
+<a href="https://docs.python.org/3/library/re.html#regular-expression-syntax" class="bare">https://docs.python.org/3/library/re.html#regular-expression-syntax</a> for the
+complete documentation.</p>
+</div>
+<div class="paragraph">
+<p>Glob patterns support these wildcard characters:</p>
 </div>
 <table class="tableblock frame-none grid-none fit-content">
 <colgroup>
@@ -1030,10 +1035,6 @@ raw bytes for sizes, etc).</p>
 <dd>
 <p>Aborted by SIGINT (typically Ctrl-c was pressed)</p>
 </dd>
-<dt class="hdlist1">129</dt>
-<dd>
-<p>Broken pipe (stdout was closed before we could flush it)</p>
-</dd>
 </dl>
 </div>
 </div>
@@ -1050,7 +1051,7 @@ raw bytes for sizes, etc).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-03-26 14:18:53 +0100
+Last updated 2020-03-28 17:19:31 +0100
 </div>
 </div>
 </body>
