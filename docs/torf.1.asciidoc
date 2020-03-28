@@ -176,21 +176,19 @@ times.
 * Display bytes with and without unit prefix, e.g. "1 MiB / 1,048,576 B".
 * When verifying, corrupt files are always read to the end instead of skipping
   them after the first corrupt piece.
-+
-Any other effects are explained in the relevant arguments' documentation.
+* Any other effects are explained in the relevant arguments' documentation.
 
 *--json*, *-j*::
 Print information and errors as a JSON object.  Progress is not reported.
 
 *--metainfo*, *-m*::
-
 Print the torrent's metainfo as a JSON object.  Byte strings (e.g. "pieces" in
 the "info" section) are encoded in Base64.  Progress is not reported.  Errors
 are reported normally on stderr.
 +
-Unless --verbose is given, any non-standard fields are excluded and metainfo
-that doesn't represent a valid torrent results in an error.  Unless --verbose is
-given twice, the "pieces" field in the "info" section is excluded.
+Unless *--verbose* is given, any non-standard fields are excluded and metainfo
+that doesn't represent a valid torrent results in an error.  Unless *--verbose*
+is given twice, the "pieces" field in the "info" section is excluded.
 
 *--human*, *-u*::
 Display information in human-readable output even if stdout is not a TTY.  See
@@ -244,13 +242,14 @@ The *--exclude-regex* option takes a regular expression pattern that is matched
 against each file path beneath _PATH_.  Files that match are not included in the
 torrent.  Matching is case-sensitive.
 
-File paths start with the last segment of _PATH_, e.g. if _PATH_ is
-"`/home/foo/bar`", each file path starts with "`bar/`".
+File paths start with the torrent's name (usually the last segment of _PATH_),
+e.g. if _PATH_ is "`/home/foo/bar`", each file path starts with "`bar/`"
 
 Empty directories and empty files are automatically excluded.
 
 Regular expressions should be identical for simple patterns.  See
-https://docs.python.org/3/library/re.html for the complete documentation.
+https://docs.python.org/3/library/re.html#regular-expression-syntax for the
+complete documentation.
 
 Glob patterns support these wildcard characters:
 
@@ -355,8 +354,6 @@ is provided, the output format is slightly different:
 6:: Error while verifying a torrent's content
 
 128:: Aborted by SIGINT (typically Ctrl-c was pressed)
-
-129:: Broken pipe (stdout was closed before we could flush it)
 
 
 == REPORTING BUGS
