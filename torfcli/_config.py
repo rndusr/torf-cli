@@ -157,21 +157,19 @@ def parse_args(args):
             raise _errors.CliError(e)
 
     # Validate tracker URLs
-    if cfg['tracker']:
-        for tier in cfg['tracker']:
-            for url in tier.split(','):
-                try:
-                    torf.Torrent().trackers = url
-                except torf.URLError as e:
-                    raise _errors.CliError(e)
-
-    # Validate webseed URLs
-    if cfg['webseed']:
-        for webseed in cfg['webseed']:
+    for tier in cfg['tracker']:
+        for url in tier.split(','):
             try:
-                torf.Torrent().webseeds = (webseed,)
+                torf.Torrent().trackers = url
             except torf.URLError as e:
                 raise _errors.CliError(e)
+
+    # Validate webseed URLs
+    for webseed in cfg['webseed']:
+        try:
+            torf.Torrent().webseeds = (webseed,)
+        except torf.URLError as e:
+            raise _errors.CliError(e)
 
     # Auto-detect metainfo validation based on other options
     cfg['_validate'] = not cfg['metainfo'] or cfg['verbose'] <= 0
