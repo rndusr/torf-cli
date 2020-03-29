@@ -247,7 +247,7 @@ e.g. if _PATH_ is "`/home/foo/bar`", each file path starts with "`bar/`"
 
 Empty directories and empty files are automatically excluded.
 
-Regular expressions should be identical for simple patterns.  See
+Regular expressions should be Perl-compatible for simple patterns.  See
 https://docs.python.org/3/library/re.html#regular-expression-syntax for the
 complete documentation.
 
