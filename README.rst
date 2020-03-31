@@ -2,14 +2,14 @@ torf-cli
 ========
 
 torf-cli is a command line tool that can create torrents and magnet links, dump
-the metainfo of a torrent, and edit existing torrents (e.g.  to fix a typo
-without having to hash all the pieces again).
+the metainfo of a torrent, and edit existing torrents (e.g. to fix a typo)
+without having to hash all the pieces again.
 
-The output is pleasant to read for humans and easy to parse with common CLI
-tools if stdout is not a TTY.
+The output is pleasant to read for humans or easy to parse with common CLI
+tools.
 
 An optional configuration file specifies custom default options and profiles
-that give names to sets of options.
+that combine commonly used options.
 
 Documentation is available as a man page, or you can `read it here
 <https://rndusr.github.io/torf-cli/torf.1.html>`_.
@@ -21,51 +21,52 @@ The only depdencies are `torf <https://pypi.org/project/torf/>`_ and `pyxdg
 Examples
 --------
 
-Create private torrent with two trackers:
+Create private torrent with two trackers and a specific creation date:
 
 .. code:: sh
 
-    $ torf ./docs -t http://bar:123/announce -t http://baz:321/announce --private
+    $ torf ./docs -t http://bar:123/announce -t http://baz:321/announce \
+                  --private --date '2020-03-31 21:23:42'
            Name  docs
-           Size  60.1 KiB
-        Created  2018-06-19 14:47:26
+           Size  74.43 KiB
+        Created  2020-03-31 21:23:42
+     Created By  torf 3.1.0
         Private  yes
        Trackers  http://bar:123/announce
                  http://baz:321/announce
      Piece Size  16 KiB
-    Piece Count  4
+    Piece Count  5
      File Count  3
           Files  docs
-                 ├─torf.1
-                 ├─torf.1.asciidoc
-                 └─torf.1.html
-           Path  docs
-       Progress  100.00 %  |  Time: 0:00:00  |  58.84 MB/s
-      Info Hash  215f506179b6526b582e4fb78ebc24dd1f2a791f
-         Magnet  magnet:?xt=urn:btih:215f506179b6526b582e4fb78ebc24dd1f2a791f&dn=docs&xl=61542&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
+                 ├─torf.1 [14.53 KiB]
+                 ├─torf.1.asciidoc [10.56 KiB]
+                 └─torf.1.html [49.34 KiB]
+       Progress  100.00 %  |  0:00:00 total  |  72.69 MiB/s
+      Info Hash  0a9dfcf07feb2a82da11b509e8929266d8510a02
+         Magnet  magnet:?xt=urn:btih:0a9dfcf07feb2a82da11b509e8929266d8510a02&dn=docs&xl=76217&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
         Torrent  docs.torrent
 
-
-Display metainfo of an existing torrent:
+Display information about an existing torrent:
 
 .. code:: sh
 
     $ torf -i docs.torrent
            Name  docs
-      Info Hash  215f506179b6526b582e4fb78ebc24dd1f2a791f
-           Size  60.1 KiB
-        Created  2018-06-19 14:47:26
+      Info Hash  0a9dfcf07feb2a82da11b509e8929266d8510a02
+           Size  74.43 KiB
+        Created  2020-03-31 21:23:42
+     Created By  torf 3.1.0
         Private  yes
        Trackers  http://bar:123/announce
                  http://baz:321/announce
      Piece Size  16 KiB
-    Piece Count  4
+    Piece Count  5
      File Count  3
           Files  docs
-                 ├─torf.1
-                 ├─torf.1.asciidoc
-                 └─torf.1.html
-         Magnet  magnet:?xt=urn:btih:215f506179b6526b582e4fb78ebc24dd1f2a791f&dn=docs&xl=61542&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
+                 ├─torf.1 [14.53 KiB]
+                 ├─torf.1.asciidoc [10.56 KiB]
+                 └─torf.1.html [49.34 KiB]
+         Magnet  magnet:?xt=urn:btih:0a9dfcf07feb2a82da11b509e8929266d8510a02&dn=docs&xl=76217&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
 
 Quickly add a comment to an existing torrent:
 
@@ -73,29 +74,110 @@ Quickly add a comment to an existing torrent:
 
     $ torf -i docs.torrent --comment 'Forgot to add this comment.' -o docs.revised.torrent
            Name  docs
-      Info Hash  215f506179b6526b582e4fb78ebc24dd1f2a791f
-           Size  60.1 KiB
+      Info Hash  0a9dfcf07feb2a82da11b509e8929266d8510a02
+           Size  74.43 KiB
         Comment  Forgot to add this comment.
-        Created  2018-06-19 14:47:26
+        Created  2020-03-31 21:23:42
+     Created By  torf 3.1.0
         Private  yes
        Trackers  http://bar:123/announce
                  http://baz:321/announce
      Piece Size  16 KiB
-    Piece Count  4
+    Piece Count  5
      File Count  3
           Files  docs
-                 ├─torf.1
-                 ├─torf.1.asciidoc
-                 └─torf.1.html
-         Magnet  magnet:?xt=urn:btih:215f506179b6526b582e4fb78ebc24dd1f2a791f&dn=docs&xl=61542&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
+                 ├─torf.1 [14.53 KiB]
+                 ├─torf.1.asciidoc [10.56 KiB]
+                 └─torf.1.html [49.34 KiB]
+         Magnet  magnet:?xt=urn:btih:0a9dfcf07feb2a82da11b509e8929266d8510a02&dn=docs&xl=76217&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
         Torrent  docs.revised.torrent
 
-Get a list of files:
+Verify the files in ``docs``:
 
 .. code:: sh
 
-    $ torf -i docs.revised.torrent | grep '^Files' | cut -f2-
-    docs/torf.1     docs/torf.1.asciidoc    docs/torf.1.html
+    $ <edit torf.1.html>
+    $ torf -i docs.revised.torrent docs
+           Name  docs
+      Info Hash  0a9dfcf07feb2a82da11b509e8929266d8510a02
+           Size  74.43 KiB
+        Comment  Forgot to add this comment.
+        Created  2020-03-31 21:23:42
+     Created By  torf 3.1.0
+        Private  yes
+       Trackers  http://bar:123/announce
+                 http://baz:321/announce
+     Piece Size  16 KiB
+    Piece Count  5
+     File Count  3
+          Files  docs
+                 ├─torf.1 [14.53 KiB]
+                 ├─torf.1.asciidoc [10.56 KiB]
+                 └─torf.1.html [49.34 KiB]
+           Path  docs
+      Info Hash  0a9dfcf07feb2a82da11b509e8929266d8510a02
+          Error  docs/torf.1.html: Too big: 50523 instead of 50522 bytes
+          Error  Corruption in piece 2, at least one of these files is corrupt:
+                   docs/torf.1.asciidoc
+                   docs/torf.1.html
+       Progress  100.00 %  |  0:00:00 total  |  72.69 MiB/s
+    torf: docs does not satisfy docs.revised.torrent
+
+Get a list of files via `jq <https://stedolan.github.io/jq/>`_:
+
+.. code:: sh
+
+    $ torf -i docs.revised.torrent --json | jq .Files
+    [
+      "docs/torf.1",
+      "docs/torf.1.asciidoc",
+      "docs/torf.1.html"
+    ]
+
+Get metainfo as JSON:
+
+.. code:: sh
+
+    $ torf -i docs.revised.torrent -m
+    {
+        "announce": "http://bar:123/announce",
+        "announce-list": [
+            [
+                "http://bar:123/announce"
+            ],
+            [
+                "http://baz:321/announce"
+            ]
+        ],
+        "comment": "Forgot to add this comment.",
+        "created by": "torf 3.1.0",
+        "creation date": 1585682622,
+        "info": {
+            "name": "docs",
+            "piece length": 16384,
+            "private": 1,
+            "files": [
+                {
+                    "length": 14877,
+                    "path": [
+                        "torf.1"
+                    ]
+                },
+                {
+                    "length": 10818,
+                    "path": [
+                        "torf.1.asciidoc"
+                    ]
+                },
+                {
+                    "length": 50522,
+                    "path": [
+                        "torf.1.html"
+                    ]
+                }
+            ]
+        }
+    }
 
 
 Installation
