@@ -428,10 +428,9 @@ class _HumanStatusReporter(_StatusReporterBase):
     def _progress_bar(self, text, fraction_done, width):
         if len(text) > width:
             half = int(width/2)
-            text = text[:half] + '…' + text[-(width-half-1):]
+            text = text[:half] + '…' + text[-(width-half-3):]
         elif len(text) < width:
             text += ' ' * (width - len(text))
-        assert len(text) == width, f'len({text!r}) != {width}'
         pos = int(fraction_done * width)
         return ''.join(('▕',
                         _term.reverse_on,
