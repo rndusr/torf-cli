@@ -38,7 +38,7 @@ ARGUMENTS
                            (e.g. "*.txt")
     --exclude-regex, -er PATTERN
                            Regular expression that is used to exclude files
-                           (e.g. ".*\.txt$")
+                           (e.g. ".*\\.txt$")
     --in, -i TORRENT       Read metainfo from TORRENT
     --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
     --name, -n NAME        Torrent name (default: basename of PATH)
