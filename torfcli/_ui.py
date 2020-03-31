@@ -23,6 +23,8 @@ from . import _errors as err
 from . import _vars
 from . import _term
 
+LABEL_WIDTH = 11
+LABEL_SEPARATOR = '  '
 
 class UI:
     """Universal abstraction layer to allow different UIs"""
@@ -186,9 +188,7 @@ class _HumanFormatter(_FormatterBase):
         return lines
 
     def info(self, key, value, newline=True):
-        sep = '  '
-        label_width = 11
-        label = key.rjust(label_width)
+        label = key.rjust(LABEL_WIDTH)
         # Show multiple values as indented list
         if not isinstance(value, str) and isinstance(value, abc.Iterable):
             if value:
@@ -196,7 +196,7 @@ class _HumanFormatter(_FormatterBase):
                 value_parts = [f'{value[0]}']
                 indent = len(label) * ' '
                 for item in value[1:]:
-                    value_parts.append(f'{indent}{sep}{item}')
+                    value_parts.append(f'{indent}{LABEL_SEPARATOR}{item}')
                 value = f'{_term.erase_to_eol}\n'.join(value_parts)
             else:
                 value = ''
@@ -206,9 +206,9 @@ class _HumanFormatter(_FormatterBase):
 
         _term.echo('move_pos1')
         if newline:
-            sys.stdout.write(f'{label}{sep}{value}\n')
+            sys.stdout.write(f'{label}{LABEL_SEPARATOR}{value}\n')
         else:
-            sys.stdout.write(f'{label}{sep}{value}')
+            sys.stdout.write(f'{label}{LABEL_SEPARATOR}{value}')
             _util.flush(sys.stdout)
 
     def infos(self, pairs):
