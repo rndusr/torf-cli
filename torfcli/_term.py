@@ -13,9 +13,7 @@ import sys
 import termios
 import tty
 import io
-import shutil
 
-COLUMNS, LINES = shutil.get_terminal_size()
 
 # References:
 #   https://www.vt100.net/docs/vt100-ug/chapter3.html#DECSCNM
