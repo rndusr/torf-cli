@@ -440,12 +440,13 @@ class _HumanStatusReporter(_StatusReporterBase):
             return percent_str
 
     def _progress_bar(self, text, fraction_done, width):
-        if len(text) > width:
-            half = int(width/2)
-            text = text[:half] + '…' + text[-(width-half-3):]
-        elif len(text) < width:
-            text += ' ' * (width - len(text))
-        pos = int(fraction_done * width)
+        text_width = width - 2
+        if len(text) > text_width:
+            half = int(text_width/2)
+            text = text[:half] + '…' + text[-(text_width-half-1):]
+        elif len(text) < text_width:
+            text += ' ' * (text_width - len(text))
+        pos = int(fraction_done * text_width)
         return ''.join(('▕', _term.reverse_on, text[:pos], _term.reverse_off, text[pos:], '▏'))
 
     def _progress_line2(self, info, status_width):
