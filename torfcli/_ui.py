@@ -17,6 +17,7 @@ import os
 import time
 import datetime
 import torf
+import shutil
 
 from . import _util
 from . import _errors as err
@@ -25,6 +26,7 @@ from . import _term
 
 LABEL_WIDTH = 11
 LABEL_SEPARATOR = '  '
+STATUS_SEPARATOR = ' | '
 
 class UI:
     """Universal abstraction layer to allow different UIs"""
@@ -408,22 +410,34 @@ class _HumanStatusReporter(_StatusReporterBase):
 
     def _get_progress_string(self, info):
         perc_str = f'{info.fraction_done * 100:5.2f} %'
-        bps_str = f'{_util.bytes2string(info.bytes_per_sec)}/s'
+        bps_str = f'{_util.bytes2string(info.bytes_per_sec, trailing_zeros=True)}/s'
         if info.pieces_done < info.pieces_total:
-            progress_bar = self._progress_bar(os.path.basename(info.filepath), info.fraction_done, 45)
-            first_line = ' '.join((perc_str, progress_bar, bps_str))
-            eta_str = '{0:%H}:{0:%M}:{0:%S}'.format(info.eta)
-            second_line = (f'{info.time_elapsed} elapsed  |  {info.time_left} left '
-                           f' |  {info.time_total} total  |  ETA: {eta_str}')
+            term_width,_ = shutil.get_terminal_size()
+            term_width = min(term_width, 76)
+            # Available width minus label ("   Progress  ")
+            status_width = term_width - LABEL_WIDTH - len(LABEL_SEPARATOR)
+            line1 = self._progress_line1(info.fraction_done, os.path.basename(info.filepath),
+                                         perc_str, bps_str, status_width)
+            line2 = self._progress_line2(info, status_width)
             return ''.join((_term.save_cursor_pos,
                             _term.erase_to_eol,
                             _term.move_down,
-                            second_line,
+                            line2,
                             _term.restore_cursor_pos,
-                            first_line))
+                            line1))
         else:
-            return ''.join((f'{perc_str}  |  {info.time_total} total  |  {bps_str}',
-                            _term.erase_to_eol))
+            return STATUS_SEPARATOR.join((perc_str, f'{info.time_total} total', bps_str))
+
+    def _progress_line1(self, fraction_done, filename, percent_str, bps_str, status_width):
+        progress_bar_width = (status_width - len('99.99 % ') - len(' 999.99 MiB/s') - 1)
+        if progress_bar_width >= 10:
+            progress_bar = self._progress_bar(filename, fraction_done,
+                                              width=progress_bar_width)
+            return ' '.join((percent_str, progress_bar, bps_str))
+        elif status_width >= 23:
+            return STATUS_SEPARATOR.join((percent_str, bps_str))
+        else:
+            return percent_str
 
     def _progress_bar(self, text, fraction_done, width):
         if len(text) > width:
@@ -432,12 +446,39 @@ class _HumanStatusReporter(_StatusReporterBase):
         elif len(text) < width:
             text += ' ' * (width - len(text))
         pos = int(fraction_done * width)
-        return ''.join(('▕',
-                        _term.reverse_on,
-                        text[:pos],
-                        _term.reverse_off,
-                        text[pos:],
-                        '▏'))
+        return ''.join(('▕', _term.reverse_on, text[:pos], _term.reverse_off, text[pos:], '▏'))
+
+    def _progress_line2(self, info, status_width):
+        items = {'elapsed' : f'{info.time_elapsed} elapsed',
+                 'left'    : f'{info.time_left} left',
+                 'total'   : f'{info.time_total} total',
+                 'eta'     : f'ETA: {"{0:%H}:{0:%M}:{0:%S}".format(info.eta)}'}
+        priority = iter(('left', 'total', 'elapsed', 'eta'))
+        order = ('elapsed', 'left', 'total', 'eta')
+        parts = []
+        priority = iter(priority)
+        while True:
+            try:
+                name = next(priority)
+            except StopIteration:
+                break
+            position = order.index(name)
+            part = items[name]
+            parts.insert(position, part)
+            if len(STATUS_SEPARATOR.join(parts)) > status_width:
+                # Always keep at least the time left to completion, even if it
+                # looks ugly
+                if len(parts) > 1:
+                    del parts[parts.index(part)]
+                break
+
+        line = STATUS_SEPARATOR.join(parts)
+        if len(line) < status_width:
+            # Remove any garbage that might still be there from previous draw
+            # when terminal was wider
+            return line + _term.erase_to_eol
+        else:
+            return line
 
     def _format_error(self, exception, torrent):
         if isinstance(exception, torf.VerifyContentError) and len(torrent.files) > 1:

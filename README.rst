@@ -41,7 +41,7 @@ Create private torrent with two trackers and a specific creation date:
                  ├─torf.1 [14.53 KiB]
                  ├─torf.1.asciidoc [10.56 KiB]
                  └─torf.1.html [49.34 KiB]
-       Progress  100.00 %  |  0:00:00 total  |  72.69 MiB/s
+       Progress  100.00 % | 0:00:00 total | 72.69 MiB/s
       Info Hash  0a9dfcf07feb2a82da11b509e8929266d8510a02
          Magnet  magnet:?xt=urn:btih:0a9dfcf07feb2a82da11b509e8929266d8510a02&dn=docs&xl=76217&tr=http%3A%2F%2Fbar%3A123%2Fannounce&tr=http%3A%2F%2Fbaz%3A321%2Fannounce
         Torrent  docs.torrent
@@ -120,7 +120,7 @@ Verify the files in ``docs``:
           Error  Corruption in piece 2, at least one of these files is corrupt:
                    docs/torf.1.asciidoc
                    docs/torf.1.html
-       Progress  100.00 %  |  0:00:00 total  |  72.69 MiB/s
+       Progress  100.00 % | 0:00:00 total | 72.69 MiB/s
     torf: docs does not satisfy docs.revised.torrent
 
 Get a list of files via `jq <https://stedolan.github.io/jq/>`_:

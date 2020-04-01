@@ -263,7 +263,7 @@ def test_success(tmp_path, create_torrent, human_readable, hr_enabled, capsys, c
 
     cap = capsys.readouterr()
     if hr_enabled:
-        assert clear_ansi(cap.out) == regex(rf'^\s*Progress  100.00 %  \|  \d+:\d+:\d+ total  \|  \s*\d+\.\d+ [KMGT]iB/s$',
+        assert clear_ansi(cap.out) == regex(rf'^\s*Progress  100.00 % \| \d+:\d+:\d+ total \| \s*\d+\.\d+ [KMGT]iB/s$',
                                             flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)
