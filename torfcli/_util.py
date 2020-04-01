@@ -112,7 +112,7 @@ def parse_date(date_str):
 
 
 _PREFIXES = ((1024**4, 'Ti'), (1024**3, 'Gi'), (1024**2, 'Mi'), (1024, 'Ki'))
-def bytes2string(b, plain_bytes=False):
+def bytes2string(b, plain_bytes=False, trailing_zeros=False):
     string = str(b)
     prefix = ''
     for minval,_prefix in _PREFIXES:
@@ -120,10 +120,11 @@ def bytes2string(b, plain_bytes=False):
             prefix = _prefix
             string = f'{b/minval:.02f}'
             # Remove trailing zeros after the point
-            while string[-1] == '0':
+            while not trailing_zeros and string[-1] == '0':
                 string = string[:-1]
-            if string[-1] == '.':
-                string = string[:-1]
+            if not trailing_zeros:
+                if string[-1] == '.':
+                    string = string[:-1]
             break
     if plain_bytes and prefix:
         return f'{string} {prefix}B / {b:,} B'
