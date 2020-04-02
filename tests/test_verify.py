@@ -21,10 +21,10 @@ def test_skipping_files_with_increased_verbosity(mock_content, create_torrent):
     with create_torrent(path=mock_content) as torrent_file:
         with patch('torf.Torrent.verify') as mock_verify:
             run([str(mock_content), '-i', torrent_file])
-            assert mock_verify.call_args.kwargs['skip_file_on_first_error'] is False
+            assert mock_verify.call_args.kwargs['skip_on_error'] is False
 
             run([str(mock_content), '-i', torrent_file, '--verbose'])
-            assert mock_verify.call_args.kwargs['skip_file_on_first_error'] is True
+            assert mock_verify.call_args.kwargs['skip_on_error'] is True
 
 
 @pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))

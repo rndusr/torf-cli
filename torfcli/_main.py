@@ -177,7 +177,7 @@ def _verify_mode(ui, cfg):
             success = torrent.verify(cfg['PATH'],
                                      callback=sr.verify_callback,
                                      interval=PROGRESS_INTERVAL,
-                                     skip_file_on_first_error=skip_files)
+                                     skip_on_error=skip_files)
         except torf.TorfError as e:
             raise _errors.Error(e)
         except KeyboardInterrupt:
