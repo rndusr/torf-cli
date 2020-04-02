@@ -327,7 +327,7 @@ If "`--profile bar`" is given, it also adds these arguments:
 == PIPING OUTPUT
 
 If stdout is not a TTY (i.e. when output is piped) or if the *--nohuman* option
-is provided, the output format is slightly different:
+is provided, the output format is different:
 
 - Leading spaces are removed from each line.
 
