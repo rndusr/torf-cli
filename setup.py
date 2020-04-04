@@ -17,6 +17,7 @@ setup(
     license            = 'GPLv3+',
     description        = __description__,
     long_description   = long_description,
+    long_description_content_type = 'text/x-rst',
     keywords           = 'bittorrent torrent magnet file cli',
     url                = __url__,
 
