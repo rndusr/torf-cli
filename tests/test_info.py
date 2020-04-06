@@ -144,7 +144,8 @@ def test_creation_date(capsys, create_torrent, human_readable, clear_ansi, regex
         with human_readable(False):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert cap.out == regex(r'^Created\t957911445$', flags=re.MULTILINE)
+            exp_timestamp = int(date.timestamp())
+            assert cap.out == regex(rf'^Created\t{exp_timestamp}$', flags=re.MULTILINE)
 
 
 def test_created_by(capsys, create_torrent, human_readable, clear_ansi, regex):
