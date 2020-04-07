@@ -123,6 +123,13 @@ Verify the files in ``docs``:
        Progress  100.00 % | 0:00:00 total | 72.69 MiB/s
     torf: docs does not satisfy docs.revised.torrent
 
+Get a list of files via grep and cut:
+
+.. code:: sh
+
+    $ torf -i docs.revised.torrent | grep '^Files' | cut -f2-
+    docs/torf.1     docs/torf.1.asciidoc    docs/torf.1.html
+
 Get a list of files via `jq <https://stedolan.github.io/jq/>`_:
 
 .. code:: sh
