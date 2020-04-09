@@ -1,3 +1,7 @@
+2020-??-?? 3.2.0
+  - Make --in, --out and --name illegal in config files.
+
+
 2020-04-07 3.1.1
   - Bugfix: Allow all torf 3.*.* version, not just 3.0.0.
 

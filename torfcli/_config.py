@@ -240,7 +240,7 @@ def get_cfg(cliargs):
         raise _errors.ConfigError(f'{cfgfile}: {e}')
 
 def _check_illegal_configfile_arguments(cfg, cfgfile):
-    for arg in ('config', 'noconfig', 'profile', 'help', 'version'):
+    for arg in ('in', 'name', 'out', 'config', 'noconfig', 'profile', 'help', 'version'):
         if arg in cfg:
             raise _errors.ConfigError(f'{cfgfile}: Not allowed in config file: {arg}')
 

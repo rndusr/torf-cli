@@ -271,7 +271,7 @@ quoted with single or double quotes to preserve leading and/or trailing spaces.
 Lines that start with "`#`" are ignored.
 
 All of the options listed in the *OPTIONS* section are allowed except for
-_PATH_, *config*, *noconfig*, *profile*, *help* and *version*.
+_PATH_, *in*, *out*, *name*, *config*, *noconfig*, *profile*, *help*, *version*.
 
 There is rudimental support for environment variables in parameters. As usual,
 "`$FOO`" or "`${FOO}`" will be replaced with the value of the variable *FOO*,
