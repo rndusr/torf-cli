@@ -79,7 +79,8 @@ class UI:
 
     def show_torrent(self, torrent):
         info = self.info
-        info('Name', torrent.name)
+        if torrent.name is not None:
+            info('Name', torrent.name)
         if torrent.is_ready:
             info('Info Hash', torrent.infohash)
         info('Size', self._fmt.size(torrent))
