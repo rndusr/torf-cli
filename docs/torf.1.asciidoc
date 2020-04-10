@@ -9,8 +9,8 @@ torf - command line tool to create, display and edit torrents
 == SYNOPSIS
 
 *torf* _PATH_ [_OPTIONS_] [*-o* _TORRENT_] +
-*torf* *-i* _TORRENT_ +
-*torf* *-i* _TORRENT_ [_OPTIONS_] *-o* _NEWTORRENT_ +
+*torf* *-i* _INPUT_ +
+*torf* *-i* _INPUT_ [_OPTIONS_] *-o* _TORRENT_ +
 *torf* *-i* _TORRENT_ _PATH_ +
 
 
@@ -22,12 +22,12 @@ torrent's content.
 * *torf* _PATH_ [_OPTIONS_] [*-o* _TORRENT_] +
 Create the torrent file _TORRENT_ from the file or directory _PATH_.
 
-* *torf* *-i* _TORRENT_ +
-Display information stored in the torrent file _TORRENT_.
+* *torf* *-i* _INPUT_ +
+Display information stored in the torrent file _INPUT_.
 
-* *torf* *-i* _TORRENT_ [_OPTIONS_] *-o* _NEWTORRENT_ +
-Edit the existing torrent file _TORRENT_ (e.g. to fix a typo in the comment)
-and create the new torrent file _NEWTORRENT_.
+* *torf* *-i* _INPUT_ [_OPTIONS_] *-o* _TORRENT_ +
+Edit the existing torrent file _INPUT_ (e.g. to fix a typo in the comment) and
+create the new torrent file _TORRENT_.
 +
 WARNING: Editing a torrent can change its hash, depending on what is changed,
          which essentially makes it a new torrent.  See OPTIONS to find out
@@ -53,11 +53,12 @@ may be given multiple times.  See *EXCLUDING FILES*.
 Exclude files from _PATH_ that match the regular expression _PATTERN_.  This
 option may be given multiple times.  See *EXCLUDING FILES*.
 
-*--in*, *-i* _TORRENT_::
-Read metainfo from _TORRENT_.
+*--in*, *-i* _INPUT_::
+Read metainfo from the torrent file _INPUT_.  Except when verifying, _INPUT_ may
+also be a magnet URI.
 
 *--out*, *-o* _TORRENT_::
-Write torrent to _TORRENT_. +
+Write to torrent file _TORRENT_. +
 Default: __NAME__**.torrent**
 
 *--notorrent*, *-N*::
@@ -114,7 +115,7 @@ Default: *now*
 *--nodate*, *-D*::
 Remove the creation date from an existing torrent.
 
-*--source*, *-s* _SOURCE_::
+*--source*, *-s* _INPUT_::
 Add a "`source`" field to the torrent file.  This is usually used to make the
 torrent's info hash unique per tracker.
 +

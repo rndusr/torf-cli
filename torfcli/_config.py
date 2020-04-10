@@ -27,10 +27,10 @@ HELP_TEXT = f"""
 {_vars.__appname__} - {_vars.__description__}
 
 USAGE
-    {_vars.__appname__} PATH [OPTIONS] [-o TORRENT]         # Create torrent
-    {_vars.__appname__} -i TORRENT                          # Display torrent
-    {_vars.__appname__} -i TORRENT [OPTIONS] -o NEWTORRENT  # Edit torrent
-    {_vars.__appname__} -i TORRENT PATH                     # Verify torrent
+    {_vars.__appname__} PATH [OPTIONS] [-o TORRENT]    # Create torrent
+    {_vars.__appname__} -i INPUT                       # Display torrent
+    {_vars.__appname__} -i INPUT [OPTIONS] -o TORRENT  # Edit torrent
+    {_vars.__appname__} -i TORRENT PATH                # Verify file content
 
 ARGUMENTS
     PATH                   Path to torrent's content
@@ -39,7 +39,7 @@ ARGUMENTS
     --exclude-regex, -er PATTERN
                            Regular expression that is used to exclude files
                            (e.g. ".*\\.txt$")
-    --in, -i TORRENT       Read metainfo from TORRENT
+    --in, -i INPUT         Read metainfo from torrent file or magnet URI
     --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
     --name, -n NAME        Torrent name (default: basename of PATH)
     --tracker, -t TRACKER  List of comma-separated announce URLs; may be
@@ -54,14 +54,14 @@ ARGUMENTS
     --max-piece-size SIZE  Maximum piece size in multiples of 1 MiB
                            (must be a power of two)
 
-    --notracker, -T        Remove trackers from TORRENT
-    --nowebseed, -W        Remove webseeds from TORRENT
-    --noprivate, -P        Remove private flag from TORRENT
-    --nocomment, -C        Remove comment from TORRENT
-    --nodate, -D           Remove date from TORRENT
-    --nosource, -S         Remove "source" field from TORRENT
-    --noxseed, -X          De-randomize info hash of TORRENT
-    --nocreator, -R        Remove creator from TORRENT
+    --notracker, -T        Remove trackers from INPUT
+    --nowebseed, -W        Remove webseeds from INPUT
+    --noprivate, -P        Remove private flag from INPUT
+    --nocomment, -C        Remove comment from INPUT
+    --nodate, -D           Remove date from INPUT
+    --nosource, -S         Remove "source" field from INPUT
+    --noxseed, -X          De-randomize info hash of INPUT
+    --nocreator, -R        Remove creator from INPUT
     --notorrent, -N        Don't create torrent file
     --nomagnet, -M         Don't create magnet link
 
