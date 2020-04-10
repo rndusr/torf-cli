@@ -19,6 +19,27 @@ import copy
 import base64
 from collections import abc
 
+from . import _errors
+
+
+def get_torrent(cfg):
+    # Create torf.Torrent instance from INPUT
+    if not cfg['in']:
+        raise RuntimeError('--in option not given')
+    try:
+        # Read torrent from file
+        return torf.Torrent.read(cfg['in'], validate=cfg['validate'])
+    except torf.TorfError as e:
+        # Read magnet URI
+        try:
+            magnet = torf.Magnet.from_string(cfg['in'])
+        except torf.TorfError:
+            # Report previous exception because default is reading torrent file
+            raise _errors.Error(e)
+        else:
+            magnet.get_info()  # Get "info" section (files, sizes)
+            return magnet.torrent()
+
 def get_torrent_filepath(torrent, cfg):
     if cfg['out']:
         # User-given torrent file path

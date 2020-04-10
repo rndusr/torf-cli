@@ -46,26 +46,9 @@ def run(ui):
         else:
             raise _errors.CliError(f'Not sure what to do (see USAGE in `{_vars.__appname__} -h`)')
 
-def _get_torrent(ui, cfg):
-    # Create torf.Torrent instance from INPUT
-    if not cfg['in']:
-        raise RuntimeError('--in option not given')
-    try:
-        # Read torrent from file
-        return torf.Torrent.read(cfg['in'], validate=cfg['validate'])
-    except torf.TorfError as e:
-        # Read magnet URI
-        try:
-            magnet = torf.Magnet.from_string(cfg['in'])
-        except torf.TorfError:
-            # Report previous exception because default is reading torrent file
-            raise _errors.Error(e)
-        else:
-            magnet.get_info()  # Get "info" section (files, sizes)
-            return magnet.torrent()
 
 def _info_mode(ui, cfg):
-    torrent = _get_torrent(ui, cfg)
+    torrent = _util.get_torrent(cfg)
     ui.show_torrent(torrent)
     try:
         ui.info('Magnet', torrent.magnet())
@@ -112,7 +95,7 @@ def _create_mode(ui, cfg):
     return torrent
 
 def _edit_mode(ui, cfg):
-    torrent = _get_torrent(ui, cfg)
+    torrent = _util.get_torrent(cfg)
 
     # Make sure we can write before we start editing
     ui.check_output_file_exists(_util.get_torrent_filepath(torrent, cfg))
@@ -177,7 +160,7 @@ def _edit_mode(ui, cfg):
     return torrent
 
 def _verify_mode(ui, cfg):
-    torrent = _get_torrent(ui, cfg)
+    torrent = _util.get_torrent(cfg)
     ui.show_torrent(torrent)
     ui.info('Path', cfg['PATH'])
     try:
