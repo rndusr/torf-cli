@@ -200,7 +200,7 @@ def _verify_mode(ui, cfg):
         else:
             sr.keep_progress_summary()
             if not success:
-                raise _errors.VerifyError(content=cfg["PATH"], torrent=cfg["in"])
+                raise _errors.VerifyError(content=cfg['PATH'], torrent=cfg['in'])
     return torrent
 
 def _hash_pieces(ui, torrent):
