@@ -6,6 +6,7 @@ import pytest
 from unittest.mock import patch
 import torf
 import os
+import re
 from datetime import datetime
 
 
@@ -303,3 +304,69 @@ def test_edit_name(create_torrent, tmpdir, assert_torrents_equal):
         assert new.filetree == {'new name': {'Anotherthing.iso': torf.File('new name/Anotherthing.iso', size=9),
                                              'Something.jpg': torf.File('new name/Something.jpg', size=9),
                                              'Thirdthing.txt': torf.File('new name/Thirdthing.txt', size=9)}}
+
+
+def test_edit_invalid_torrent_with_validation_enabled(tmp_path, capsys):
+    infile = tmp_path / 'in.torrent'
+    outfile = tmp_path / 'out.torrent'
+    with open(infile, 'wb') as f:
+        f.write(b'd1:2i3e4:thisl2:is3:note5:validd2:is2:ok8:metainfol3:but4:thateee')
+    with patch('sys.exit') as mock_exit:
+        run(['-i', str(infile), '--name', 'New Name', '-o', str(outfile)])
+    mock_exit.assert_called_once_with(err.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.err == f"{_vars.__appname__}: Invalid metainfo: Missing 'info'\n"
+    assert cap.out == ''
+    assert not os.path.exists(outfile)
+
+def test_edit_invalid_torrent_with_validation_disabled(tmp_path, capsys, regex):
+    infile = tmp_path / 'in.torrent'
+    outfile = tmp_path / 'out.torrent'
+    with open(infile, 'wb') as f:
+        f.write(b'd1:2i3e4:thisl2:is3:note5:validd2:is2:ok8:metainfol3:but4:thateee')
+    run(['-i', str(infile), '--name', 'New Name', '-o', str(outfile), '--novalidate'])
+    cap = capsys.readouterr()
+    assert cap.err == f"{_vars.__appname__}: WARNING: Invalid metainfo: Missing 'piece length' in ['info']\n"
+    assert cap.out == regex(r'^Name\tNew Name$', flags=re.MULTILINE)
+    assert cap.out == regex(fr'^Torrent\t{outfile}$', flags=re.MULTILINE)
+    assert os.path.exists(outfile)
+
+
+def test_edit_magnet_uri_and_dont_create_torrent(capsys, regex):
+    magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=My+Torrent&xl=142631'
+              '&tr=https%3A%2F%2Flocalhost%3A123%2Fannounce')
+    run(['-i', magnet, '--name', 'New Name', '--notracker', '--webseed', 'http://foo',
+         '--notorrent'])
+    cap = capsys.readouterr()
+    assert cap.err == ''
+    new_magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=New+Name&xl=142631'
+                  '&ws=http%3A%2F%2Ffoo')
+    assert cap.out == regex(fr'^Magnet\t{re.escape(new_magnet)}\n$', flags=re.MULTILINE)
+
+def test_edit_magnet_uri_and_create_torrent_with_validation_enabled(capsys, tmp_path, regex):
+    magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=My+Torrent&xl=142631'
+              '&tr=https%3A%2F%2Flocalhost%3A123%2Fannounce')
+    outfile = tmp_path / 'out.torrent'
+    with patch('sys.exit') as mock_exit:
+        run(['-i', magnet, '--name', 'New Name', '--notracker', '--tracker', 'http://bar',
+             '-o', str(outfile)])
+    mock_exit.assert_called_once_with(err.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.err == f"{_vars.__appname__}: Invalid metainfo: Missing 'pieces' in ['info']\n"
+
+def test_edit_magnet_uri_and_create_torrent_with_validation_disabled(capsys, tmp_path, regex):
+    magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=My+Torrent&xl=142631'
+              '&tr=https%3A%2F%2Flocalhost%3A123%2Fannounce')
+    outfile = tmp_path / 'out.torrent'
+    run(['-i', magnet, '--name', 'New Name', '--notracker', '--tracker', 'http://bar',
+         '-o', str(outfile), '--novalidate'])
+    cap = capsys.readouterr()
+    assert cap.err == f"{_vars.__appname__}: WARNING: Invalid metainfo: Missing 'pieces' in ['info']\n"
+    new_magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=New+Name&xl=142631'
+                  '&tr=http%3A%2F%2Fbar')
+    assert cap.out == regex(fr'^Magnet\t{re.escape(new_magnet)}$', flags=re.MULTILINE)
+    assert cap.out == regex(fr'^Torrent\t{re.escape(str(outfile))}$', flags=re.MULTILINE)
+    torrent = torf.Torrent.read(outfile, validate=False)
+    assert torrent.size == 142631
+    assert torrent.name == 'New Name'
+    assert torrent.trackers == [['http://bar']]

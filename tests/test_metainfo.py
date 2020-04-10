@@ -76,7 +76,7 @@ def test_metainfo_uses_one_and_zero_for_boolean_values(capsys, create_torrent):
     assert cap.err == ''
     assert json.loads(cap.out)['info']['private'] == 1
 
-def test_metainfo_does_not_need_to_be_valid_with_verbose_option(capsys, tmp_path):
+def test_metainfo_with_disabled_validation(capsys, tmp_path):
     with open(tmp_path / 'nonstandard.torrent', 'wb') as f:
         f.write(b'd1:2i3e4:thisl2:is3:note5:validd2:is2:ok8:metainfol3:but4:thateee')
     t = torf.Torrent.read(tmp_path / 'nonstandard.torrent', validate=False)
@@ -88,15 +88,12 @@ def test_metainfo_does_not_need_to_be_valid_with_verbose_option(capsys, tmp_path
     assert cap.err == f"{_vars.__appname__}: Invalid metainfo: Missing 'info'\n"
     assert json.loads(cap.out) == {}
 
-    run(['-i', str(tmp_path / 'nonstandard.torrent'), '--metainfo', '--verbose'])
+    run(['-i', str(tmp_path / 'nonstandard.torrent'), '--metainfo', '--novalidate'])
     cap = capsys.readouterr()
     assert cap.err == f"{_vars.__appname__}: WARNING: Invalid metainfo: Missing 'name' in ['info']\n"
-    assert json.loads(cap.out) == {"2": 3,
-                                   "this": ["is", "not"],
-                                   "valid": {"is": "ok",
-                                             "metainfo": ["but", "that"]}}
+    assert json.loads(cap.out) == {}
 
-    run(['-i', str(tmp_path / 'nonstandard.torrent'), '--metainfo', '--verbose', '--verbose'])
+    run(['-i', str(tmp_path / 'nonstandard.torrent'), '--metainfo', '--novalidate', '--verbose'])
     cap = capsys.readouterr()
     assert cap.err == f"{_vars.__appname__}: WARNING: Invalid metainfo: Missing 'name' in ['info']\n"
     assert json.loads(cap.out) == {"2": 3,

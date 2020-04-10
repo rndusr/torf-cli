@@ -33,27 +33,48 @@ def run(ui):
         # Figure out our modus operandi
         if cfg['PATH'] and not cfg['in']:
             return _create_mode(ui, cfg)
+        elif cfg['in'] and (# Create new torrent file
+                            cfg['out']
+                            # Create new magnet URI
+                            or cfg['name'] or cfg['tracker'] or cfg['webseed']
+                            or cfg['notracker'] or cfg['nowebseed']):
+            return _edit_mode(ui, cfg)
         elif not cfg['PATH'] and not cfg['out'] and cfg['in']:
             return _info_mode(ui, cfg)
-        elif cfg['out'] and cfg['in']:
-            return _edit_mode(ui, cfg)
         elif cfg['PATH'] and not cfg['out'] and cfg['in']:
             return _verify_mode(ui, cfg)
         else:
             raise _errors.CliError(f'Not sure what to do (see USAGE in `{_vars.__appname__} -h`)')
 
-def _info_mode(ui, cfg):
+def _get_torrent(ui, cfg):
+    # Create torf.Torrent instance from INPUT
+    if not cfg['in']:
+        raise RuntimeError('--in option not given')
     try:
-        torrent = torf.Torrent.read(cfg['in'], validate=cfg['_validate'])
+        # Read torrent from file
+        return torf.Torrent.read(cfg['in'], validate=cfg['validate'])
     except torf.TorfError as e:
-        raise _errors.Error(e)
-    else:
-        ui.show_torrent(torrent)
+        # Read magnet URI
         try:
-            ui.info('Magnet', torrent.magnet())
-        except torf.TorfError as e:
-            ui.warn(e)
-        return torrent
+            magnet = torf.Magnet.from_string(cfg['in'])
+        except torf.TorfError:
+            # Report previous exception because default is reading torrent file
+            raise _errors.Error(e)
+        else:
+            magnet.get_info()  # Get "info" section (files, sizes)
+            return magnet.torrent()
+
+def _info_mode(ui, cfg):
+    torrent = _get_torrent(ui, cfg)
+    ui.show_torrent(torrent)
+    try:
+        ui.info('Magnet', torrent.magnet())
+    except torf.TorfError as e:
+        if cfg['validate']:
+            raise _errors.Error(e)
+        else:
+            ui.warn(_errors.Error(e))
+    return torrent
 
 def _create_mode(ui, cfg):
     trackers = [tier.split(',') for tier in cfg['tracker']]
@@ -91,10 +112,7 @@ def _create_mode(ui, cfg):
     return torrent
 
 def _edit_mode(ui, cfg):
-    try:
-        torrent = torf.Torrent.read(cfg['in'], validate=cfg['_validate'])
-    except torf.TorfError as e:
-        raise _errors.Error(e)
+    torrent = _get_torrent(ui, cfg)
 
     # Make sure we can write before we start editing
     ui.check_output_file_exists(_util.get_torrent_filepath(torrent, cfg))
@@ -159,17 +177,13 @@ def _edit_mode(ui, cfg):
     return torrent
 
 def _verify_mode(ui, cfg):
+    torrent = _get_torrent(ui, cfg)
+    ui.show_torrent(torrent)
+    ui.info('Path', cfg['PATH'])
     try:
-        torrent = torf.Torrent.read(cfg['in'], validate=cfg['_validate'])
+        ui.info('Info Hash', torrent.infohash)
     except torf.TorfError as e:
         raise _errors.Error(e)
-    else:
-        ui.show_torrent(torrent)
-        ui.info('Path', cfg['PATH'])
-        try:
-            ui.info('Info Hash', torrent.infohash)
-        except torf.TorfError as e:
-            raise _errors.Error(e)
 
     with ui.StatusReporter() as sr:
         skip_files = cfg['verbose'] > 0
@@ -211,17 +225,34 @@ def _write_torrent(ui, torrent, cfg):
     try:
         torrent.validate()
     except torf.TorfError as e:
-        raise _errors.Error(e)
-    else:
-        if not cfg['nomagnet']:
+        if cfg['notorrent']:
+            # Not writing torrent file; do not fail because,
+            # e.g., magnet URI lacks ['info']
+            pass
+        elif cfg['validate']:
+            # Croak with validation error
+            raise _errors.Error(e)
+        else:
+            # Report validation error but write torrent/magnet anyway
+            ui.warn(_errors.Error(e))
+
+    if not cfg['nomagnet']:
+        try:
             ui.info('Magnet', torrent.magnet())
-        if not cfg['notorrent']:
-            filepath = _util.get_torrent_filepath(torrent, cfg)
-            try:
-                torrent.write(filepath, overwrite=True)
-            except torf.TorfError as e:
-                raise _errors.Error(e)
-            else:
-                ui.info('Torrent', filepath)
-        if torrent.private and not torrent.trackers:
-            ui.warn('Torrent is private and has no trackers')
+        except torf.TorfError as e:
+            # Error was already reported
+            pass
+
+    if not cfg['notorrent']:
+        filepath = _util.get_torrent_filepath(torrent, cfg)
+        try:
+            torrent.write(filepath, overwrite=True, validate=cfg['validate'])
+        except torf.WriteError as e:
+            # Errors other than WriteError should already be reported by
+            # torrent.validate() above
+            raise _errors.Error(e)
+        else:
+            ui.info('Torrent', filepath)
+
+    if torrent.private and not torrent.trackers:
+        ui.warn('Torrent is private and has no trackers')

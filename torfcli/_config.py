@@ -64,6 +64,7 @@ ARGUMENTS
     --nocreator, -R        Remove creator from INPUT
     --notorrent, -N        Don't create torrent file
     --nomagnet, -M         Don't create magnet link
+    --novalidate, -V       Don't check SOURCE and/or TORRENT for errors
 
     --yes, -y              Answer all yes/no prompts with "yes"
     --config, -f FILE      Read configuration from FILE
@@ -114,6 +115,7 @@ _cliparser.add_argument('--noxseed', '-X', action='store_true')
 _cliparser.add_argument('--nocreator', '-R', action='store_true')
 _cliparser.add_argument('--notorrent', '-N', action='store_true')
 _cliparser.add_argument('--nomagnet', '-M', action='store_true')
+_cliparser.add_argument('--novalidate', '-V', action='store_true')
 
 _cliparser.add_argument('--yes', '-y', action='store_true')
 _cliparser.add_argument('--config', '-f')
@@ -126,7 +128,7 @@ _cliparser.add_argument('--metainfo', '-m', action='store_true')
 _cliparser.add_argument('--human', '-u', action='store_true')
 _cliparser.add_argument('--nohuman', '-U', action='store_true')
 _cliparser.add_argument('--help', '-h', action='store_true')
-_cliparser.add_argument('--version', '-V', action='store_true')
+_cliparser.add_argument('--version', action='store_true')
 _cliparser.add_argument('--debug-file')
 
 
@@ -184,8 +186,7 @@ def parse_args(args):
             raise _errors.CliError(f'Invalid regular expression: {regex}: '
                                    f'{str(e)[0].upper()}{str(e)[1:]}')
 
-    # Auto-detect metainfo validation based on other options
-    cfg['_validate'] = not cfg['metainfo'] or cfg['verbose'] <= 0
+    cfg['validate'] = not cfg['novalidate']
 
     return cfg
 
