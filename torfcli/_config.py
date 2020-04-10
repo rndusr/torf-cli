@@ -46,7 +46,7 @@ ARGUMENTS
                            given multiple times for multiple tiers
     --webseed, -w WEBSEED  Webseed URL; may be given multiple times
     --private, -p          Forbid clients to use DHT and PEX
-    --comment, -c COMMENT  Comment that is stored in TORRENT
+    --comment, -c COMMENT  Comment that is stored in the torrent file
     --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now'
                            or 'today' (default: 'now')
     --source, -s SOURCE    Add "source" field
