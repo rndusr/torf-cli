@@ -23,7 +23,7 @@ from collections import abc
 from . import _errors
 
 
-def get_torrent(cfg):
+def get_torrent(cfg, ui):
     # Create torf.Torrent instance from INPUT
     if not cfg['in']:
         raise RuntimeError('--in option not given')
@@ -42,7 +42,10 @@ def get_torrent(cfg):
                 # Input looks like file
                 raise _errors.Error(e_torrent)
         else:
-            magnet.get_info()  # Get "info" section (files, sizes)
+            def callback(exc):
+                ui.error(_errors.Error(exc), exit=False)
+            # Get "info" section (files, sizes)
+            magnet.get_info(callback=callback)
             return magnet.torrent()
 
 

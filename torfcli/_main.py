@@ -48,7 +48,7 @@ def run(ui):
 
 
 def _info_mode(ui, cfg):
-    torrent = _util.get_torrent(cfg)
+    torrent = _util.get_torrent(cfg, ui)
     ui.show_torrent(torrent)
     if not _util.is_magnet(cfg['in']):
         try:
@@ -96,7 +96,7 @@ def _create_mode(ui, cfg):
     return torrent
 
 def _edit_mode(ui, cfg):
-    torrent = _util.get_torrent(cfg)
+    torrent = _util.get_torrent(cfg, ui)
 
     # Make sure we can write before we start editing
     ui.check_output_file_exists(_util.get_torrent_filepath(torrent, cfg))
@@ -161,7 +161,7 @@ def _edit_mode(ui, cfg):
     return torrent
 
 def _verify_mode(ui, cfg):
-    torrent = _util.get_torrent(cfg)
+    torrent = _util.get_torrent(cfg, ui)
     ui.show_torrent(torrent)
     ui.info('Path', cfg['PATH'])
     try:
