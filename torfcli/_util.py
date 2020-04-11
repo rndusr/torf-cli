@@ -13,6 +13,7 @@ import datetime
 import time
 import contextlib
 import sys
+import os
 import json
 import torf
 import copy
@@ -44,6 +45,7 @@ def get_torrent(cfg):
             magnet.get_info()  # Get "info" section (files, sizes)
             return magnet.torrent()
 
+
 def get_torrent_filepath(torrent, cfg):
     if cfg['out']:
         # User-given torrent file path
@@ -51,6 +53,10 @@ def get_torrent_filepath(torrent, cfg):
     else:
         # Default to torrent's name in cwd
         return torrent.name + '.torrent'
+
+
+def is_magnet(string):
+    return not os.path.exists(string) and string.startswith('magnet:')
 
 
 class Average():
