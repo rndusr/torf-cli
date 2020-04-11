@@ -50,13 +50,14 @@ def run(ui):
 def _info_mode(ui, cfg):
     torrent = _util.get_torrent(cfg)
     ui.show_torrent(torrent)
-    try:
-        ui.info('Magnet', torrent.magnet())
-    except torf.TorfError as e:
-        if cfg['validate']:
-            raise _errors.Error(e)
-        else:
-            ui.warn(_errors.Error(e))
+    if not _util.is_magnet(cfg['in']):
+        try:
+            ui.info('Magnet', torrent.magnet())
+        except torf.TorfError as e:
+            if cfg['validate']:
+                raise _errors.Error(e)
+            else:
+                ui.warn(_errors.Error(e))
     return torrent
 
 def _create_mode(ui, cfg):
