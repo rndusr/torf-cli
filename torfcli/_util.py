@@ -46,7 +46,9 @@ def get_torrent(cfg, ui):
                 ui.error(_errors.Error(exc), exit=False)
             # Get "info" section (files, sizes)
             magnet.get_info(callback=callback)
-            return magnet.torrent()
+            torrent = magnet.torrent()
+            torrent.created_by = None
+            return torrent
 
 
 def get_torrent_filepath(torrent, cfg):
