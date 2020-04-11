@@ -23,10 +23,10 @@ torrent's content.
 Create the torrent file _TORRENT_ from the file or directory _PATH_.
 
 * *torf* *-i* _INPUT_ +
-Display information stored in the torrent file _INPUT_.
+Display information stored in the torrent file or magnet URI _INPUT_.
 
 * *torf* *-i* _INPUT_ [_OPTIONS_] *-o* _TORRENT_ +
-Edit the existing torrent file _INPUT_ (e.g. to fix a typo in the comment) and
+Edit the existing torrent file or magnet URI _INPUT_ (e.g. to fix a typo) and
 create the new torrent file _TORRENT_.
 +
 WARNING: Editing a torrent can change its hash, depending on what is changed,
@@ -54,8 +54,7 @@ Exclude files from _PATH_ that match the regular expression _PATTERN_.  This
 option may be given multiple times.  See *EXCLUDING FILES*.
 
 *--in*, *-i* _INPUT_::
-Read metainfo from the torrent file _INPUT_.  Except when verifying, _INPUT_ may
-also be a magnet URI.
+Read metainfo from the torrent file or magnet URI _INPUT_.
 
 *--out*, *-o* _TORRENT_::
 Write to torrent file _TORRENT_. +
@@ -65,7 +64,7 @@ Default: __NAME__**.torrent**
 Do not create a torrent file.
 
 *--nomagnet*, *-M*::
-Do not create a magnet link.
+Do not create a magnet URI.
 
 *--name*, *-n* _NAME_::
 Destination file or directory when the torrent is downloaded. +
@@ -115,7 +114,7 @@ Default: *now*
 *--nodate*, *-D*::
 Remove the creation date from an existing torrent.
 
-*--source*, *-s* _INPUT_::
+*--source*, *-s* _SOURCE_::
 Add a "`source`" field to the torrent file.  This is usually used to make the
 torrent's info hash unique per tracker.
 +
@@ -174,7 +173,7 @@ multiple times.  See *CONFIGURATION FILE*.
 Produce more output or be more thorough.  This option may be given multiple
 times.
 +
-* Display bytes with and without unit prefix, e.g. "1 MiB / 1,048,576 B".
+* Display bytes with and without unit prefix, e.g. "1.38 MiB / 1,448,576 B".
 * When verifying, corrupt files are always read to the end instead of skipping
   them after the first corrupt piece.
 * Any other effects are explained in the relevant arguments' documentation.

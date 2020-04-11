@@ -1,9 +1,8 @@
 torf-cli
 ========
 
-torf-cli is a command line tool that can create torrents and magnet links, dump
-the metainfo of a torrent, and edit existing torrents (e.g. to fix a typo)
-without having to hash all the pieces again.
+torf-cli is a command line tool that can create, read and edit torrent files and
+magnet URIs and verify that a file system path contains a torrent's data.
 
 The output is pleasant to read for humans or easy to parse with common CLI
 tools.

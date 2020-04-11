@@ -450,8 +450,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="paragraph">
 <p><strong>torf</strong> <em>PATH</em> [<em>OPTIONS</em>] [<strong>-o</strong> <em>TORRENT</em>]<br>
-<strong>torf</strong> <strong>-i</strong> <em>TORRENT</em><br>
-<strong>torf</strong> <strong>-i</strong> <em>TORRENT</em> [<em>OPTIONS</em>] <strong>-o</strong> <em>NEWTORRENT</em><br>
+<strong>torf</strong> <strong>-i</strong> <em>INPUT</em><br>
+<strong>torf</strong> <strong>-i</strong> <em>INPUT</em> [<em>OPTIONS</em>] <strong>-o</strong> <em>TORRENT</em><br>
 <strong>torf</strong> <strong>-i</strong> <em>TORRENT</em> <em>PATH</em><br></p>
 </div>
 </div>
@@ -470,13 +470,13 @@ torrent&#8217;s content.</p>
 Create the torrent file <em>TORRENT</em> from the file or directory <em>PATH</em>.</p>
 </li>
 <li>
-<p><strong>torf</strong> <strong>-i</strong> <em>TORRENT</em><br>
-Display information stored in the torrent file <em>TORRENT</em>.</p>
+<p><strong>torf</strong> <strong>-i</strong> <em>INPUT</em><br>
+Display information stored in the torrent file or magnet URI <em>INPUT</em>.</p>
 </li>
 <li>
-<p><strong>torf</strong> <strong>-i</strong> <em>TORRENT</em> [<em>OPTIONS</em>] <strong>-o</strong> <em>NEWTORRENT</em><br>
-Edit the existing torrent file <em>TORRENT</em> (e.g. to fix a typo in the comment)
-and create the new torrent file <em>NEWTORRENT</em>.</p>
+<p><strong>torf</strong> <strong>-i</strong> <em>INPUT</em> [<em>OPTIONS</em>] <strong>-o</strong> <em>TORRENT</em><br>
+Edit the existing torrent file or magnet URI <em>INPUT</em> (e.g. to fix a typo) and
+create the new torrent file <em>TORRENT</em>.</p>
 <div class="admonitionblock warning">
 <table>
 <tr>
@@ -523,13 +523,13 @@ may be given multiple times.  See <strong>EXCLUDING FILES</strong>.</p>
 <p>Exclude files from <em>PATH</em> that match the regular expression <em>PATTERN</em>.  This
 option may be given multiple times.  See <strong>EXCLUDING FILES</strong>.</p>
 </dd>
-<dt class="hdlist1"><strong>--in</strong>, <strong>-i</strong> <em>TORRENT</em></dt>
+<dt class="hdlist1"><strong>--in</strong>, <strong>-i</strong> <em>INPUT</em></dt>
 <dd>
-<p>Read metainfo from <em>TORRENT</em>.</p>
+<p>Read metainfo from the torrent file or magnet URI <em>INPUT</em>.</p>
 </dd>
 <dt class="hdlist1"><strong>--out</strong>, <strong>-o</strong> <em>TORRENT</em></dt>
 <dd>
-<p>Write torrent to <em>TORRENT</em>.<br>
+<p>Write to torrent file <em>TORRENT</em>.<br>
 Default: <em>NAME</em><strong>.torrent</strong></p>
 </dd>
 <dt class="hdlist1"><strong>--notorrent</strong>, <strong>-N</strong></dt>
@@ -538,7 +538,7 @@ Default: <em>NAME</em><strong>.torrent</strong></p>
 </dd>
 <dt class="hdlist1"><strong>--nomagnet</strong>, <strong>-M</strong></dt>
 <dd>
-<p>Do not create a magnet link.</p>
+<p>Do not create a magnet URI.</p>
 </dd>
 <dt class="hdlist1"><strong>--name</strong>, <strong>-n</strong> <em>NAME</em></dt>
 <dd>
@@ -741,7 +741,7 @@ times.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Display bytes with and without unit prefix, e.g. "1 MiB / 1,048,576 B".</p>
+<p>Display bytes with and without unit prefix, e.g. "1.38 MiB / 1,448,576 B".</p>
 </li>
 <li>
 <p>When verifying, corrupt files are always read to the end instead of skipping
@@ -905,7 +905,7 @@ Lines that start with &#8220;#&#8221; are ignored.</p>
 </div>
 <div class="paragraph">
 <p>All of the options listed in the <strong>OPTIONS</strong> section are allowed except for
-<em>PATH</em>, <strong>config</strong>, <strong>noconfig</strong>, <strong>profile</strong>, <strong>help</strong> and <strong>version</strong>.</p>
+<em>PATH</em>, <strong>in</strong>, <strong>out</strong>, <strong>name</strong>, <strong>config</strong>, <strong>noconfig</strong>, <strong>profile</strong>, <strong>help</strong>, <strong>version</strong>.</p>
 </div>
 <div class="paragraph">
 <p>There is rudimental support for environment variables in parameters. As usual,
@@ -1051,7 +1051,7 @@ raw bytes for sizes, etc).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-04 11:20:42 +0200
+Last updated 2020-04-11 16:21:59 +0200
 </div>
 </div>
 </body>

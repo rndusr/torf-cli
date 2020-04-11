@@ -2,12 +2,12 @@
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
 .\" Generator: Asciidoctor 2.0.10
-.\"      Date: 2020-04-04
+.\"      Date: 2020-04-11
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2020-04-04" "\ \&" "\ \&"
+.TH "TORF" "1" "2020-04-11" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -33,9 +33,9 @@ torf \- command line tool to create, display and edit torrents
 .sp
 \fBtorf\fP \fIPATH\fP [\fIOPTIONS\fP] [\fB\-o\fP \fITORRENT\fP]
 .br
-\fBtorf\fP \fB\-i\fP \fITORRENT\fP
+\fBtorf\fP \fB\-i\fP \fIINPUT\fP
 .br
-\fBtorf\fP \fB\-i\fP \fITORRENT\fP [\fIOPTIONS\fP] \fB\-o\fP \fINEWTORRENT\fP
+\fBtorf\fP \fB\-i\fP \fIINPUT\fP [\fIOPTIONS\fP] \fB\-o\fP \fITORRENT\fP
 .br
 \fBtorf\fP \fB\-i\fP \fITORRENT\fP \fIPATH\fP
 .br
@@ -65,9 +65,9 @@ Create the torrent file \fITORRENT\fP from the file or directory \fIPATH\fP.
 .  sp -1
 .  IP \(bu 2.3
 .\}
-\fBtorf\fP \fB\-i\fP \fITORRENT\fP
+\fBtorf\fP \fB\-i\fP \fIINPUT\fP
 .br
-Display information stored in the torrent file \fITORRENT\fP.
+Display information stored in the torrent file or magnet URI \fIINPUT\fP.
 .RE
 .sp
 .RS 4
@@ -78,10 +78,10 @@ Display information stored in the torrent file \fITORRENT\fP.
 .  sp -1
 .  IP \(bu 2.3
 .\}
-\fBtorf\fP \fB\-i\fP \fITORRENT\fP [\fIOPTIONS\fP] \fB\-o\fP \fINEWTORRENT\fP
+\fBtorf\fP \fB\-i\fP \fIINPUT\fP [\fIOPTIONS\fP] \fB\-o\fP \fITORRENT\fP
 .br
-Edit the existing torrent file \fITORRENT\fP (e.g. to fix a typo in the comment)
-and create the new torrent file \fINEWTORRENT\fP.
+Edit the existing torrent file or magnet URI \fIINPUT\fP (e.g. to fix a typo) and
+create the new torrent file \fITORRENT\fP.
 .if n .sp
 .RS 4
 .it 1 an-trap
@@ -134,14 +134,14 @@ Exclude files from \fIPATH\fP that match the regular expression \fIPATTERN\fP.  
 option may be given multiple times.  See \fBEXCLUDING FILES\fP.
 .RE
 .sp
-\fB\-\-in\fP, \fB\-i\fP \fITORRENT\fP
+\fB\-\-in\fP, \fB\-i\fP \fIINPUT\fP
 .RS 4
-Read metainfo from \fITORRENT\fP.
+Read metainfo from the torrent file or magnet URI \fIINPUT\fP.
 .RE
 .sp
 \fB\-\-out\fP, \fB\-o\fP \fITORRENT\fP
 .RS 4
-Write torrent to \fITORRENT\fP.
+Write to torrent file \fITORRENT\fP.
 .br
 Default: \fINAME\fP\fB.torrent\fP
 .RE
@@ -153,7 +153,7 @@ Do not create a torrent file.
 .sp
 \fB\-\-nomagnet\fP, \fB\-M\fP
 .RS 4
-Do not create a magnet link.
+Do not create a magnet URI.
 .RE
 .sp
 \fB\-\-name\fP, \fB\-n\fP \fINAME\fP
@@ -401,7 +401,7 @@ times.
 .  sp -1
 .  IP \(bu 2.3
 .\}
-Display bytes with and without unit prefix, e.g. "1 MiB / 1,048,576 B".
+Display bytes with and without unit prefix, e.g. "1.38 MiB / 1,448,576 B".
 .RE
 .sp
 .RS 4
@@ -573,7 +573,7 @@ quoted with single or double quotes to preserve leading and/or trailing spaces.
 Lines that start with \(lq#\(rq are ignored.
 .sp
 All of the options listed in the \fBOPTIONS\fP section are allowed except for
-\fIPATH\fP, \fBconfig\fP, \fBnoconfig\fP, \fBprofile\fP, \fBhelp\fP and \fBversion\fP.
+\fIPATH\fP, \fBin\fP, \fBout\fP, \fBname\fP, \fBconfig\fP, \fBnoconfig\fP, \fBprofile\fP, \fBhelp\fP, \fBversion\fP.
 .sp
 There is rudimental support for environment variables in parameters. As usual,
 \(lq$FOO\(rq or \(lq${FOO}\(rq will be replaced with the value of the variable \fBFOO\fP,

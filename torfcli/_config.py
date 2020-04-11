@@ -63,7 +63,7 @@ ARGUMENTS
     --noxseed, -X          De-randomize info hash of INPUT
     --nocreator, -R        Remove creator from INPUT
     --notorrent, -N        Don't create torrent file
-    --nomagnet, -M         Don't create magnet link
+    --nomagnet, -M         Don't create magnet URI
     --novalidate, -V       Don't check SOURCE and/or TORRENT for errors
 
     --yes, -y              Answer all yes/no prompts with "yes"
