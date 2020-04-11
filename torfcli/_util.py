@@ -29,13 +29,17 @@ def get_torrent(cfg):
     try:
         # Read torrent from file
         return torf.Torrent.read(cfg['in'], validate=cfg['validate'])
-    except torf.TorfError as e:
+    except torf.TorfError as e_torrent:
         # Read magnet URI
         try:
             magnet = torf.Magnet.from_string(cfg['in'])
-        except torf.TorfError:
-            # Report previous exception because default is reading torrent file
-            raise _errors.Error(e)
+        except torf.TorfError as e_magnet:
+            if cfg['in'].startswith('magnet:'):
+                # Input looks like magnet URI
+                raise _errors.Error(e_magnet)
+            else:
+                # Input looks like file
+                raise _errors.Error(e_torrent)
         else:
             magnet.get_info()  # Get "info" section (files, sizes)
             return magnet.torrent()
