@@ -326,3 +326,50 @@ def test_file_tree_and_file_count(capsys, create_torrent, human_readable, tmpdir
 	                           'root/subdir2/file4'))
             assert cap.out == regex(rf'^Files\t{exp_files}$', flags=re.MULTILINE)
             assert cap.err == ''
+
+
+def test_reading_magnet(capsys, human_readable, clear_ansi, regex):
+    magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=My+Torrent&xl=142631'
+              '&tr=https%3A%2F%2Flocalhost%3A123%2Fannounce'
+              '&xs=https%3A%2F%2Flocalhost%3A123%2FMy+Torrent.torrent'
+              '&as=https%3A%2F%2Flocalhost%3A456%2FMy+Torrent.torrent'
+              '&ws=https%3A%2F%2Flocalhost%3A80%2FMy+Torrent.torrent')
+
+    with human_readable(True):
+        run(['-i', magnet])
+    cap = capsys.readouterr()
+    assert clear_ansi(cap.out) == regex((rf'^\s*Name  My Torrent\n'
+                                         rf'\s*Size  \d+\.\d+ [TMK]iB\n'
+                                         rf'\s*Created By  {_vars.__appname__} \d+\.\d+\.\d+\n'
+                                         rf'\s*Private  no\n'
+                                         rf'\s*Tracker  https://localhost:123/announce\n'
+                                         rf'\s*Webseed  https://localhost:80/My Torrent.torrent\n'
+                                         rf'\s*Piece Size  \d+ [TMK]iB\n'
+                                         rf'\s*Piece Count  \d+\n'
+                                         rf'\s*File Count  \d+\n'
+                                         rf'\s*Files  My Torrent \[\d+\.\d+ [TMK]iB\]\n$'))
+    assert cap.err == ''
+
+    with human_readable(False):
+        run(['-i', magnet])
+    cap = capsys.readouterr()
+    assert clear_ansi(cap.out) == regex((rf'^Name\tMy Torrent\n'
+                                         rf'Size\t\d+\n'
+                                         rf'Created By\t{_vars.__appname__} \d+\.\d+\.\d+\n'
+                                         rf'Private\tno\n'
+                                         rf'Tracker\thttps://localhost:123/announce\n'
+                                         rf'Webseed\thttps://localhost:80/My Torrent.torrent\n'
+                                         rf'Piece Size\t\d+\n'
+                                         rf'Piece Count\t\d+\n'
+                                         rf'File Count\t\d+\n'
+                                         rf'Files\tMy Torrent$'))
+    assert cap.err == ''
+
+def test_reading_invalid_magnet(capsys):
+    magnet = 'magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&xl=not_an_int'
+    with patch('sys.exit') as mock_exit:
+        run(['-i', magnet])
+    mock_exit.assert_called_once_with(err.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.err == f'{_vars.__appname__}: not_an_int: Invalid exact length ("xl")\n'
+    assert cap.out == ''
