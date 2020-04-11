@@ -43,6 +43,7 @@ class Error(Exception):
          torf.PathError               : Code.READ,
          torf.BdecodeError            : Code.READ,
          torf.MetainfoError           : Code.READ,
+         torf.MagnetError             : Code.READ,
          torf.WriteError              : Code.WRITE,
          torf.VerifyNotDirectoryError : Code.VERIFY,
          torf.VerifyIsDirectoryError  : Code.VERIFY,
