@@ -269,3 +269,15 @@ def test_success(tmp_path, create_torrent, human_readable, hr_enabled, capsys, c
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Progress\t100\.000\t\d+\t\d+\t\d+\t\d+\t\d+\t{content_path}$',
                                 flags=re.MULTILINE)
+
+
+def test_metainfo_with_magnet_uri(capsys, tmp_path, regex):
+    magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=My+Torrent&xl=142631'
+              '&tr=https%3A%2F%2Flocalhost%3A123%2Fannounce&&tr=https%3A%2F%2Flocalhost%3A456%2Fannounce')
+    filepath = tmp_path / 'My Torrent'
+    filepath.write_text('something')
+    with patch('sys.exit') as mock_exit:
+        run(['-i', magnet, str(filepath)])
+    mock_exit.assert_called_once_with(err.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.err == f"{_vars.__appname__}: Invalid metainfo: Missing 'pieces' in ['info']\n"

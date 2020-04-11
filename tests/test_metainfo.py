@@ -152,3 +152,15 @@ def test_metainfo_when_verifying_torrent(capsys, create_torrent, mock_content, t
     cap = capsys.readouterr()
     assert cap.err == f'{_vars.__appname__}: {wrong_content} does not satisfy {torrent_file}\n'
     assert json.loads(cap.out) == {}
+
+def test_metainfo_with_magnet_uri(capsys, regex):
+    magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=My+Torrent&xl=142631'
+              '&tr=https%3A%2F%2Flocalhost%3A123%2Fannounce&&tr=https%3A%2F%2Flocalhost%3A456%2Fannounce')
+    run(['-i', magnet, '--metainfo'])
+    cap = capsys.readouterr()
+    assert cap.err == ''
+    j = json.loads(cap.out)
+    assert j == {'announce': 'https://localhost:123/announce',
+                 'announce-list': [['https://localhost:123/announce'], ['https://localhost:456/announce']],
+                 'created by': regex(rf'^{_vars.__appname__} \d+\.\d+\.\d+$'),
+                 'info': {'name': 'My Torrent', 'piece length': 16384, 'length': 142631}}

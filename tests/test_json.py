@@ -91,3 +91,19 @@ def test_json_contains_verification_errors(capsys, tmp_path, create_torrent):
     j = json.loads(cap.out)
     assert j['Error'] == [f'{content_path}: Too big: 12 instead of 9 bytes',
                           f'{content_path} does not satisfy {torrent_file}']
+
+def test_json_with_magnet_uri(capsys, regex):
+    magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=My+Torrent&xl=142631'
+              '&tr=https%3A%2F%2Flocalhost%3A123%2Fannounce&&tr=https%3A%2F%2Flocalhost%3A456%2Fannounce')
+    run(['-i', magnet, '--json'])
+    cap = capsys.readouterr()
+    assert cap.err == ''
+    assert json.loads(cap.out) == {'Name': 'My Torrent',
+                                   'Size': 142631,
+                                   'Created By': regex(rf'^{_vars.__appname__} \d+\.\d+\.\d+$'),
+                                   'Private': False,
+                                   'Trackers': ['https://localhost:123/announce', 'https://localhost:456/announce'],
+                                   'Piece Size': 16384,
+                                   'Piece Count': 9,
+                                   'File Count': 1,
+                                   'Files': ['My Torrent']}
