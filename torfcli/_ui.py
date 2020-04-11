@@ -92,7 +92,8 @@ class UI:
             info('Created By', torrent.created_by)
         if torrent.source:
             info('Source', torrent.source)
-        info('Private', self._fmt.private(torrent))
+        if torrent.private is not None:
+            info('Private', self._fmt.private(torrent))
         if torrent.trackers:
             info('Tracker' + ('s' if len(torrent.trackers) > 1 else ''),
                  self._fmt.trackers(torrent))
