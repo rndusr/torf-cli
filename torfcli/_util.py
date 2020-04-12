@@ -44,8 +44,10 @@ def get_torrent(cfg, ui):
         else:
             def callback(exc):
                 ui.error(_errors.Error(exc), exit=False)
-            # Get "info" section (files, sizes)
-            magnet.get_info(callback=callback)
+            # Get "info" section (files, sizes) unless the user is editing a
+            # magnet URI
+            if not cfg['notorrent']:
+                magnet.get_info(callback=callback)
             torrent = magnet.torrent()
             torrent.created_by = None
             return torrent
