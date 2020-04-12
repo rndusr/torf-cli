@@ -79,7 +79,7 @@ def test_remove_private(create_torrent, tmpdir, assert_torrents_equal):
         orig = torf.Torrent.read(infile)
         run(['-i', infile, '--noprivate', '-o', outfile])
         new = torf.Torrent.read(outfile)
-        assert_torrents_equal(orig, new, private=False)
+        assert_torrents_equal(orig, new, private=None)
 
 def test_add_private(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
@@ -352,7 +352,9 @@ def test_edit_magnet_uri_and_create_torrent_with_validation_enabled(capsys, tmp_
              '-o', str(outfile)])
     mock_exit.assert_called_once_with(err.Code.READ)
     cap = capsys.readouterr()
-    assert cap.err == f"{_vars.__appname__}: Invalid metainfo: Missing 'pieces' in ['info']\n"
+    assert cap.err == (f"{_vars.__appname__}: https://localhost:123/file?info_hash=%E1g%B1%FB%B4.%A7/%05%1FOPC%27%030%8E%FB%8F%D1"
+                       f': Connection refused\n'
+                       f"{_vars.__appname__}: Invalid metainfo: Missing 'pieces' in ['info']\n")
 
 def test_edit_magnet_uri_and_create_torrent_with_validation_disabled(capsys, tmp_path, regex):
     magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=My+Torrent&xl=142631'
@@ -361,7 +363,9 @@ def test_edit_magnet_uri_and_create_torrent_with_validation_disabled(capsys, tmp
     run(['-i', magnet, '--name', 'New Name', '--notracker', '--tracker', 'http://bar',
          '-o', str(outfile), '--novalidate'])
     cap = capsys.readouterr()
-    assert cap.err == f"{_vars.__appname__}: WARNING: Invalid metainfo: Missing 'pieces' in ['info']\n"
+    assert cap.err == (f"{_vars.__appname__}: https://localhost:123/file?info_hash=%E1g%B1%FB%B4.%A7/%05%1FOPC%27%030%8E%FB%8F%D1"
+                       f': Connection refused\n'
+                       f"{_vars.__appname__}: WARNING: Invalid metainfo: Missing 'pieces' in ['info']\n")
     new_magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=New+Name&xl=142631'
                   '&tr=http%3A%2F%2Fbar')
     assert cap.out == regex(fr'^Magnet\t{re.escape(new_magnet)}$', flags=re.MULTILINE)

@@ -17,7 +17,6 @@ def test_json_contains_standard_fields(capsys, mock_content):
     assert isinstance(j['Size'], int)
     assert j['Created'] == pytest.approx(now - 1, abs=2)
     assert j['Created By'] == f'{_vars.__appname__} {_vars.__version__}'
-    assert isinstance(j['Private'], bool)
     assert isinstance(j['Piece Size'], int)
     assert isinstance(j['Piece Count'], int)
     assert isinstance(j['File Count'], int)
@@ -98,12 +97,14 @@ def test_json_with_magnet_uri(capsys, regex):
     run(['-i', magnet, '--json'])
     cap = capsys.readouterr()
     assert cap.err == ''
-    assert json.loads(cap.out) == {'Name': 'My Torrent',
-                                   'Size': 142631,
-                                   'Created By': regex(rf'^{_vars.__appname__} \d+\.\d+\.\d+$'),
-                                   'Private': False,
-                                   'Trackers': ['https://localhost:123/announce', 'https://localhost:456/announce'],
-                                   'Piece Size': 16384,
-                                   'Piece Count': 9,
-                                   'File Count': 1,
-                                   'Files': ['My Torrent']}
+    assert json.loads(cap.out) == {
+        "Error": ['https://localhost:123/file?info_hash=%E1g%B1%FB%B4.%A7/%05%1FOPC%27%030%8E%FB%8F%D1: Connection refused',
+                  'https://localhost:456/file?info_hash=%E1g%B1%FB%B4.%A7/%05%1FOPC%27%030%8E%FB%8F%D1: Connection refused'],
+        'Name': 'My Torrent',
+        'Size': 142631,
+        'Trackers': ['https://localhost:123/announce', 'https://localhost:456/announce'],
+        'Piece Size': 16384,
+        'Piece Count': 9,
+        'File Count': 1,
+        'Files': ['My Torrent']
+    }

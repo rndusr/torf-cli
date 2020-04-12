@@ -280,4 +280,8 @@ def test_metainfo_with_magnet_uri(capsys, tmp_path, regex):
         run(['-i', magnet, str(filepath)])
     mock_exit.assert_called_once_with(err.Code.READ)
     cap = capsys.readouterr()
-    assert cap.err == f"{_vars.__appname__}: Invalid metainfo: Missing 'pieces' in ['info']\n"
+    assert cap.err == regex(rf'^{_vars.__appname__}: https://localhost:123/file\?info_hash='
+                            r'%E1g%B1%FB%B4\.%A7/%05%1FOPC%27%030%8E%FB%8F%D1: [\w\s]+\n'
+                            rf'{_vars.__appname__}: https://localhost:456/file\?info_hash='
+                            r'%E1g%B1%FB%B4\.%A7/%05%1FOPC%27%030%8E%FB%8F%D1: [\w\s]+\n'
+                            rf"{_vars.__appname__}: Invalid metainfo: Missing 'pieces' in \['info'\]\n$")

@@ -158,9 +158,11 @@ def test_metainfo_with_magnet_uri(capsys, regex):
               '&tr=https%3A%2F%2Flocalhost%3A123%2Fannounce&&tr=https%3A%2F%2Flocalhost%3A456%2Fannounce')
     run(['-i', magnet, '--metainfo'])
     cap = capsys.readouterr()
-    assert cap.err == ''
+    assert cap.err == regex(rf'^{_vars.__appname__}: https://localhost:123/file\?info_hash='
+                            r'%E1g%B1%FB%B4\.%A7/%05%1FOPC%27%030%8E%FB%8F%D1: [\w\s]+\n'
+                            rf'{_vars.__appname__}: https://localhost:456/file\?info_hash='
+                            r'%E1g%B1%FB%B4\.%A7/%05%1FOPC%27%030%8E%FB%8F%D1: [\w\s]+\n$')
     j = json.loads(cap.out)
     assert j == {'announce': 'https://localhost:123/announce',
                  'announce-list': [['https://localhost:123/announce'], ['https://localhost:456/announce']],
-                 'created by': regex(rf'^{_vars.__appname__} \d+\.\d+\.\d+$'),
                  'info': {'name': 'My Torrent', 'piece length': 16384, 'length': 142631}}

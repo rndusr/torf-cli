@@ -314,7 +314,7 @@ def test_missing_private_option_does_not_set_private_field(capsys, mock_content)
     run([content_path])
     t = torf.Torrent.read(exp_torrent_filepath)
     assert 'private' not in t.metainfo['info']
-    assert t.private == False
+    assert t.private == None
 
 
 def test_source_option(capsys, mock_content):

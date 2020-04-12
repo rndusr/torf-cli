@@ -333,37 +333,41 @@ def test_reading_magnet(capsys, human_readable, clear_ansi, regex):
               '&tr=https%3A%2F%2Flocalhost%3A123%2Fannounce'
               '&xs=https%3A%2F%2Flocalhost%3A123%2FMy+Torrent.torrent'
               '&as=https%3A%2F%2Flocalhost%3A456%2FMy+Torrent.torrent'
-              '&ws=https%3A%2F%2Flocalhost%3A80%2FMy+Torrent.torrent')
+              '&ws=https%3A%2F%2Flocalhost%2FMy+Torrent')
 
     with human_readable(True):
         run(['-i', magnet])
     cap = capsys.readouterr()
     assert clear_ansi(cap.out) == regex((rf'^\s*Name  My Torrent\n'
                                          rf'\s*Size  \d+\.\d+ [TMK]iB\n'
-                                         rf'\s*Created By  {_vars.__appname__} \d+\.\d+\.\d+\n'
-                                         rf'\s*Private  no\n'
                                          rf'\s*Tracker  https://localhost:123/announce\n'
-                                         rf'\s*Webseed  https://localhost:80/My Torrent.torrent\n'
+                                         rf'\s*Webseed  https://localhost/My\+Torrent\n'
                                          rf'\s*Piece Size  \d+ [TMK]iB\n'
                                          rf'\s*Piece Count  \d+\n'
                                          rf'\s*File Count  \d+\n'
                                          rf'\s*Files  My Torrent \[\d+\.\d+ [TMK]iB\]\n$'))
-    assert cap.err == ''
+    assert cap.err == regex((rf'^{_vars.__appname__}: https://localhost:123/My\+Torrent.torrent: [\w\s]+\n'
+                             rf'{_vars.__appname__}: https://localhost:456/My\+Torrent.torrent: [\w\s]+\n'
+                             rf'{_vars.__appname__}: https://localhost/My\+Torrent.torrent: [\w\s]+\n'
+                             rf'{_vars.__appname__}: https://localhost:123/file\?info_hash='
+                             r'%E1g%B1%FB%B4\.%A7/%05%1FOPC%27%030%8E%FB%8F%D1: [\w\s]+\n$'))
 
     with human_readable(False):
         run(['-i', magnet])
     cap = capsys.readouterr()
-    assert clear_ansi(cap.out) == regex((rf'^Name\tMy Torrent\n'
-                                         rf'Size\t\d+\n'
-                                         rf'Created By\t{_vars.__appname__} \d+\.\d+\.\d+\n'
-                                         rf'Private\tno\n'
-                                         rf'Tracker\thttps://localhost:123/announce\n'
-                                         rf'Webseed\thttps://localhost:80/My Torrent.torrent\n'
-                                         rf'Piece Size\t\d+\n'
-                                         rf'Piece Count\t\d+\n'
-                                         rf'File Count\t\d+\n'
-                                         rf'Files\tMy Torrent$'))
-    assert cap.err == ''
+    assert cap.out == regex((rf'^Name\tMy Torrent\n'
+                             rf'Size\t\d+\n'
+                             rf'Tracker\thttps://localhost:123/announce\n'
+                             rf'Webseed\thttps://localhost/My\+Torrent\n'
+                             rf'Piece Size\t\d+\n'
+                             rf'Piece Count\t\d+\n'
+                             rf'File Count\t\d+\n'
+                             rf'Files\tMy Torrent$'))
+    assert cap.err == regex((rf'^{_vars.__appname__}: https://localhost:123/My\+Torrent.torrent: [\w\s]+\n'
+                             rf'{_vars.__appname__}: https://localhost:456/My\+Torrent.torrent: [\w\s]+\n'
+                             rf'{_vars.__appname__}: https://localhost/My\+Torrent.torrent: [\w\s]+\n'
+                             rf'{_vars.__appname__}: https://localhost:123/file\?info_hash='
+                             r'%E1g%B1%FB%B4\.%A7/%05%1FOPC%27%030%8E%FB%8F%D1: [\w\s]+\n$'))
 
 def test_reading_invalid_magnet(capsys):
     magnet = 'magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&xl=not_an_int'
