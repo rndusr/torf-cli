@@ -243,12 +243,11 @@ def test_multifile_torrent__correct_size_but_corrupt(tmp_path, create_torrent, h
     assert cap.err == f'{_vars.__appname__}: {content_path} does not satisfy {torrent_file}\n'
 
     if hr_enabled:
-        assert clear_ansi(cap.out) == regex(rf'^\s*Error  Corruption in piece 31, at least one of these files is corrupt:$',
+        assert clear_ansi(cap.out) == regex(rf'^\s*Error  Corruption in piece 31 in {file1}$',
                                             flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(rf'^\s*      {file1}$', flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)
-        assert cap.out == regex((rf'^Error\tCorruption in piece 31, at least one of these files is corrupt:\t{file1}$'),
+        assert cap.out == regex((rf'^Error\tCorruption in piece 31 in {file1}$'),
                                 flags=re.MULTILINE)
 
 
