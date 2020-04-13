@@ -26,7 +26,7 @@ from . import _errors
 def get_torrent(cfg, ui):
     # Create torf.Torrent instance from INPUT
     if not cfg['in']:
-        raise RuntimeError('--in option not given')
+        raise RuntimeError('--in option not given; mode detection is probably kaput')
     try:
         # Read torrent from file
         return torf.Torrent.read(cfg['in'], validate=cfg['validate'])
