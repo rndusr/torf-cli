@@ -25,6 +25,13 @@ from . import _errors
 
 
 def get_torrent(cfg, ui):
+    """
+    Read --in parameter and return torf.Torrent instance
+
+    The --in parameter may be the path to a torrent file, a magnet URI or "-".
+    If "-", stdin is read and interpreted as the content of a torrent file or a
+    magnet URI.
+    """
     # Create torf.Torrent instance from INPUT
     if not cfg['in']:
         raise RuntimeError('--in option not given; mode detection is probably kaput')
@@ -69,6 +76,7 @@ def get_torrent(cfg, ui):
 
 
 def get_torrent_filepath(torrent, cfg):
+    """Return the file path of the output torrent file"""
     if cfg['out']:
         # User-given torrent file path
         return cfg['out']
