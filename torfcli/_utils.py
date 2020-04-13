@@ -14,6 +14,7 @@ import time
 import contextlib
 import sys
 import os
+import io
 import json
 import torf
 import copy
@@ -27,30 +28,44 @@ def get_torrent(cfg, ui):
     # Create torf.Torrent instance from INPUT
     if not cfg['in']:
         raise RuntimeError('--in option not given; mode detection is probably kaput')
-    try:
-        # Read torrent from file
-        return torf.Torrent.read(cfg['in'], validate=cfg['validate'])
-    except torf.TorfError as e_torrent:
-        # Read magnet URI
+
+    def get_torrent_from_magnet(string, fallback_exc):
+        # Parse magnet URI from stdin
         try:
-            magnet = torf.Magnet.from_string(cfg['in'])
-        except torf.TorfError as e_magnet:
-            if cfg['in'].startswith('magnet:'):
-                # Input looks like magnet URI
-                raise _errors.Error(e_magnet)
+            magnet = torf.Magnet.from_string(string)
+        except torf.TorfError as exc:
+            # Raise magnet parsing error if INPUT looks like magnet URI,
+            # torrent parsing error otherwise.
+            if string.startswith('magnet:'):
+                raise _errors.Error(exc)
             else:
-                # Input looks like file
-                raise _errors.Error(e_torrent)
+                raise _errors.Error(fallback_exc)
         else:
-            def callback(exc):
-                ui.error(_errors.Error(exc), exit=False)
-            # Get "info" section (files, sizes) unless the user is editing a
-            # magnet URI
+            # Get "info" section (files, sizes, etc) unless the user is not
+            # interested in a complete torrent, e.g. when editing a magnet URI
             if not cfg['notorrent']:
+                def callback(exc):
+                    ui.error(_errors.Error(exc), exit=False)
                 magnet.get_info(callback=callback)
             torrent = magnet.torrent()
             torrent.created_by = None
             return torrent
+
+    if cfg['in'] == '-' and not os.path.exists('-'):
+        data = os.read(sys.stdin.fileno(), torf.Torrent.MAX_TORRENT_FILE_SIZE)
+        try:
+            # Read torrent data from stdin
+            return torf.Torrent.read_stream(io.BytesIO(data), validate=cfg['validate'])
+        except torf.TorfError as exc:
+            # Parse magnet URI from stdin
+            return get_torrent_from_magnet(data.decode('utf-8'), exc)
+    else:
+        try:
+            # Read torrent data from file path
+            return torf.Torrent.read(cfg['in'], validate=cfg['validate'])
+        except torf.TorfError as exc:
+            # Parse magnet URI from string
+            return get_torrent_from_magnet(cfg['in'], exc)
 
 
 def get_torrent_filepath(torrent, cfg):

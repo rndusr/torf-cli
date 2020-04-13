@@ -54,7 +54,8 @@ Exclude files from _PATH_ that match the regular expression _PATTERN_.  This
 option may be given multiple times.  See *EXCLUDING FILES*.
 
 *--in*, *-i* _INPUT_::
-Read metainfo from the torrent file or magnet URI _INPUT_.
+Read metainfo from the torrent file or magnet URI _INPUT_.  If _INPUT_ is "-"
+and does not exist, the torrent data or magnet URI is read from stdin.
 
 *--out*, *-o* _TORRENT_::
 Write to torrent file _TORRENT_. +

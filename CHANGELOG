@@ -1,4 +1,6 @@
 2020-??-?? 3.2.0
+  - The --in option now supports "-" as a parameter to read a torrent or magnet
+    URI from stdin.
   - Make --in, --out and --name illegal in config files.
 
 
