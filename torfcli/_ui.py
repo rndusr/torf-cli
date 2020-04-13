@@ -19,7 +19,7 @@ import datetime
 import torf
 import shutil
 
-from . import _util
+from . import _utils
 from . import _errors as err
 from . import _vars
 from . import _term
@@ -155,16 +155,16 @@ class _HumanFormatter(_FormatterBase):
         return 'yes' if torrent.private else 'no'
 
     def size(self, torrent):
-        return _util.bytes2string(torrent.size, plain_bytes=self._cfg['verbose'] > 0)
+        return _utils.bytes2string(torrent.size, plain_bytes=self._cfg['verbose'] > 0)
 
     def creation_date(self, torrent):
         return torrent.creation_date.isoformat(sep=' ', timespec='seconds')
 
     def piece_size(self, torrent):
-        return _util.bytes2string(torrent.piece_size, plain_bytes=self._cfg['verbose'] > 0)
+        return _utils.bytes2string(torrent.piece_size, plain_bytes=self._cfg['verbose'] > 0)
 
     def files(self, torrent):
-        return _util.make_filetree(torrent.filetree, plain_bytes=self._cfg['verbose'] > 0)
+        return _utils.make_filetree(torrent.filetree, plain_bytes=self._cfg['verbose'] > 0)
 
     def comment(self, torrent):
         # Split lines into paragraphs, then wrap each paragraph at max width.
@@ -213,7 +213,7 @@ class _HumanFormatter(_FormatterBase):
             sys.stdout.write(f'{label}{LABEL_SEPARATOR}{value}\n')
         else:
             sys.stdout.write(f'{label}{LABEL_SEPARATOR}{value}')
-            _util.flush(sys.stdout)
+            _utils.flush(sys.stdout)
 
     def infos(self, pairs):
         for key, value in pairs:
@@ -227,7 +227,7 @@ class _HumanFormatter(_FormatterBase):
     def dialog_yes_no(self, question):
         while True:
             sys.stdout.write(f'{question} [y|n] ')
-            _util.flush(sys.stdout)
+            _utils.flush(sys.stdout)
             key = _term.getch()
             _term.echo('erase_line', 'move_pos1')
             answer = self.DIALOG_YES_NO_ANSWERS.get(key, None)
@@ -263,7 +263,7 @@ class _MachineFormatter(_FormatterBase):
         if not isinstance(value, str) and isinstance(value, abc.Iterable):
             value = '\t'.join(str(v) for v in value)
         sys.stdout.write(f'{key}\t{value}\n')
-        _util.flush(sys.stdout)
+        _utils.flush(sys.stdout)
 
     def infos(self, pairs):
         for key, value in pairs:
@@ -296,8 +296,8 @@ class _JSONFormatter(_MachineFormatter):
             self._info[key] = value
 
     def terminate(self, torrent):
-        sys.stdout.write(_util.json_dumps(self._info))
-        _util.flush(sys.stdout)
+        sys.stdout.write(_utils.json_dumps(self._info))
+        _utils.flush(sys.stdout)
 
 
 class _MetainfoFormatter(_JSONFormatter):
@@ -309,23 +309,23 @@ class _MetainfoFormatter(_JSONFormatter):
             mi = {}
         elif self._cfg['verbose'] <= 0:
             # Show only standard fields
-            mi = _util.metainfo(torrent.metainfo, all_fields=False, remove_pieces=True)
+            mi = _utils.metainfo(torrent.metainfo, all_fields=False, remove_pieces=True)
         elif self._cfg['verbose'] == 1:
             # Show all fields except for ['info']['pieces']
-            mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=True)
+            mi = _utils.metainfo(torrent.metainfo, all_fields=True, remove_pieces=True)
         elif self._cfg['verbose'] >= 2:
             # Show all fields
-            mi = _util.metainfo(torrent.metainfo, all_fields=True, remove_pieces=False)
-        sys.stdout.write(_util.json_dumps(mi))
-        _util.flush(sys.stdout)
+            mi = _utils.metainfo(torrent.metainfo, all_fields=True, remove_pieces=False)
+        sys.stdout.write(_utils.json_dumps(mi))
+        _utils.flush(sys.stdout)
 
 
 class _StatusReporterBase():
     def __init__(self, ui):
         self._ui = ui
         self._start_time = time.time()
-        self._progress = _util.Average(samples=5)
-        self._time_left = _util.Average(samples=3)
+        self._progress = _utils.Average(samples=5)
+        self._time_left = _utils.Average(samples=3)
         self._info = types.SimpleNamespace(
             torrent=None, filepath=None,
             pieces_done=0, pieces_total=0,
@@ -412,7 +412,7 @@ class _HumanStatusReporter(_StatusReporterBase):
 
     def _get_progress_string(self, info):
         perc_str = f'{info.fraction_done * 100:5.2f} %'
-        bps_str = f'{_util.bytes2string(info.bytes_per_sec, trailing_zeros=True)}/s'
+        bps_str = f'{_utils.bytes2string(info.bytes_per_sec, trailing_zeros=True)}/s'
         if info.pieces_done < info.pieces_total:
             term_width,_ = shutil.get_terminal_size()
             term_width = min(term_width, 76)

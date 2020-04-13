@@ -17,7 +17,7 @@ from xdg import BaseDirectory
 import torf
 from . import _errors
 from . import _vars
-from . import _util
+from . import _utils
 
 
 DEFAULT_CONFIG_FILE = os.path.join(BaseDirectory.xdg_config_home, _vars.__appname__, 'config')
@@ -148,7 +148,7 @@ def parse_args(args):
     # Validate creation date
     if cfg['date']:
         try:
-            cfg['date'] = _util.parse_date(cfg['date'] or 'now')
+            cfg['date'] = _utils.parse_date(cfg['date'] or 'now')
         except ValueError:
             raise _errors.CliError(f'{cfg["date"]}: Invalid date')
 

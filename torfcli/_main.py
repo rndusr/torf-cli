@@ -16,7 +16,7 @@ import torf
 from . import _vars
 from . import _config
 from . import _ui
-from . import _util
+from . import _utils
 from . import _errors
 
 # Seconds between progress updates
@@ -48,9 +48,9 @@ def run(ui):
 
 
 def _info_mode(ui, cfg):
-    torrent = _util.get_torrent(cfg, ui)
+    torrent = _utils.get_torrent(cfg, ui)
     ui.show_torrent(torrent)
-    if not _util.is_magnet(cfg['in']):
+    if not _utils.is_magnet(cfg['in']):
         try:
             ui.info('Magnet', torrent.magnet())
         except torf.TorfError as e:
@@ -89,17 +89,17 @@ def _create_mode(ui, cfg):
     if cfg['max_piece_size']:
         torrent.piece_size = cfg['max_piece_size']
 
-    ui.check_output_file_exists(_util.get_torrent_filepath(torrent, cfg))
+    ui.check_output_file_exists(_utils.get_torrent_filepath(torrent, cfg))
     ui.show_torrent(torrent)
     _hash_pieces(ui, torrent)
     _write_torrent(ui, torrent, cfg)
     return torrent
 
 def _edit_mode(ui, cfg):
-    torrent = _util.get_torrent(cfg, ui)
+    torrent = _utils.get_torrent(cfg, ui)
 
     # Make sure we can write before we start editing
-    ui.check_output_file_exists(_util.get_torrent_filepath(torrent, cfg))
+    ui.check_output_file_exists(_utils.get_torrent_filepath(torrent, cfg))
 
     # Make changes according to CLI args
     def set_or_remove(arg_name, attr_name):
@@ -161,7 +161,7 @@ def _edit_mode(ui, cfg):
     return torrent
 
 def _verify_mode(ui, cfg):
-    torrent = _util.get_torrent(cfg, ui)
+    torrent = _utils.get_torrent(cfg, ui)
     ui.show_torrent(torrent)
     ui.info('Path', cfg['PATH'])
     try:
@@ -228,7 +228,7 @@ def _write_torrent(ui, torrent, cfg):
             pass
 
     if not cfg['notorrent']:
-        filepath = _util.get_torrent_filepath(torrent, cfg)
+        filepath = _utils.get_torrent_filepath(torrent, cfg)
         try:
             torrent.write(filepath, overwrite=True, validate=cfg['validate'])
         except torf.WriteError as e:
