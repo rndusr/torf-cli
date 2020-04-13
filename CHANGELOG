@@ -1,4 +1,8 @@
 2020-??-?? 3.2.0
+  - Support for reading magnet URIs was added, e.g. "torf -i 'magnet:...' -o
+    foo.torrent".  The missing information is downloaded from the parameters
+    "xs", "as", "ws" or any of the "tr" parameters, if possible.  Support for
+    DHT and UDP trackers is not implemented (yet?).
   - The --in option now supports "-" as a parameter to read a torrent or magnet
     URI from stdin.
   - Make --in, --out and --name illegal in config files.
