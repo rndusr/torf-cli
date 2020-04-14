@@ -11,6 +11,7 @@
 
 import sys
 import datetime
+import os.path
 
 import torf
 from . import _vars
@@ -172,8 +173,11 @@ def _verify_mode(ui, cfg):
     with ui.StatusReporter() as sr:
         skip_files = cfg['verbose'] > 0
         try:
-            success = torrent.verify(cfg['PATH'],
-                                     callback=sr.verify_callback,
+            path = cfg['PATH']
+            if cfg['basename']:
+                path = os.path.join(path,
+                                    torrent.metainfo['info'].get('name', ''))
+            success = torrent.verify(path, callback=sr.verify_callback,
                                      interval=PROGRESS_INTERVAL,
                                      skip_on_error=skip_files)
         except torf.TorfError as e:
