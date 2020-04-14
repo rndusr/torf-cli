@@ -13,7 +13,7 @@ that combine commonly used options.
 Documentation is available as a man page, or you can `read it here
 <https://rndusr.github.io/torf-cli/torf.1.html>`_.
 
-The only depdencies are `torf <https://pypi.org/project/torf/>`_ and `pyxdg
+The only dependencies are `torf <https://pypi.org/project/torf/>`_ and `pyxdg
 <https://pypi.org/project/pyxdg/>`_.
 
 
