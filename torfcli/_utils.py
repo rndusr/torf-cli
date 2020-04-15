@@ -234,15 +234,21 @@ def bool2int(obj):
 
 _main_fields = ('announce', 'announce-list', 'comment',
                 'created by', 'creation date', 'encoding',
-                'url-list', 'httpseed')
-_info_fields = ('name', 'piece length', 'private', 'length', 'md5sum')
+                'info', 'url-list', 'httpseed')
+_info_fields = ('files', 'length', 'md5sum', 'name', 'piece length', 'private')
 _files_fields = ('length', 'path', 'md5sum')
 def metainfo(dct, all_fields=False, remove_pieces=True):
+    """
+    Return user-friendly copy of metainfo `dct`
+
+    all_fields: Whether to remove any non-standard entries in `dct`
+    remove_pieces: Whether to remove ['info']['pieces']
+    """
 
     def copy(obj, only=(), exclude=()):
         if isinstance(obj, abc.Mapping):
             cp = type(obj)()
-            for k,v in sorted(obj.items()):
+            for k,v in obj.items():
                 if k not in exclude and (not only or k in only):
                     cp[k] = copy(v)
             return cp
@@ -251,38 +257,32 @@ def metainfo(dct, all_fields=False, remove_pieces=True):
         else:
             return obj
 
-    # Make order-preserving copy
     new = copy(dct)
 
     if remove_pieces:
         if 'pieces' in new.get('info', {}):
             del new['info']['pieces']
+
     if not all_fields:
-        # Remove non-standard fields
-        new = {}
-        # Copy main fields
-        for f in _main_fields:
-            if f in dct:
-                new[f] = dct[f]
+        # Remove non-standard top-level fields
+        for k in tuple(new):
+            if k not in _main_fields:
+                del new[k]
 
-        # Copy all "info" fields except for "files"
-        if 'info' in dct:
-            new['info'] = {}
-            for f in _info_fields:
-                if f in dct['info']:
-                    new['info'][f] = dct['info'][f]
+        # Remove non-standard fields in "info" or "info" itself if non-dict
+        if 'info' in new:
+            if not isinstance(new['info'], dict):
+                del new['info']
+            else:
+                for k in tuple(new['info']):
+                    if k not in _info_fields:
+                        del new['info'][k]
 
-        # Copy "files", but only standard fields
-        new_files = []
-        for file in dct['info'].get('files', ()):
-            new_file = {}
-            for f in _files_fields:
-                if f in file:
-                    new_file[f] = file[f]
-            if new_file:
-                new_files.append(new_file)
-        if new_files:
-            new['info']['files'] = new_files
+                if 'files' in new['info'] and isinstance(new['info']['files'], list):
+                    for file in new['info']['files']:
+                        for k in tuple(file):
+                            if k not in _files_fields:
+                                del file[k]
 
     if 'info' in new and not new['info']:
         del new['info']
