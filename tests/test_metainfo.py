@@ -119,10 +119,11 @@ def test_metainfo_when_creating_torrent(capsys, mock_content):
     assert 'pieces' in j['info']
 
 def test_metainfo_when_editing_torrent(capsys, create_torrent):
-    with create_torrent() as orig_torrent:
+    with create_torrent(trackers=['http://foo', 'http://bar']) as orig_torrent:
         run(['-i', str(orig_torrent),
              '--comment', 'This comment was not here before.',
-             '--webseed', 'https://new.webseeds',
+             '--date', '1999-07-23 14:00',
+             '--nowebseed', '--webseed', 'https://new.webseeds',
              '-o', 'new.torrent', '--metainfo', '-v'])
     cap = capsys.readouterr()
     assert cap.err == ''
@@ -131,7 +132,11 @@ def test_metainfo_when_editing_torrent(capsys, create_torrent):
     assert 'name' in j['info']
     assert 'pieces' not in j['info']
     assert j['comment'] == 'This comment was not here before.'
-    assert 'https://new.webseeds' in j['url-list']
+    assert j['creation date'] == 932731200
+    assert j['url-list'] == ['https://new.webseeds']
+    assert j['announce-list'] == [['http://foo'], ['http://bar']]
+    assert j['announce'] == 'http://foo'
+
 
 def test_metainfo_when_verifying_torrent(capsys, create_torrent, mock_content, tmp_path):
     with create_torrent(path=mock_content) as torrent_file:
