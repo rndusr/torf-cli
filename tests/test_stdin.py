@@ -29,7 +29,7 @@ def test_reading_invalid_torrent_data_from_stdin(capsys, tmp_path, monkeypatch, 
     mock_exit.assert_called_once_with(_errors.Code.READ)
     cap = capsys.readouterr()
     assert cap.out == ''
-    assert cap.err == f"{_vars.__appname__}: Invalid metainfo: Missing 'pieces' in ['info']\n"
+    assert cap.err == f"{_vars.__appname__}: Invalid metainfo: Missing 'piece length' in ['info']\n"
 
 def test_reading_valid_magnet_URI_from_stdin(capsys, monkeypatch, clear_ansi, regex):
     magnet = torf.Magnet('7edbb76b446f87617393537fffa48af733cb4127', dn='Foo', xl=12345)
