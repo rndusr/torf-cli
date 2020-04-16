@@ -30,11 +30,10 @@ USAGE
     {_vars.__appname__} PATH [OPTIONS] [-o TORRENT]    # Create torrent
     {_vars.__appname__} -i INPUT                       # Display torrent
     {_vars.__appname__} -i INPUT [OPTIONS] -o TORRENT  # Edit torrent
-    {_vars.__appname__} [-b] -i TORRENT PATH           # Verify file content
+    {_vars.__appname__} -i TORRENT PATH                # Verify file content
 
 ARGUMENTS
     PATH                   Path to torrent's content
-    --basename, -b         Use torrent name as basename to find contents at
     --exclude, -e PATTERN  Glob pattern that is used to exclude files
                            (e.g. "*.txt")
     --exclude-regex, -er PATTERN
