@@ -174,7 +174,7 @@ def _verify_mode(ui, cfg):
         skip_files = cfg['verbose'] > 0
         try:
             path = cfg['PATH']
-            if path[-1] == '/':
+            if path[-1] == os.path.sep:
                 path = os.path.join(path,
                                     torrent.metainfo['info'].get('name', ''))
             success = torrent.verify(path, callback=sr.verify_callback,
