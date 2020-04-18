@@ -1,11 +1,15 @@
 2020-??-?? 3.2.0
   - Support for reading magnet URIs was added, e.g. "torf -i 'magnet:...' -o
     foo.torrent".  The missing information is downloaded from the parameters
-    "xs", "as", "ws" or any of the "tr" parameters, if possible.  Support for
-    DHT and UDP trackers is not implemented (yet?).
+    "xs", "as", "ws" and "tr", if possible.  Support for DHT and UDP trackers is
+    not implemented.
   - The --in option now supports "-" as a parameter to read a torrent or magnet
     URI from stdin.
-  - Make --in, --out and --name illegal in config files.
+  - When verifying torrent content, a trailing slash in PATH automatically
+    appends the torrent's name to PATH.  For example, "torf -i foo.torrent
+    path/to/foo" is identical to "torf -i foo.torrent path/to/" while "torf -i
+    foo.torrent path/to" looks for foo.torrent's files in "path/to".
+  - --in, --out and --name are now illegal in config files.
 
 
 2020-04-07 3.1.1
