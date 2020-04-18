@@ -175,9 +175,9 @@ def _verify_mode(ui, cfg):
         try:
             path = cfg['PATH']
             if path[-1] == os.path.sep:
-                path = os.path.join(path,
-                                    torrent.metainfo['info'].get('name', ''))
-            success = torrent.verify(path, callback=sr.verify_callback,
+                path = os.path.join(path, torrent.metainfo['info'].get('name', ''))
+            success = torrent.verify(path,
+                                     callback=sr.verify_callback,
                                      interval=PROGRESS_INTERVAL,
                                      skip_on_error=skip_files)
         except torf.TorfError as e:
