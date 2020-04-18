@@ -2,12 +2,12 @@
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
 .\" Generator: Asciidoctor 2.0.10
-.\"      Date: 2020-04-11
+.\"      Date: 2020-04-18
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2020-04-11" "\ \&" "\ \&"
+.TH "TORF" "1" "2020-04-18" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -112,6 +112,9 @@ whether a certain option will change the hash.
 .br
 Verify that the content in \fIPATH\fP matches the metadata in the torrent file
 \fITORRENT\fP.
+.sp
+If \fIPATH\fP ends with a path separator (e.g. "/"), the name of the torrent (as
+specified in \fITORRENT\fP) is appended.
 .RE
 .SH "OPTIONS"
 .sp
@@ -120,6 +123,8 @@ Options that start with \fB\-\-no\fP take precedence.
 \fIPATH\fP
 .RS 4
 The path to the torrent\(cqs content.
+.sp
+When verifying data, the torrent\(cqs name is appended.
 .RE
 .sp
 \fB\-\-exclude\fP, \fB\-e\fP \fIPATTERN\fP

@@ -36,6 +36,9 @@ WARNING: Editing a torrent can change its hash, depending on what is changed,
 * *torf* *-i* _TORRENT_ _PATH_ +
 Verify that the content in _PATH_ matches the metadata in the torrent file
 _TORRENT_.
++
+If _PATH_ ends with a path separator (e.g. "/"), the name of the torrent (as
+specified in _TORRENT_) is appended.
 
 
 == OPTIONS
@@ -43,7 +46,9 @@ _TORRENT_.
 Options that start with *--no* take precedence.
 
 _PATH_::
-    The path to the torrent's content.
+The path to the torrent's content.
++
+When verifying data, the torrent's name is appended.
 
 *--exclude*, *-e* _PATTERN_::
 Exclude files from _PATH_ that match the glob pattern _PATTERN_.  This option

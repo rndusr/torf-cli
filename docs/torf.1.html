@@ -496,6 +496,10 @@ Editing a torrent can change its hash, depending on what is changed,
 <p><strong>torf</strong> <strong>-i</strong> <em>TORRENT</em> <em>PATH</em><br>
 Verify that the content in <em>PATH</em> matches the metadata in the torrent file
 <em>TORRENT</em>.</p>
+<div class="paragraph">
+<p>If <em>PATH</em> ends with a path separator (e.g. "/"), the name of the torrent (as
+specified in <em>TORRENT</em>) is appended.</p>
+</div>
 </li>
 </ul>
 </div>
@@ -512,6 +516,9 @@ Verify that the content in <em>PATH</em> matches the metadata in the torrent fil
 <dt class="hdlist1"><em>PATH</em></dt>
 <dd>
 <p>The path to the torrent&#8217;s content.</p>
+<div class="paragraph">
+<p>When verifying data, the torrent&#8217;s name is appended.</p>
+</div>
 </dd>
 <dt class="hdlist1"><strong>--exclude</strong>, <strong>-e</strong> <em>PATTERN</em></dt>
 <dd>
@@ -1052,7 +1059,7 @@ raw bytes for sizes, etc).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-11 16:21:59 +0200
+Last updated 2020-04-18 11:47:16 +0200
 </div>
 </div>
 </body>
