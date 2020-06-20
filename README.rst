@@ -194,7 +194,7 @@ and on `AUR <https://aur.archlinux.org/packages/torf-cli/>`_.
 
 
 pipx
-`````
+````
 
 The easiest and cleanest installation method is `pipx
 <https://pipxproject.github.io/pipx/>`_, which installs each application with all
