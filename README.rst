@@ -197,7 +197,7 @@ pipx
 ````
 
 The easiest and cleanest installation method is `pipx
-<https://pipxproject.github.io/pipx/>`_, which installs each application with all
+<https://pipxproject.github.io/pipx/>`__, which installs each application with all
 dependencies in a separate virtual environment in ``~/.local/venvs/`` and links
 the executable to ``~/.local/bin/``.
 
@@ -215,7 +215,7 @@ page available, but `it's also available here
 pip
 ```
 
-The alternative is regular `pip <https://pypi.org/project/torf/>`_, but if you
+The alternative is regular `pip <https://pypi.org/project/torf/>`__, but if you
 decide to uninstall, you have to manually uninstall the dependencies.
 
 .. code:: sh
