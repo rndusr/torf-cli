@@ -7,6 +7,7 @@ __pycache__/
 .cache
 .pytest_cache
 .tox
+.python-version
 
 # Virtual environment
 venv
