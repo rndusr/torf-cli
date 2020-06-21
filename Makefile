@@ -27,6 +27,11 @@ test: venv
 	. "$(VENV_PATH)"/bin/activate ; \
 	"$(VENV_PATH)"/bin/pytest --exitfirst tests
 
+testreadme: venv
+	# Check if README.org converts correctly to rst for PyPI
+	. "$(VENV_PATH)"/bin/activate ; \
+	  "$(PYTHON)" setup.py check -r -s >/dev/null
+
 man:
 	asciidoctor $(MANPAGE_SRC) -o $(MANPAGE) --doctype=manpage --backend=manpage
 	asciidoctor $(MANPAGE_SRC) -o $(MANPAGE_HTML) --doctype=manpage --backend=html
