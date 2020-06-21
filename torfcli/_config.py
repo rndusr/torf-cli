@@ -9,16 +9,15 @@
 # GNU General Public License for more details
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
-import re
 import argparse
 import os
+import re
+
 from xdg import BaseDirectory
 
 import torf
-from . import _errors
-from . import _vars
-from . import _utils
 
+from . import _errors, _utils, _vars
 
 DEFAULT_CONFIG_FILE = os.path.join(BaseDirectory.xdg_config_home, _vars.__appname__, 'config')
 DEFAULT_CREATOR = f'{_vars.__appname__} {_vars.__version__}'

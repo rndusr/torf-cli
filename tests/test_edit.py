@@ -1,13 +1,13 @@
-from torfcli import run
-from torfcli import _errors as err
-from torfcli import _vars
-
-import pytest
-from unittest.mock import patch
-import torf
 import os
 import re
 from datetime import datetime
+from unittest.mock import patch
+
+import pytest
+
+import torf
+from torfcli import _errors as err
+from torfcli import _vars, run
 
 
 def test_nonexisting_input(capsys):

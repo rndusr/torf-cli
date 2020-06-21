@@ -1,11 +1,11 @@
-from torfcli import run
-from torfcli import _errors as err
-from torfcli import _vars
-
-import pytest
-from unittest.mock import patch
 import json
 import time
+from unittest.mock import patch
+
+import pytest
+
+from torfcli import _errors as err
+from torfcli import _vars, run
 
 
 def test_json_contains_standard_fields(capsys, mock_content):

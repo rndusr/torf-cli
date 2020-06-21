@@ -1,11 +1,11 @@
-from torfcli import run
-from torfcli import _errors as err
-from torfcli import _vars
+import datetime
+import textwrap
+from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
-import textwrap
-import datetime
+
+from torfcli import _errors as err
+from torfcli import _vars, run
 
 
 def test_unknown_profile(capsys, cfgfile, mock_content, mock_create_mode):

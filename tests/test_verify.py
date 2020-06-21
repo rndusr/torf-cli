@@ -1,12 +1,12 @@
-from torfcli import run
-from torfcli import _errors as err
-from torfcli import _vars
-
-import pytest
-from unittest.mock import patch, call
-import torf
 import os
 import re
+from unittest.mock import call, patch
+
+import pytest
+
+import torf
+from torfcli import _errors as err
+from torfcli import _vars, run
 
 
 def test_torrent_unreadable(capsys, mock_content):

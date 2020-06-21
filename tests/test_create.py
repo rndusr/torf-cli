@@ -1,13 +1,13 @@
-from torfcli import run
-from torfcli import _errors as err
-from torfcli import _vars
+import os
+import re
+from datetime import date, datetime, time, timedelta
+from unittest.mock import DEFAULT, patch
 
 import pytest
-from unittest.mock import patch, DEFAULT
-import os
+
 import torf
-from datetime import datetime, date, time, timedelta
-import re
+from torfcli import _errors as err
+from torfcli import _vars, run
 
 
 def assert_approximate_date(date1, date2):

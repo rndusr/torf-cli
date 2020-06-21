@@ -13,4 +13,5 @@
 # `python -m torfcli`.
 
 from . import run
+
 run()

@@ -9,16 +9,13 @@
 # GNU General Public License for more details
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
-import sys
 import datetime
 import os.path
+import sys
 
 import torf
-from . import _vars
-from . import _config
-from . import _ui
-from . import _utils
-from . import _errors
+
+from . import _config, _errors, _ui, _utils, _vars
 
 # Seconds between progress updates
 PROGRESS_INTERVAL = 0.5

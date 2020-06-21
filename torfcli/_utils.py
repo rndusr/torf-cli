@@ -9,17 +9,18 @@
 # GNU General Public License for more details
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
-import datetime
-import time
+import base64
 import contextlib
-import sys
-import os
+import copy
+import datetime
 import io
 import json
-import torf
-import copy
-import base64
+import os
+import sys
+import time
 from collections import abc
+
+import torf
 
 from . import _errors
 

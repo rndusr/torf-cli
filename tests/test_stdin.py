@@ -1,13 +1,13 @@
-import torf
-from torfcli import run
-from torfcli import _errors
-from torfcli import _vars
-
-import pytest
-from unittest.mock import patch
-import sys
 import os
 import re
+import sys
+from unittest.mock import patch
+
+import pytest
+
+import torf
+from torfcli import _errors, _vars, run
+
 
 def test_reading_valid_torrent_data_from_stdin(capsys, monkeypatch, clear_ansi, create_torrent, regex):
     with create_torrent(name='Foo', comment='Bar.') as torrent_file:

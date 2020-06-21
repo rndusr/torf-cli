@@ -1,7 +1,10 @@
-from torfcli import _errors as err
-import torf
 import errno
+
 import pytest
+
+import torf
+from torfcli import _errors as err
+
 
 def test_CliError():
     for cls,args,kwargs in ((err.CliError, ('invalid argument: --foo',), {}),

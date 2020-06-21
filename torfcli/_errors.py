@@ -9,8 +9,8 @@
 # GNU General Public License for more details
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
-from enum import IntEnum
 from collections import defaultdict
+from enum import IntEnum
 
 import torf
 

@@ -1,11 +1,12 @@
-from torfcli import run
-from torfcli import _errors as err
-from torfcli import _vars
+import os
+import re
+from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
-import re
-import os
+
+from torfcli import _errors as err
+from torfcli import _vars, run
+
 
 @pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
 def test_creating_prints_performance_summary_on_success(tmp_path, human_readable, hr_enabled, capsys, clear_ansi, regex):

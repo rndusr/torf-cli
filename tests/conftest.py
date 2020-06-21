@@ -1,12 +1,15 @@
-import pytest
-from unittest import mock
 import contextlib
-import os
-import torf
 import functools
+import os
+import re
 import shutil
 from types import GeneratorType
-import re
+from unittest import mock
+
+import pytest
+
+import torf
+
 
 @pytest.fixture
 def regex():

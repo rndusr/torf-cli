@@ -9,20 +9,19 @@
 # GNU General Public License for more details
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
-import sys
-from collections import abc
-import textwrap
-import types
-import os
-import time
 import datetime
-import torf
+import os
 import shutil
+import sys
+import textwrap
+import time
+import types
+from collections import abc
 
-from . import _utils
+import torf
+
 from . import _errors as err
-from . import _vars
-from . import _term
+from . import _term, _utils, _vars
 
 LABEL_WIDTH = 11
 LABEL_SEPARATOR = '  '

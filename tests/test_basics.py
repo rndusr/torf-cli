@@ -1,9 +1,8 @@
-from torfcli import run
-from torfcli import _errors
-from torfcli import _vars
+from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
+
+from torfcli import _errors, _vars, run
 
 
 def test_no_arguments(capsys):

@@ -1,12 +1,11 @@
-from torfcli import run
-from torfcli import _vars
-from torfcli import _errors
+import datetime
+import os
+import textwrap
+from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
-import textwrap
-import os
-import datetime
+
+from torfcli import _errors, _vars, run
 
 
 def test_default_configfile_doesnt_exist(cfgfile, mock_content, mock_create_mode):

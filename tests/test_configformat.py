@@ -1,7 +1,9 @@
-from torfcli._main import run
-from torfcli._config import _readfile
-import pytest
 import textwrap
+
+import pytest
+
+from torfcli._config import _readfile
+from torfcli._main import run
 
 
 def test_boolean_options(cfgfile):

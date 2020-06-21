@@ -9,11 +9,10 @@
 # GNU General Public License for more details
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
+import io
 import sys
 import termios
 import tty
-import io
-
 
 # References:
 #   https://www.vt100.net/docs/vt100-ug/chapter3.html#DECSCNM

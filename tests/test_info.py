@@ -1,13 +1,13 @@
-from torfcli import run
-from torfcli import _errors as err
-from torfcli import _vars
+import errno
+import os
+import re
+from datetime import datetime
+from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
-import os
-from datetime import datetime
-import errno
-import re
+
+from torfcli import _errors as err
+from torfcli import _vars, run
 
 
 def test_nonexisting_torrent_file(capsys):

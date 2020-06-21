@@ -1,12 +1,13 @@
-from torfcli import run
-from torfcli import _errors as err
-from torfcli import _vars
+import base64
+import json
+from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
-import json
+
 import torf
-import base64
+from torfcli import _errors as err
+from torfcli import _vars, run
+
 
 @pytest.fixture
 def nonstandard_torrent(tmp_path):
