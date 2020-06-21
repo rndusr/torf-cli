@@ -27,6 +27,14 @@ test: venv
 	. "$(VENV_PATH)"/bin/activate ; \
 	"$(VENV_PATH)"/bin/pytest --exitfirst tests
 
+fulltest: venv testreadme
+	. "$(VENV_PATH)"/bin/activate ; \
+	  tox
+	. "$(VENV_PATH)"/bin/activate ; \
+	  flake8 torfcli tests
+	. "$(VENV_PATH)"/bin/activate ; \
+	  isort --recursive torfcli tests
+
 testreadme: venv
 	# Check if README.org converts correctly to rst for PyPI
 	. "$(VENV_PATH)"/bin/activate ; \
