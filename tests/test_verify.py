@@ -3,7 +3,7 @@ from torfcli import _errors as err
 from torfcli import _vars
 
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, call
 import torf
 import os
 import re
@@ -21,10 +21,11 @@ def test_skipping_files_with_increased_verbosity(mock_content, create_torrent):
     with create_torrent(path=mock_content) as torrent_file:
         with patch('torf.Torrent.verify') as mock_verify:
             run([str(mock_content), '-i', torrent_file])
-            assert mock_verify.call_args.kwargs['skip_on_error'] is False
-
+            kwargs = mock_verify.call_args[1]
+            assert kwargs['skip_on_error'] is False
             run([str(mock_content), '-i', torrent_file, '--verbose'])
-            assert mock_verify.call_args.kwargs['skip_on_error'] is True
+            kwargs = mock_verify.call_args[1]
+            assert kwargs['skip_on_error'] is True
 
 
 @pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
