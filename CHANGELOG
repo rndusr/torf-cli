@@ -1,4 +1,4 @@
-2020-??-?? 3.2.0
+2020-06-21 3.2.0
   - Support for reading magnet URIs was added, e.g. "torf -i 'magnet:...' -o
     foo.torrent".  The missing information is downloaded from the parameters
     "xs", "as", "ws" and "tr", if possible.  Support for DHT and UDP trackers is
