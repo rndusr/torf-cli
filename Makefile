@@ -1,3 +1,4 @@
+PYTHON?=python3
 VENV_PATH?=venv
 MANPAGE ?= docs/torf.1
 MANPAGE_HTML ?= docs/torf.1.html
@@ -15,7 +16,7 @@ clean:
 	rm -rf .tox
 
 venv:
-	python3 -m venv "$(VENV_PATH)"
+	"$(PYTHON)" -m venv "$(VENV_PATH)"
 	"$(VENV_PATH)"/bin/pip install --upgrade pytest wheel
 	"$(VENV_PATH)"/bin/pip install --editable ../torf
 	"$(VENV_PATH)"/bin/pip install --editable .
