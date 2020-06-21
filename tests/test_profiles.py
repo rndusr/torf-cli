@@ -2,8 +2,6 @@ import datetime
 import textwrap
 from unittest.mock import patch
 
-import pytest
-
 from torfcli import _errors as err
 from torfcli import _vars, run
 
@@ -30,13 +28,13 @@ def test_profile_option(cfgfile, mock_content, mock_create_mode):
     '''))
     run([str(mock_content)])
     cfg = mock_create_mode.call_args[0][1]
-    assert cfg['xseed'] == True
+    assert cfg['xseed'] is True
     assert cfg['date'] == datetime.datetime(2000, 1, 2)
-    assert cfg['comment'] == None
+    assert cfg['comment'] is  None
 
     run([str(mock_content), '--profile', 'foo'])
     cfg = mock_create_mode.call_args[0][1]
-    assert cfg['xseed'] == True
+    assert cfg['xseed'] is True
     assert cfg['date'] == datetime.datetime(2000, 1, 2)
     assert cfg['comment'] == 'Foo!'
 
@@ -58,23 +56,23 @@ def test_overloading_values(cfgfile, mock_content, mock_create_mode):
     run([str(mock_content), '--profile', 'foo', '--profile', 'bar'])
     cfg = mock_create_mode.call_args[0][1]
     assert cfg['comment'] == 'Bar'
-    assert cfg['private'] == True
-    assert cfg['yes'] == True
-    assert cfg['xseed'] == False
+    assert cfg['private'] is True
+    assert cfg['yes'] is True
+    assert cfg['xseed'] is False
 
     run([str(mock_content), '--profile', 'bar', '--profile', 'foo'])
     cfg = mock_create_mode.call_args[0][1]
     assert cfg['comment'] == 'Foo'
-    assert cfg['private'] == True
-    assert cfg['yes'] == True
-    assert cfg['xseed'] == False
+    assert cfg['private'] is True
+    assert cfg['yes'] is True
+    assert cfg['xseed'] is False
 
     run([str(mock_content), '--profile', 'bar', '--profile', 'baz'])
     cfg = mock_create_mode.call_args[0][1]
     assert cfg['comment'] == 'Baz'
-    assert cfg['private'] == None
-    assert cfg['yes'] == True
-    assert cfg['xseed'] == True
+    assert cfg['private'] is None
+    assert cfg['yes'] is True
+    assert cfg['xseed'] is True
 
 
 def test_list_value(cfgfile, mock_content, mock_create_mode):
@@ -90,22 +88,22 @@ def test_list_value(cfgfile, mock_content, mock_create_mode):
     run([str(mock_content), '--profile', 'foo', '--profile', 'bar'])
     cfg = mock_create_mode.call_args[0][1]
     assert cfg['webseed'] == ['https://foo', 'https://bar']
-    assert cfg['nowebseed'] == False
+    assert cfg['nowebseed'] is False
 
     run([str(mock_content), '--profile', 'bar', '--profile', 'foo'])
     cfg = mock_create_mode.call_args[0][1]
     assert cfg['webseed'] == ['https://bar', 'https://foo']
-    assert cfg['nowebseed'] == False
+    assert cfg['nowebseed'] is False
 
     run([str(mock_content), '--profile', 'bar', '--profile', 'baz'])
     cfg = mock_create_mode.call_args[0][1]
     assert cfg['webseed'] == ['https://bar', 'https://baz']
-    assert cfg['nowebseed'] == True
+    assert cfg['nowebseed'] is True
 
     run([str(mock_content), '--profile', 'bar', '--profile', 'baz', '--profile', 'foo'])
     cfg = mock_create_mode.call_args[0][1]
     assert cfg['webseed'] == ['https://bar', 'https://baz', 'https://foo']
-    assert cfg['nowebseed'] == True
+    assert cfg['nowebseed'] is True
 
 
 def test_illegal_configfile_arguments(capsys, cfgfile, mock_content, mock_create_mode):

@@ -29,7 +29,6 @@ def test_json_contains_standard_fields(capsys, mock_content):
     assert isinstance(j['Torrent'], str)
 
 def test_json_does_not_contain_progress(capsys, mock_content):
-    now = time.time()
     run([str(mock_content), '--json'])
     cap = capsys.readouterr()
     assert cap.err == ''

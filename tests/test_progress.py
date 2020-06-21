@@ -1,5 +1,4 @@
 import os
-import re
 from unittest.mock import patch
 
 import pytest
@@ -41,12 +40,14 @@ def test_creating_keeps_progress_when_aborted(tmp_path, human_readable, hr_enabl
         status_reporter_cls = torfcli._ui._HumanStatusReporter
     else:
         status_reporter_cls = torfcli._ui._MachineStatusReporter
+
     class MockStatusReporter(status_reporter_cls):
         def generate_callback(self, torrent, filepath, pieces_done, pieces_total):
             if pieces_done / pieces_total >= 0.5:
                 raise KeyboardInterrupt()
             else:
                 super().generate_callback(torrent, filepath, pieces_done, pieces_total)
+
     monkeypatch.setattr(torfcli._ui, status_reporter_cls.__name__, MockStatusReporter)
     monkeypatch.setattr(torfcli._main, 'PROGRESS_INTERVAL', 0)
 
@@ -96,6 +97,7 @@ def test_verifying_keeps_progress_when_aborted(tmp_path, human_readable, hr_enab
         status_reporter_cls = torfcli._ui._HumanStatusReporter
     else:
         status_reporter_cls = torfcli._ui._MachineStatusReporter
+
     class MockStatusReporter(status_reporter_cls):
         def verify_callback(self, torrent, filepath, pieces_done, pieces_total,
                             piece_index, piece_hash, exception):
@@ -104,6 +106,7 @@ def test_verifying_keeps_progress_when_aborted(tmp_path, human_readable, hr_enab
             else:
                 super().verify_callback(torrent, filepath, pieces_done, pieces_total,
                                         piece_index, piece_hash, exception)
+
     monkeypatch.setattr(torfcli._ui, status_reporter_cls.__name__, MockStatusReporter)
     monkeypatch.setattr(torfcli._main, 'PROGRESS_INTERVAL', 0)
 
@@ -117,8 +120,7 @@ def test_verifying_keeps_progress_when_aborted(tmp_path, human_readable, hr_enab
     if hr_enabled:
         pattern = (r'\s*Progress  \d+:\d{2}:\d{2} elapsed \| \d+:\d{2}:\d{2} left \| '
                    r'\d+:\d{2}:\d{2} total \| ETA: \d{2}:\d{2}:\d{2}'
-                   r'\d{1,2}\.\d{2} % ▕foo\s+▏ \s*\d+\.\d{2} [KMGT]iB/s\n\n$'
-        )
+                   r'\d{1,2}\.\d{2} % ▕foo\s+▏ \s*\d+\.\d{2} [KMGT]iB/s\n\n$')
         assert clear_ansi(cap.out) == regex(pattern), clear_ansi(cap.out)
     else:
         pattern = (r'\nProgress\t\d+\.\d+\t\d+\t\d+\t\d+\t\d+\t\d+\t' + str(content_path) + '\n$')

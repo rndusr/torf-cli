@@ -1,10 +1,7 @@
-import errno
 import os
 import re
 from datetime import datetime
 from unittest.mock import patch
-
-import pytest
 
 from torfcli import _errors as err
 from torfcli import _vars, run
@@ -238,9 +235,9 @@ def test_trackers___multiple_trackers_per_tier(capsys, create_torrent, human_rea
             run(['-i', torrent_file])
             cap = capsys.readouterr()
             assert clear_ansi(cap.out) == regex(r'^(\s*)Trackers  Tier 1: http://tracker1.1\n'
-                                                rf'\1          Tier 2: http://tracker2.1\n'
-                                                rf'\1                  http://tracker2.2\n'
-                                                rf'\1          Tier 3: http://tracker3.1$', flags=re.MULTILINE)
+                                                r'\1          Tier 2: http://tracker2.1\n'
+                                                r'\1                  http://tracker2.2\n'
+                                                r'\1          Tier 3: http://tracker3.1$', flags=re.MULTILINE)
             assert cap.err == ''
 
         with human_readable(False):
@@ -291,14 +288,14 @@ def test_httpseeds(capsys, create_torrent, human_readable, clear_ansi, regex):
 def test_file_tree_and_file_count(capsys, create_torrent, human_readable, tmpdir, clear_ansi, regex):
     root = tmpdir.mkdir('root')
     subdir1 = root.mkdir('subdir1')
-    file1 = subdir1.join('file1') ; file1.write('data')
+    file1 = subdir1.join('file1') ; file1.write('data')  # noqa: E702
     subdir10 = subdir1.mkdir('subsubdir1.0')
-    file2 = subdir10.join('file2') ; file2.write('data')
+    file2 = subdir10.join('file2') ; file2.write('data')  # noqa: E702
     subdir100 = subdir10.mkdir('subsubdir1.0.0')
-    file3 = subdir100.join('file3') ; file3.write('data')
+    file3 = subdir100.join('file3') ; file3.write('data')  # noqa: E702
 
     subdir2 = root.mkdir('subdir2')
-    file4 = subdir2.join('file4') ; file4.write('data')
+    file4 = subdir2.join('file4') ; file4.write('data')  # noqa: E702
 
     with create_torrent(path=str(root)) as torrent_file:
         with human_readable(True):
@@ -321,9 +318,9 @@ def test_file_tree_and_file_count(capsys, create_torrent, human_readable, tmpdir
             cap = capsys.readouterr()
             assert cap.out == regex(r'^File Count\t4$', flags=re.MULTILINE)
             exp_files = '\t'.join(('root/subdir1/file1',
-	                           'root/subdir1/subsubdir1.0/file2',
-	                           'root/subdir1/subsubdir1.0/subsubdir1.0.0/file3',
-	                           'root/subdir2/file4'))
+                                   'root/subdir1/subsubdir1.0/file2',
+                                   'root/subdir1/subsubdir1.0/subsubdir1.0.0/file3',
+                                   'root/subdir2/file4'))
             assert cap.out == regex(rf'^Files\t{exp_files}$', flags=re.MULTILINE)
             assert cap.err == ''
 
@@ -338,14 +335,14 @@ def test_reading_magnet(capsys, human_readable, clear_ansi, regex):
     with human_readable(True):
         run(['-i', magnet])
     cap = capsys.readouterr()
-    assert clear_ansi(cap.out) == regex((rf'^\s*Name  My Torrent\n'
-                                         rf'\s*Size  \d+\.\d+ [TMK]iB\n'
-                                         rf'\s*Tracker  https://localhost:123/announce\n'
-                                         rf'\s*Webseed  https://localhost/My\+Torrent\n'
-                                         rf'\s*Piece Size  \d+ [TMK]iB\n'
-                                         rf'\s*Piece Count  \d+\n'
-                                         rf'\s*File Count  \d+\n'
-                                         rf'\s*Files  My Torrent \[\d+\.\d+ [TMK]iB\]\n$'))
+    assert clear_ansi(cap.out) == regex((r'^\s*Name  My Torrent\n'
+                                         r'\s*Size  \d+\.\d+ [TMK]iB\n'
+                                         r'\s*Tracker  https://localhost:123/announce\n'
+                                         r'\s*Webseed  https://localhost/My\+Torrent\n'
+                                         r'\s*Piece Size  \d+ [TMK]iB\n'
+                                         r'\s*Piece Count  \d+\n'
+                                         r'\s*File Count  \d+\n'
+                                         r'\s*Files  My Torrent \[\d+\.\d+ [TMK]iB\]\n$'))
     assert cap.err == regex((rf'^{_vars.__appname__}: https://localhost:123/My\+Torrent.torrent: [\w\s]+\n'
                              rf'{_vars.__appname__}: https://localhost:456/My\+Torrent.torrent: [\w\s]+\n'
                              rf'{_vars.__appname__}: https://localhost/My\+Torrent.torrent: [\w\s]+\n'
@@ -355,14 +352,14 @@ def test_reading_magnet(capsys, human_readable, clear_ansi, regex):
     with human_readable(False):
         run(['-i', magnet])
     cap = capsys.readouterr()
-    assert cap.out == regex((rf'^Name\tMy Torrent\n'
-                             rf'Size\t\d+\n'
-                             rf'Tracker\thttps://localhost:123/announce\n'
-                             rf'Webseed\thttps://localhost/My\+Torrent\n'
-                             rf'Piece Size\t\d+\n'
-                             rf'Piece Count\t\d+\n'
-                             rf'File Count\t\d+\n'
-                             rf'Files\tMy Torrent$'))
+    assert cap.out == regex((r'^Name\tMy Torrent\n'
+                             r'Size\t\d+\n'
+                             r'Tracker\thttps://localhost:123/announce\n'
+                             r'Webseed\thttps://localhost/My\+Torrent\n'
+                             r'Piece Size\t\d+\n'
+                             r'Piece Count\t\d+\n'
+                             r'File Count\t\d+\n'
+                             r'Files\tMy Torrent$'))
     assert cap.err == regex((rf'^{_vars.__appname__}: https://localhost:123/My\+Torrent.torrent: [\w\s]+\n'
                              rf'{_vars.__appname__}: https://localhost:456/My\+Torrent.torrent: [\w\s]+\n'
                              rf'{_vars.__appname__}: https://localhost/My\+Torrent.torrent: [\w\s]+\n'

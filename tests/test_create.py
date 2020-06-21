@@ -36,19 +36,19 @@ def test_default_torrent_filepath(capsys, mock_content, human_readable, hr_enabl
 
     cap = capsys.readouterr()
     if hr_enabled:
-          out_cleared = clear_ansi(cap.out)
-          assert out_cleared == regex(rf'^\s*Magnet  magnet:\?xt=urn:btih:{t.infohash}&dn=My\+Torrent&xl=\d+$', flags=re.MULTILINE)
-          assert out_cleared == regex(rf'^\s*Torrent  {exp_torrent_filename}$', flags=re.MULTILINE)
-          assert out_cleared == regex(rf'^\s*Name  My Torrent$', flags=re.MULTILINE)
-          assert out_cleared == regex(rf'^\s*File Count  3$', flags=re.MULTILINE)
-          assert out_cleared == regex(rf'^\s*Info Hash  {t.infohash}$', flags=re.MULTILINE)
-          assert out_cleared == regex(rf'^\s*Created By  torf {re.escape(_vars.__version__)}$', flags=re.MULTILINE)
+        out_cleared = clear_ansi(cap.out)
+        assert out_cleared == regex(rf'^\s*Magnet  magnet:\?xt=urn:btih:{t.infohash}&dn=My\+Torrent&xl=\d+$', flags=re.MULTILINE)
+        assert out_cleared == regex(rf'^\s*Torrent  {exp_torrent_filename}$', flags=re.MULTILINE)
+        assert out_cleared == regex(r'^\s*Name  My Torrent$', flags=re.MULTILINE)
+        assert out_cleared == regex(r'^\s*File Count  3$', flags=re.MULTILINE)
+        assert out_cleared == regex(rf'^\s*Info Hash  {t.infohash}$', flags=re.MULTILINE)
+        assert out_cleared == regex(rf'^\s*Created By  torf {re.escape(_vars.__version__)}$', flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Magnet\tmagnet:\?xt=urn:btih:{t.infohash}&dn=My\+Torrent&xl=\d+$', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Torrent\t{exp_torrent_filename}$', flags=re.MULTILINE)
-        assert cap.out == regex(rf'^Name\tMy Torrent$', flags=re.MULTILINE)
-        assert cap.out == regex(rf'^File Count\t3$', flags=re.MULTILINE)
+        assert cap.out == regex(r'^Name\tMy Torrent$', flags=re.MULTILINE)
+        assert cap.out == regex(r'^File Count\t3$', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Info Hash\t{t.infohash}$', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Created By\ttorf {re.escape(_vars.__version__)}$', flags=re.MULTILINE)
 
@@ -68,7 +68,7 @@ def test_user_given_torrent_filepath(capsys, mock_content):
     assert t.created_by.startswith('torf')
 
     cap = capsys.readouterr()
-    assert f'Magnet\tmagnet:?xt=urn:btih:' in cap.out
+    assert 'Magnet\tmagnet:?xt=urn:btih:' in cap.out
     assert f'Torrent\t{exp_torrent_filename}' in cap.out
     assert 'Name\tMy Torrent' in cap.out
     assert 'File Count\t3' in cap.out
@@ -193,7 +193,7 @@ def test_yes_option(capsys, mock_content):
     assert t.name == 'My Torrent'
 
     cap = capsys.readouterr()
-    assert f'Magnet\tmagnet:?xt=urn:btih:' in cap.out
+    assert 'Magnet\tmagnet:?xt=urn:btih:' in cap.out
     assert f'Torrent\t{exp_torrent_filename}' in cap.out
 
 
@@ -258,6 +258,7 @@ def test_exclude_everything(capsys, mock_content):
     mock_exit.assert_called_once_with(err.Code.READ)
     cap = capsys.readouterr()
     assert cap.err == f'{_vars.__appname__}: {content_path}: Empty or all files excluded\n'
+    assert not os.path.exists(exp_torrent_filepath)
 
 
 def test_name_option(capsys, mock_content):
@@ -268,11 +269,13 @@ def test_name_option(capsys, mock_content):
     wrong_torrent_filename = os.path.basename(content_path) + '.torrent'
 
     run([content_path, '--name', name])
+    assert not os.path.exists(wrong_torrent_filename)
 
     t = torf.Torrent.read(exp_torrent_filepath)
     assert t.name == 'Your Torrent'
 
     cap = capsys.readouterr()
+    assert f'Name\t{name}' in cap.out
     assert 'Torrent\tYour Torrent.torrent' in cap.out
 
 
@@ -283,7 +286,7 @@ def test_private_option(capsys, mock_content):
 
     run([content_path, '--private', '--tracker', 'https://foo.bar:123/'])
     t = torf.Torrent.read(exp_torrent_filepath)
-    assert t.private == True
+    assert t.private is True
 
     cap = capsys.readouterr()
     assert 'Private\tyes' in cap.out
@@ -301,7 +304,7 @@ def test_noprivate_option(capsys, mock_content):
 
     run([content_path, '--private', '--noprivate'])
     t = torf.Torrent.read(exp_torrent_filepath)
-    assert t.private == False
+    assert t.private is False
 
     cap = capsys.readouterr()
     assert 'Private\tno' in cap.out
@@ -314,7 +317,7 @@ def test_missing_private_option_does_not_set_private_field(capsys, mock_content)
     run([content_path])
     t = torf.Torrent.read(exp_torrent_filepath)
     assert 'private' not in t.metainfo['info']
-    assert t.private == None
+    assert t.private is None
 
 
 def test_source_option(capsys, mock_content):
@@ -449,7 +452,7 @@ def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
 
     with patch.multiple('torfcli._main', _hash_pieces=DEFAULT, _write_torrent=DEFAULT):
         factor = 1.234
-        exp_invalid_piece_size = int(factor*2**20)
+        exp_invalid_piece_size = int(factor * 2**20)
         with patch('sys.exit') as mock_exit:
             run([content_path, '--max-piece-size', str(factor)])
         mock_exit.assert_called_once_with(err.Code.CLI)
@@ -501,7 +504,6 @@ def test_date_now(capsys, mock_content):
     assert_approximate_date(t.creation_date, now)
 
     cap = capsys.readouterr()
-    exp_date = int(now.timestamp())
     exp_dates = [int(now.timestamp()), int((now + timedelta(seconds=1)).timestamp())]
     assert any(f'Created\t{exp_date}' in cap.out for exp_date in exp_dates)
 
@@ -561,6 +563,7 @@ def test_invalid_date(capsys, mock_content):
     mock_exit.assert_called_once_with(err.Code.CLI)
     cap = capsys.readouterr()
     assert cap.err == f'{_vars.__appname__}: foo: Invalid date\n'
+    assert not os.path.exists(exp_torrent_filepath)
 
 
 def test_nodate_option(capsys, mock_content):
@@ -571,7 +574,7 @@ def test_nodate_option(capsys, mock_content):
     run([content_path, '--date', '2000-01-02 03:04:05', '--nodate'])
 
     t = torf.Torrent.read(exp_torrent_filepath)
-    assert t.creation_date == None
+    assert t.creation_date is None
 
     cap = capsys.readouterr()
     assert 'Created\t' not in cap.out

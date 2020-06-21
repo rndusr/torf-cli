@@ -3,8 +3,6 @@ import os
 import textwrap
 from unittest.mock import patch
 
-import pytest
-
 from torfcli import _errors, _vars, run
 
 
@@ -55,8 +53,8 @@ def test_noconfig_option(cfgfile, mock_content, mock_create_mode):
     '''))
     run([str(mock_content), '--noconfig'])
     cfg = mock_create_mode.call_args[0][1]
-    assert cfg['private'] == None
-    assert cfg['comment'] == None
+    assert cfg['private'] is None
+    assert cfg['comment'] is None
 
 
 def test_cli_args_take_precedence(cfgfile, mock_content, mock_create_mode):
@@ -67,8 +65,8 @@ def test_cli_args_take_precedence(cfgfile, mock_content, mock_create_mode):
     '''))
     run([str(mock_content), '--noxseed', '--date', '2001-02-03 04:05'])
     cfg = mock_create_mode.call_args[0][1]
-    assert cfg['noxseed'] == True
-    assert cfg['xseed'] == True
+    assert cfg['noxseed'] is True
+    assert cfg['xseed'] is True
     assert cfg['comment'] == 'Generic description'
     assert cfg['date'] == datetime.datetime(2001, 2, 3, 4, 5)
 

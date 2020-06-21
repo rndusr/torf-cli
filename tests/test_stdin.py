@@ -3,8 +3,6 @@ import re
 import sys
 from unittest.mock import patch
 
-import pytest
-
 import torf
 from torfcli import _errors, _vars, run
 

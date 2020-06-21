@@ -1,6 +1,6 @@
 import os
 import re
-from unittest.mock import call, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -55,7 +55,7 @@ def test_singlefile_torrent__path_is_dir(tmp_path, create_torrent, human_readabl
     with create_torrent(path=content_path) as torrent_file:
         os.remove(content_path)
         content_path.mkdir()
-        content_file = (content_path / 'some.file').write_bytes(b'some data')
+        (content_path / 'some.file').write_bytes(b'some data')
         assert os.path.isfile(content_path) is False
 
         with human_readable(hr_enabled):
@@ -114,10 +114,10 @@ def test_singlefile_torrent__correct_size_but_corrupt(tmp_path, create_torrent, 
     assert cap.err == f'{_vars.__appname__}: {content_path} does not satisfy {torrent_file}\n'
 
     if hr_enabled:
-        assert clear_ansi(cap.out) == regex(rf'^\s*Error  Corruption in piece 1$', flags=re.MULTILINE)
+        assert clear_ansi(cap.out) == regex(r'^\s*Error  Corruption in piece 1$', flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)
-        assert cap.out == regex(rf'^Error\tCorruption in piece 1$', flags=re.MULTILINE)
+        assert cap.out == regex(r'^Error\tCorruption in piece 1$', flags=re.MULTILINE)
 
 
 @pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
@@ -172,7 +172,7 @@ def test_multifile_torrent__missing_file(tmp_path, create_torrent, human_readabl
     if hr_enabled:
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  {file1}: No such file or directory$',
                                             flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(rf'^\s*Error  Corruption in piece 1, at least one of these files is corrupt:$',
+        assert clear_ansi(cap.out) == regex(r'^\s*Error  Corruption in piece 1, at least one of these files is corrupt:$',
                                             flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*      {file1}$', flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*      {file2}$', flags=re.MULTILINE)
@@ -208,7 +208,7 @@ def test_multifile_torrent__wrong_size(tmp_path, create_torrent, human_readable,
     if hr_enabled:
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  {file2}: Too big: 20 instead of 15 bytes$',
                                             flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(rf'^\s*Error  Corruption in piece 1, at least one of these files is corrupt:$',
+        assert clear_ansi(cap.out) == regex(r'^\s*Error  Corruption in piece 1, at least one of these files is corrupt:$',
                                             flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*      {file1}$', flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*      {file2}$', flags=re.MULTILINE)
@@ -263,7 +263,7 @@ def test_success(tmp_path, create_torrent, human_readable, hr_enabled, capsys, c
 
     cap = capsys.readouterr()
     if hr_enabled:
-        assert clear_ansi(cap.out) == regex(rf'^\s*Progress  100.00 % \| \d+:\d+:\d+ total \| \s*\d+\.\d+ [KMGT]iB/s$',
+        assert clear_ansi(cap.out) == regex(r'^\s*Progress  100.00 % \| \d+:\d+:\d+ total \| \s*\d+\.\d+ [KMGT]iB/s$',
                                             flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)

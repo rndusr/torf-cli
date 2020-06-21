@@ -3,8 +3,6 @@ import re
 from datetime import datetime
 from unittest.mock import patch
 
-import pytest
-
 import torf
 from torfcli import _errors as err
 from torfcli import _vars, run
@@ -176,7 +174,6 @@ def test_replace_trackers(create_torrent, tmpdir, assert_torrents_equal):
 def test_invalid_tracker_url(capsys, create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(trackers=['http://tracker1', 'http://tracker2']) as infile:
-        orig = torf.Torrent.read(infile)
         with patch('sys.exit') as mock_exit:
             run(['-i', infile, '--tracker', 'not a url', '-o', outfile])
         mock_exit.assert_called_once_with(err.Code.CLI)
@@ -213,7 +210,6 @@ def test_replace_webseeds(create_torrent, tmpdir, assert_torrents_equal):
 def test_invalid_webseed_url(capsys, create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent(webseeds=['http://webseed1', 'http://webseed2']) as infile:
-        orig = torf.Torrent.read(infile)
         with patch('sys.exit') as mock_exit:
             run(['-i', infile, '--webseed', 'not a url', '-o', outfile])
         mock_exit.assert_called_once_with(err.Code.CLI)
@@ -241,7 +237,6 @@ def test_remove_creation_date(create_torrent, tmpdir, assert_torrents_equal):
 def test_invalid_creation_date(capsys, create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent() as infile:
-        orig = torf.Torrent.read(infile)
         with patch('sys.exit') as mock_exit:
             run(['-i', infile, '--date', 'foo', '-o', outfile])
         mock_exit.assert_called_once_with(err.Code.CLI)
@@ -296,7 +291,6 @@ def test_edit_name(create_torrent, tmpdir, assert_torrents_equal):
         assert_torrents_equal(orig, new, ignore=('name', 'files', 'filetree'))
 
         assert new.name == 'new name'
-        orig_files = orig.files
         for of,nf in zip(orig.files, new.files):
             assert nf.parts[0] == 'new name'
             assert nf.parts[1:] == of.parts[1:]

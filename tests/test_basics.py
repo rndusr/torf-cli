@@ -1,7 +1,5 @@
 from unittest.mock import patch
 
-import pytest
-
 from torfcli import _errors, _vars, run
 
 
