@@ -11,7 +11,6 @@
 
 import base64
 import contextlib
-import copy
 import datetime
 import io
 import json
@@ -115,7 +114,7 @@ _C_CORNER     = '\u2514'  # └
 def make_filetree(tree, parents_is_last=(), plain_bytes=False):
     lines = []
     items = tuple(tree.items())
-    max_i = len(items)-1
+    max_i = len(items) - 1
 
     for i,(name,node) in enumerate(items):
         is_last = i >= max_i
@@ -132,7 +131,7 @@ def make_filetree(tree, parents_is_last=(), plain_bytes=False):
             # We ignore the first/top/root node because it isn't indented.
             for parent_is_last in parents_is_last[1:]:
                 if parent_is_last:
-                    indent += f'  '
+                    indent += '  '
                 else:
                     indent += f'{_C_DOWN} '
 

@@ -11,11 +11,10 @@
 
 import datetime
 import os.path
-import sys
 
 import torf
 
-from . import _config, _errors, _ui, _utils, _vars
+from . import _config, _errors, _utils, _vars
 
 # Seconds between progress updates
 PROGRESS_INTERVAL = 0.5
@@ -31,11 +30,13 @@ def run(ui):
         # Figure out our modus operandi
         if cfg['PATH'] and not cfg['in']:
             return _create_mode(ui, cfg)
-        elif cfg['in'] and (# Create new torrent file
-                            cfg['out']
-                            # Create new magnet URI
-                            or cfg['name'] or cfg['tracker'] or cfg['webseed']
-                            or cfg['notracker'] or cfg['nowebseed']):
+        elif cfg['in'] and (
+                # Create new torrent file
+                cfg['out']
+                # Create new magnet URI
+                or cfg['name'] or cfg['tracker'] or cfg['webseed']
+                or cfg['notracker'] or cfg['nowebseed']
+        ):
             return _edit_mode(ui, cfg)
         elif not cfg['PATH'] and not cfg['out'] and cfg['in']:
             return _info_mode(ui, cfg)
@@ -224,7 +225,7 @@ def _write_torrent(ui, torrent, cfg):
     if not cfg['nomagnet']:
         try:
             ui.info('Magnet', torrent.magnet())
-        except torf.TorfError as e:
+        except torf.TorfError:
             # Error was already reported
             pass
 

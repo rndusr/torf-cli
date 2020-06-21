@@ -44,6 +44,7 @@ def getch():
 
 class _raw_mode():
     _orig_attrs = None
+
     def enable(self):
         try:
             fd = sys.stdin.fileno()

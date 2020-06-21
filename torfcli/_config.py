@@ -255,7 +255,7 @@ def _readfile(filepath):
     # Catch any errors from the OS
     try:
         with open(filepath, 'r') as f:
-            lines = tuple(l.strip() for l in f.readlines())
+            lines = tuple(line.strip() for line in f.readlines())
     except OSError as e:
         raise _errors.ConfigError(f'{filepath}: {os.strerror(e.errno)}')
 
@@ -311,7 +311,7 @@ def _resolve_envvars(string):
         esc_count = len(m.group(1))
         esc_str = int(esc_count / 2) * '\\'
         varname = m.group(2) or m.group(3)
-        value =  os.environ.get(varname, '$'+varname)
+        value = os.environ.get(varname, '$' + varname)
         # Uneven number of \ means $varname is escaped, even number of \ means
         # it is not.
         if esc_count and esc_count % 2 != 0:

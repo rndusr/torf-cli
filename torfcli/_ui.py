@@ -47,6 +47,7 @@ class UI:
     @property
     def cfg(self):
         return self._cfg
+
     @cfg.setter
     def cfg(self, cfg):
         self._cfg = cfg
@@ -167,7 +168,7 @@ class _HumanFormatter(_FormatterBase):
 
     def comment(self, torrent):
         # Split lines into paragraphs, then wrap each paragraph at max width.
-        list_of_lines = tuple(textwrap.wrap(line, width=75) or [''] # Preserve empty lines
+        list_of_lines = tuple(textwrap.wrap(line, width=75) or ['']  # Preserve empty lines
                               for line in torrent.comment.splitlines())
         return tuple(line
                      for lines in list_of_lines
@@ -223,6 +224,7 @@ class _HumanFormatter(_FormatterBase):
                              '\x03': False,  # ctrl-c
                              '\x07': False,  # ctrl-g
                              '\x1b': False}  # escape
+
     def dialog_yes_no(self, question):
         while True:
             sys.stdout.write(f'{question} [y|n] ')
@@ -443,8 +445,8 @@ class _HumanStatusReporter(_StatusReporterBase):
     def _progress_bar(self, text, fraction_done, width):
         text_width = width - 2
         if len(text) > text_width:
-            half = int(text_width/2)
-            text = text[:half] + '…' + text[-(text_width-half-1):]
+            half = int(text_width / 2)
+            text = text[:half] + '…' + text[-(text_width - half - 1) :]
         elif len(text) < text_width:
             text += ' ' * (text_width - len(text))
         pos = int(fraction_done * text_width)
@@ -484,7 +486,7 @@ class _HumanStatusReporter(_StatusReporterBase):
 
     def _format_error(self, exception, torrent):
         if isinstance(exception, torf.VerifyContentError) and len(exception.files) > 1:
-            lines = [f'Corruption in piece {exception.piece_index+1}, '
+            lines = [f'Corruption in piece {exception.piece_index + 1}, '
                      f'at least one of these files is corrupt:']
             for filepath in exception.files:
                 lines.append(f'  {filepath}')
@@ -504,7 +506,7 @@ class _MachineStatusReporter(_StatusReporterBase):
 
     def _format_error(self, exception, torrent):
         if isinstance(exception, torf.VerifyContentError) and len(exception.files) > 1:
-            lines = [f'Corruption in piece {exception.piece_index+1}, '
+            lines = [f'Corruption in piece {exception.piece_index + 1}, '
                      f'at least one of these files is corrupt:']
             lines.extend(exception.files)
             return lines
