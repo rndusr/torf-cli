@@ -517,7 +517,7 @@ def test_user_given_date(capsys, mock_content):
     assert t.creation_date == datetime.combine(date(2000, 1, 2), time(0, 0, 0))
 
     cap = capsys.readouterr()
-    exp_date = int(datetime.fromisoformat('2000-01-02').timestamp())
+    exp_date = int(datetime.strptime('2000-01-02', '%Y-%m-%d').timestamp())
     assert f'Created\t{exp_date}' in cap.out
 
 
@@ -532,7 +532,7 @@ def test_user_given_date_and_time(capsys, mock_content):
     assert t.creation_date == datetime(2000, 1, 2, 3, 4)
 
     cap = capsys.readouterr()
-    exp_date = int(datetime.fromisoformat('2000-01-02 03:04').timestamp())
+    exp_date = int(datetime.strptime('2000-01-02 03:04', '%Y-%m-%d %H:%M').timestamp())
     assert f'Created\t{exp_date}' in cap.out
 
 
@@ -547,7 +547,7 @@ def test_user_given_date_and_time_with_seconds(capsys, mock_content):
     assert t.creation_date == datetime(2000, 1, 2, 3, 4, 5)
 
     cap = capsys.readouterr()
-    exp_date = int(datetime.fromisoformat('2000-01-02 03:04:05').timestamp())
+    exp_date = int(datetime.strptime('2000-01-02 03:04:05', '%Y-%m-%d %H:%M:%S').timestamp())
     assert f'Created\t{exp_date}' in cap.out
 
 
