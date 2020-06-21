@@ -12,6 +12,7 @@ clean:
 	rm -rf .pytest_cache .cache
 	rm -rf $(MANDIR)
 	rm -rf "$(VENV_PATH)"
+	rm -rf .tox
 
 venv:
 	python3 -m venv "$(VENV_PATH)"
