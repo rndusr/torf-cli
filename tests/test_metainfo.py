@@ -2,6 +2,7 @@ import json
 from unittest.mock import patch
 
 import pytest
+import datetime
 
 import torf
 from torfcli import _errors as err
@@ -119,10 +120,11 @@ def test_metainfo_when_creating_torrent(capsys, mock_content):
     assert 'pieces' in j['info']
 
 def test_metainfo_when_editing_torrent(capsys, create_torrent):
+    date = '1999-07-23 14:00'
     with create_torrent(trackers=['http://foo', 'http://bar']) as orig_torrent:
         run(['-i', str(orig_torrent),
              '--comment', 'This comment was not here before.',
-             '--date', '1999-07-23 14:00',
+             '--date', date,
              '--nowebseed', '--webseed', 'https://new.webseeds',
              '-o', 'new.torrent', '--metainfo', '-v'])
     cap = capsys.readouterr()
@@ -132,7 +134,7 @@ def test_metainfo_when_editing_torrent(capsys, create_torrent):
     assert 'name' in j['info']
     assert 'pieces' not in j['info']
     assert j['comment'] == 'This comment was not here before.'
-    assert j['creation date'] == 932731200
+    assert j['creation date'] == datetime.datetime.strptime(date, '%Y-%m-%d %H:%M').timestamp()
     assert j['url-list'] == ['https://new.webseeds']
     assert j['announce-list'] == [['http://foo'], ['http://bar']]
     assert j['announce'] == 'http://foo'
