@@ -1,8 +1,8 @@
+import datetime
 import json
 from unittest.mock import patch
 
 import pytest
-import datetime
 
 import torf
 from torfcli import _errors as err
