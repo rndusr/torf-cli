@@ -77,7 +77,7 @@ ARGUMENTS
     --human, -u            Force human-readable output
     --nohuman, -U          Force machine-readable output
     --help, -h             Show this help screen and exit
-    --version, -V          Show version number and exit
+    --version              Show version number and exit
 """.strip()
 
 
