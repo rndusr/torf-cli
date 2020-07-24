@@ -1,3 +1,8 @@
+2020-??-?? ?.?.?
+  - Always display which tier a tracker belongs to unless the whole torrent has
+    only one tracker.
+
+
 2020-06-21 3.2.0
   - Support for reading magnet URIs was added, e.g. "torf -i 'magnet:...' -o
     foo.torrent".  The missing information is downloaded from the parameters

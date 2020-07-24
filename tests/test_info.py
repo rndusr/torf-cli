@@ -215,8 +215,8 @@ def test_trackers___single_tracker_per_tier(capsys, create_torrent, human_readab
         with human_readable(True):
             run(['-i', torrent_file])
             cap = capsys.readouterr()
-            assert clear_ansi(cap.out) == regex(rf'^(\s*)Trackers  {trackers[0]}\n'
-                                                rf'\1          {trackers[1]}$', flags=re.MULTILINE)
+            assert clear_ansi(cap.out) == regex(rf'^(\s*)Trackers  Tier 1: {trackers[0]}\n'
+                                                rf'\1          Tier 2: {trackers[1]}$', flags=re.MULTILINE)
             assert cap.err == ''
 
         with human_readable(False):

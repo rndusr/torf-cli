@@ -176,13 +176,13 @@ class _HumanFormatter(_FormatterBase):
 
     def trackers(self, torrent):
         lines = []
-        if all(len(tier) <= 1 for tier in torrent.trackers):
-            # One tracker per tier - don't bother with printing tiers
+        if len(torrent.trackers) == 1 and len(torrent.trackers[0]) == 1:
+            # Single tracker in single tier - don't bother displaying tiers
             for tier in torrent.trackers:
                 if tier:
                     lines.append(tier[0])
         else:
-            # At least one tier has multiple trackers
+            # Show which tier each tracker belongs to
             tier_label_width = len('Tier :') + len(str(len(torrent.trackers)))
             for i,tier in enumerate(torrent.trackers, 1):
                 if tier:
