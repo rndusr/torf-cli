@@ -7,7 +7,6 @@ from types import GeneratorType
 from unittest import mock
 
 import pytest
-
 import torf
 
 

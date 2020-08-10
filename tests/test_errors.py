@@ -1,8 +1,8 @@
 import errno
 
 import pytest
-
 import torf
+
 from torfcli import _errors as err
 
 

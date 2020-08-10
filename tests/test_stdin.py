@@ -4,6 +4,7 @@ import sys
 from unittest.mock import patch
 
 import torf
+
 from torfcli import _errors, _vars, run
 
 

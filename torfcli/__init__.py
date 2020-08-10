@@ -13,10 +13,7 @@ import sys
 
 
 def run(args=sys.argv[1:]):
-    from . import _main
-    from . import _errors
-    from . import _config
-    from . import _ui
+    from . import _config, _errors, _main, _ui
 
     # Only parse --json, --human and --nohuman so UI can report errors.
     ui = _ui.UI(_config.parse_early_args(args))

@@ -4,6 +4,7 @@ from datetime import datetime
 from unittest.mock import patch
 
 import torf
+
 from torfcli import _errors as err
 from torfcli import _vars, run
 

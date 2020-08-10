@@ -4,8 +4,8 @@ from datetime import date, datetime, time, timedelta
 from unittest.mock import DEFAULT, patch
 
 import pytest
-
 import torf
+
 from torfcli import _errors as err
 from torfcli import _vars, run
 

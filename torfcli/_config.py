@@ -13,9 +13,8 @@ import argparse
 import os
 import re
 
-from xdg import BaseDirectory
-
 import torf
+from xdg import BaseDirectory
 
 from . import _errors, _utils, _vars
 
