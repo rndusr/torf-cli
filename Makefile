@@ -33,7 +33,7 @@ fulltest: venv testreadme
 	. "$(VENV_PATH)"/bin/activate ; \
 	  flake8 torfcli tests
 	. "$(VENV_PATH)"/bin/activate ; \
-	  isort --recursive torfcli tests
+	  isort torfcli tests
 
 testreadme: venv
 	# Check if README.org converts correctly to rst for PyPI
