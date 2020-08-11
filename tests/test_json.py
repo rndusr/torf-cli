@@ -45,7 +45,7 @@ def test_json_contains_cli_errors(capsys):
     assert j['Error'] == ['Unrecognized arguments: --foo']
 
 def test_json_contains_config_errors(capsys, cfgfile):
-    cfgfile.write('''
+    cfgfile.write_text('''
     foo
     ''')
     with patch('sys.exit') as mock_exit:

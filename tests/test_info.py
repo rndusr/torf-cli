@@ -285,17 +285,14 @@ def test_httpseeds(capsys, create_torrent, human_readable, clear_ansi, regex):
             assert cap.err == ''
 
 
-def test_file_tree_and_file_count(capsys, create_torrent, human_readable, tmpdir, clear_ansi, regex):
-    root = tmpdir.mkdir('root')
-    subdir1 = root.mkdir('subdir1')
-    file1 = subdir1.join('file1') ; file1.write('data')  # noqa: E702
-    subdir10 = subdir1.mkdir('subsubdir1.0')
-    file2 = subdir10.join('file2') ; file2.write('data')  # noqa: E702
-    subdir100 = subdir10.mkdir('subsubdir1.0.0')
-    file3 = subdir100.join('file3') ; file3.write('data')  # noqa: E702
-
-    subdir2 = root.mkdir('subdir2')
-    file4 = subdir2.join('file4') ; file4.write('data')  # noqa: E702
+def test_file_tree_and_file_count(capsys, create_torrent, human_readable, tmp_path, clear_ansi, regex):
+    root = tmp_path / 'root'
+    (root / 'subdir1' / 'subdir1.0' / 'subdir1.0.0').mkdir(parents=True)
+    (root / 'subdir2').mkdir(parents=True)
+    (root / 'subdir1' / 'file1').write_text('data')
+    (root / 'subdir1' / 'subdir1.0' / 'file2').write_text('data')
+    (root / 'subdir1' / 'subdir1.0' / 'subdir1.0.0' / 'file3').write_text('data')
+    (root / 'subdir2' / 'file4').write_text('data')
 
     with create_torrent(path=str(root)) as torrent_file:
         with human_readable(True):
@@ -305,9 +302,9 @@ def test_file_tree_and_file_count(capsys, create_torrent, human_readable, tmpdir
             assert clear_ansi(cap.out) == regex(r'^(\s*)      Files  root\n'
                                                 r'\1             ├─subdir1\n'
                                                 r'\1             │ ├─file1 \[4 B\]\n'
-                                                r'\1             │ └─subsubdir1.0\n'
+                                                r'\1             │ └─subdir1.0\n'
                                                 r'\1             │   ├─file2 \[4 B\]\n'
-                                                r'\1             │   └─subsubdir1.0.0\n'
+                                                r'\1             │   └─subdir1.0.0\n'
                                                 r'\1             │     └─file3 \[4 B\]\n'
                                                 r'\1             └─subdir2\n'
                                                 r'\1               └─file4 \[4 B\]$', flags=re.MULTILINE)
@@ -318,8 +315,8 @@ def test_file_tree_and_file_count(capsys, create_torrent, human_readable, tmpdir
             cap = capsys.readouterr()
             assert cap.out == regex(r'^File Count\t4$', flags=re.MULTILINE)
             exp_files = '\t'.join(('root/subdir1/file1',
-                                   'root/subdir1/subsubdir1.0/file2',
-                                   'root/subdir1/subsubdir1.0/subsubdir1.0.0/file3',
+                                   'root/subdir1/subdir1.0/file2',
+                                   'root/subdir1/subdir1.0/subdir1.0.0/file3',
                                    'root/subdir2/file4'))
             assert cap.out == regex(rf'^Files\t{exp_files}$', flags=re.MULTILINE)
             assert cap.err == ''

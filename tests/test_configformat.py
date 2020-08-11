@@ -4,7 +4,7 @@ from torfcli._config import _readfile
 
 
 def test_boolean_options(cfgfile):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     foo
     bar
     '''))
@@ -13,7 +13,7 @@ def test_boolean_options(cfgfile):
 
 
 def test_options_with_single_values(cfgfile):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     foo = 1
     bar = two
     '''))
@@ -22,7 +22,7 @@ def test_options_with_single_values(cfgfile):
 
 
 def test_options_with_empty_value(cfgfile):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     foo =
     '''))
     cfg = _readfile(cfgfile)
@@ -30,7 +30,7 @@ def test_options_with_empty_value(cfgfile):
 
 
 def test_options_with_list_values(cfgfile):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     foo = 1
     foo = 2
     foo = three
@@ -44,7 +44,7 @@ def test_optional_quotes(cfgfile):
                                     ("' A comment '", ' A comment '),
                                     ('" A comment "', ' A comment '),
                                     ('\' A comment "', '\' A comment "')):
-        cfgfile.write(textwrap.dedent(f'''
+        cfgfile.write_text(textwrap.dedent(f'''
         comment = {comment_cfg}
         '''))
         cfg = _readfile(cfgfile)
@@ -52,7 +52,7 @@ def test_optional_quotes(cfgfile):
 
 
 def test_comments(cfgfile):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     # This is a config file
     date = 1970-01-01
     # The next line is empty
@@ -70,7 +70,7 @@ def test_comments(cfgfile):
 
 
 def test_sections(cfgfile):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     date = 1970-01-01
     x = 0
 

@@ -137,7 +137,7 @@ def test_torrent_filepath_exists(capsys, mock_content, human_readable):
             mock_exit.assert_not_called()
             cap = capsys.readouterr()
             assert cap.err == ''
-            assert torf.Torrent.read(exp_torrent_filepath).name == mock_content.basename
+            assert torf.Torrent.read(exp_torrent_filepath).name == mock_content.name
 
 
 ### Options
@@ -392,7 +392,7 @@ def test_noxseed_option(capsys, mock_content):
 
 def test_max_piece_size_option_not_taking_effect(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
-    large_file = mock_content.join('large file')
+    large_file = mock_content / 'large file'
     with open(large_file, 'ab') as f:
         f.truncate(5**20)
     content_path = str(mock_content)
@@ -405,7 +405,7 @@ def test_max_piece_size_option_not_taking_effect(capsys, mock_content):
 
 def test_max_piece_size_option_smaller_than_default(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
-    large_file = mock_content.join('large file')
+    large_file = mock_content / 'large file'
     with open(large_file, 'ab') as f:
         f.truncate(5**20)
     content_path = str(mock_content)
@@ -418,7 +418,7 @@ def test_max_piece_size_option_smaller_than_default(capsys, mock_content):
 
 def test_max_piece_size_option_larger_than_default(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
-    large_file = mock_content.join('large file')
+    large_file = mock_content / 'large file'
     with open(large_file, 'ab') as f:
         f.truncate(5**20)
     content_path = str(mock_content)
@@ -431,7 +431,7 @@ def test_max_piece_size_option_larger_than_default(capsys, mock_content):
 
 def test_max_piece_size_option_not_given(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
-    large_file = mock_content.join('large file')
+    large_file = mock_content / 'large file'
     with open(large_file, 'ab') as f:
         f.truncate(2**40)
     content_path = str(mock_content)
@@ -445,7 +445,7 @@ def test_max_piece_size_option_not_given(capsys, mock_content):
 
 def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
-    large_file = mock_content.join('large file')
+    large_file = mock_content / 'large file'
     with open(large_file, 'ab') as f:
         f.truncate(2**40)
     content_path = str(mock_content)

@@ -7,7 +7,7 @@ from torfcli import _vars, run
 
 
 def test_unknown_profile(capsys, cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     [foo]
     comment = Foo!
     '''))
@@ -20,7 +20,7 @@ def test_unknown_profile(capsys, cfgfile, mock_content, mock_create_mode):
 
 
 def test_profile_option(cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     xseed
     date = 2000-01-02
     [foo]
@@ -40,7 +40,7 @@ def test_profile_option(cfgfile, mock_content, mock_create_mode):
 
 
 def test_overloading_values(cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     [foo]
     comment = Foo
     private
@@ -76,7 +76,7 @@ def test_overloading_values(cfgfile, mock_content, mock_create_mode):
 
 
 def test_list_value(cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     [foo]
     webseed = https://foo
     [bar]
@@ -108,7 +108,7 @@ def test_list_value(cfgfile, mock_content, mock_create_mode):
 
 def test_illegal_configfile_arguments(capsys, cfgfile, mock_content, mock_create_mode):
     for arg in ('config', 'profile'):
-        cfgfile.write(textwrap.dedent(f'''
+        cfgfile.write_text(textwrap.dedent(f'''
         [foo]
         {arg} = foo
         '''))
@@ -122,7 +122,7 @@ def test_illegal_configfile_arguments(capsys, cfgfile, mock_content, mock_create
 
 
     for arg in ('noconfig', 'help', 'version'):
-        cfgfile.write(textwrap.dedent(f'''
+        cfgfile.write_text(textwrap.dedent(f'''
         [foo]
         {arg}
         '''))

@@ -2,7 +2,6 @@ import contextlib
 import functools
 import os
 import re
-import shutil
 from types import GeneratorType
 from unittest import mock
 
@@ -32,20 +31,20 @@ def regex():
 
 
 @pytest.fixture(autouse=True)
-def change_cwd(tmpdir):
+def change_cwd(tmp_path):
     orig_dir = os.getcwd()
-    os.chdir(str(tmpdir))
+    os.chdir(str(tmp_path))
     try:
         yield
     finally:
-        shutil.rmtree(str(tmpdir))
         os.chdir(orig_dir)
 
 
 @pytest.fixture(autouse=True)
-def cfgfile(tmpdir, monkeypatch):
-    cfgdir = tmpdir.mkdir('configdir')
-    cfgfile = cfgdir.join('config')
+def cfgfile(tmp_path, monkeypatch):
+    cfgdir = tmp_path / 'configdir'
+    cfgdir.mkdir()
+    cfgfile = cfgdir / 'config'
     from torfcli import _config
     monkeypatch.setattr(_config, 'DEFAULT_CONFIG_FILE', str(cfgfile))
     return cfgfile
@@ -82,13 +81,14 @@ def human_readable(monkeypatch):
 
 
 @pytest.fixture
-def mock_content(tmpdir):
-    base = tmpdir.mkdir('My Torrent')
-    file1 = base.join('Something.jpg')
-    file2 = base.join('Anotherthing.iso')
-    file3 = base.join('Thirdthing.txt')
+def mock_content(tmp_path):
+    base = tmp_path / 'My Torrent'
+    base.mkdir()
+    file1 = base / 'Something.jpg'
+    file2 = base / 'Anotherthing.iso'
+    file3 = base / 'Thirdthing.txt'
     for f in (file1, file2, file3):
-        f.write('some data')
+        f.write_text('some data')
     return base
 
 
@@ -101,8 +101,8 @@ def mock_create_mode(monkeypatch):
 
 
 @contextlib.contextmanager
-def _create_torrent(tmpdir, mock_content, **kwargs):
-    torrent_file = str(tmpdir.join('test.torrent'))
+def _create_torrent(tmp_path, mock_content, **kwargs):
+    torrent_file = str(tmp_path / 'test.torrent')
     kw = {'path': str(mock_content),
           'exclude_globs': ['Original', 'exclusions'],
           'trackers': ['http://some.tracker'],
@@ -122,8 +122,8 @@ def _create_torrent(tmpdir, mock_content, **kwargs):
             os.remove(torrent_file)
 
 @pytest.fixture
-def create_torrent(tmpdir, mock_content):
-    return functools.partial(_create_torrent, tmpdir, mock_content)
+def create_torrent(tmp_path, mock_content):
+    return functools.partial(_create_torrent, tmp_path, mock_content)
 
 
 ansi_regex = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')

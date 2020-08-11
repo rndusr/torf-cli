@@ -12,8 +12,8 @@ def test_default_configfile_doesnt_exist(cfgfile, mock_content, mock_create_mode
     assert cfg['PATH'] == str(mock_content)
 
 
-def test_custom_configfile_doesnt_exist(capsys, tmpdir, mock_content, mock_create_mode):
-    cfgfile = tmpdir.join('wrong_special_config')
+def test_custom_configfile_doesnt_exist(capsys, tmp_path, mock_content, mock_create_mode):
+    cfgfile = tmp_path / 'wrong_special_config'
     with patch('sys.exit') as mock_exit:
         run(['--config', str(cfgfile), str(mock_content)])
     mock_exit.assert_called_once_with(_errors.Code.CONFIG)
@@ -24,7 +24,7 @@ def test_custom_configfile_doesnt_exist(capsys, tmpdir, mock_content, mock_creat
 
 
 def test_config_unreadable(capsys, cfgfile, mock_content, mock_create_mode):
-    cfgfile.write('something')
+    cfgfile.write_text('something')
     import os
     os.chmod(cfgfile, 0o000)
     with patch('sys.exit') as mock_exit:
@@ -36,9 +36,9 @@ def test_config_unreadable(capsys, cfgfile, mock_content, mock_create_mode):
     assert mock_create_mode.call_args is None
 
 
-def test_custom_configfile(tmpdir, mock_content, mock_create_mode):
-    cfgfile = tmpdir.join('special_config')
-    cfgfile.write(textwrap.dedent('''
+def test_custom_configfile(tmp_path, mock_content, mock_create_mode):
+    cfgfile = tmp_path / 'special_config'
+    cfgfile.write_text(textwrap.dedent('''
     comment = asdf
     '''))
     run(['--config', str(cfgfile), str(mock_content)])
@@ -47,7 +47,7 @@ def test_custom_configfile(tmpdir, mock_content, mock_create_mode):
 
 
 def test_noconfig_option(cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     private
     comment = Nobody shall see this!
     '''))
@@ -58,7 +58,7 @@ def test_noconfig_option(cfgfile, mock_content, mock_create_mode):
 
 
 def test_cli_args_take_precedence(cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     xseed
     comment = Generic description
     date = 1970-01-01
@@ -72,7 +72,7 @@ def test_cli_args_take_precedence(cfgfile, mock_content, mock_create_mode):
 
 
 def test_adding_to_list_via_cli(cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     tracker = https://foo
     tracker = https://bar
     '''))
@@ -82,7 +82,7 @@ def test_adding_to_list_via_cli(cfgfile, mock_content, mock_create_mode):
 
 
 def test_invalid_option_name(capsys, cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     foo = 123
     '''))
     with patch('sys.exit') as mock_exit:
@@ -95,7 +95,7 @@ def test_invalid_option_name(capsys, cfgfile, mock_content, mock_create_mode):
 
 
 def test_invalid_boolean_name(capsys, cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     foo
     '''))
     with patch('sys.exit') as mock_exit:
@@ -109,7 +109,7 @@ def test_invalid_boolean_name(capsys, cfgfile, mock_content, mock_create_mode):
 
 def test_illegal_configfile_arguments(capsys, cfgfile, mock_content, mock_create_mode):
     for arg in ('config', 'noconfig', 'profile', 'help', 'version'):
-        cfgfile.write(textwrap.dedent(f'''
+        cfgfile.write_text(textwrap.dedent(f'''
         {arg} = foo
         '''))
         with patch('sys.exit') as mock_exit:
@@ -121,7 +121,7 @@ def test_illegal_configfile_arguments(capsys, cfgfile, mock_content, mock_create
         assert mock_create_mode.call_args is None
 
     for arg in ('config', 'noconfig', 'profile', 'help', 'version'):
-        cfgfile.write(textwrap.dedent(f'''
+        cfgfile.write_text(textwrap.dedent(f'''
         {arg}
         '''))
         with patch('sys.exit') as mock_exit:
@@ -134,7 +134,7 @@ def test_illegal_configfile_arguments(capsys, cfgfile, mock_content, mock_create
 
 
 def test_environment_variable_resolution(cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     tracker = https://$DOMAIN:$PORT${PATH}
     date = $DATE
     comment = $UNDEFINED
@@ -152,7 +152,7 @@ def test_environment_variable_resolution(cfgfile, mock_content, mock_create_mode
 
 
 def test_environment_variable_resolution_in_profile(cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     [foo]
     tracker = https://$DOMAIN:${PORT}/$PATH
     date = $DATE
@@ -171,7 +171,7 @@ def test_environment_variable_resolution_in_profile(cfgfile, mock_content, mock_
 
 
 def test_escaping_dollar(cfgfile, mock_content, mock_create_mode):
-    cfgfile.write(textwrap.dedent('''
+    cfgfile.write_text(textwrap.dedent('''
     [one]
     comment = \\$COMMENT
     [two]
