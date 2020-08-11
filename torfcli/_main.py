@@ -141,6 +141,7 @@ def _edit_mode(ui, cfg):
 
     if cfg['PATH']:
         list_set_or_remove('exclude', 'exclude_globs')
+        list_set_or_remove('exclude_regex', 'exclude_regexs')
         try:
             torrent.path = cfg['PATH']
         except torf.TorfError as e:

@@ -283,6 +283,26 @@ def test_edit_path_with_exclude_option(create_torrent, tmpdir, assert_torrents_e
         assert new.size == len('image data')
 
 
+def test_edit_path_with_exclude_regex_option(create_torrent, tmpdir, assert_torrents_equal):
+    outfile = str(tmpdir.join('out.torrent'))
+    new_content = tmpdir.mkdir('new content')
+    new_file1 = new_content.join('some image.jpg')
+    new_file1.write('image data')
+    new_file2 = new_content.join('some text.txt')
+    new_file2.write('text data')
+    with create_torrent() as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile, str(new_content), '--exclude-regex', r'.*\.txt$', '-o', outfile])
+        new = torf.Torrent.read(outfile)
+        assert_torrents_equal(orig, new, ignore=('files', 'filetree', 'name',
+                                                 'piece_size', 'pieces', 'size'))
+        assert tuple(new.files) == (torf.File('new content/some image.jpg', size=10),)
+        assert new.filetree == {'new content': {'some image.jpg': torf.File('new content/some image.jpg',
+                                                                            size=10)}}
+        assert new.name == 'new content'
+        assert new.size == len('image data')
+
+
 def test_edit_name(create_torrent, tmpdir, assert_torrents_equal):
     outfile = str(tmpdir.join('out.torrent'))
     with create_torrent() as infile:

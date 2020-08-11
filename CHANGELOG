@@ -1,6 +1,7 @@
 2020-??-?? ?.?.?
   - Always display which tier a tracker belongs to unless the whole torrent has
     only one tracker.
+  - Bugfix: --exclude-regex was ignored when editing an existing torrent.
 
 
 2020-06-21 3.2.0
