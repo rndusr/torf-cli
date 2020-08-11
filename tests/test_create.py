@@ -261,6 +261,45 @@ def test_exclude_everything(capsys, mock_content):
     assert not os.path.exists(exp_torrent_filepath)
 
 
+def test_include_glob(capsys, tmp_path):
+    content = tmp_path / 'My Content'
+    content.mkdir()
+    new_file1 = content / 'file1.jpg'
+    new_file1.write_text('image data')
+    new_file2 = content / 'file2.jpg'
+    new_file2.write_text('image data')
+
+    exp_torrent_filepath = content.name + '.torrent'
+    run([str(content), '--exclude', '*.jpg', '--include', '*file2*'])
+    t = torf.Torrent.read(exp_torrent_filepath)
+    assert tuple(t.files) == (torf.File('My Content/file2.jpg', size=10),)
+
+    cap = capsys.readouterr()
+    assert 'Exclude\t*.jpg' in cap.out
+    assert 'Include\t*file2*' in cap.out
+    assert 'File Count\t1' in cap.out
+
+
+def test_include_regex(capsys, tmp_path):
+    content = tmp_path / 'My Content'
+    content.mkdir()
+    new_file1 = content / 'file1.jpg'
+    new_file1.write_text('image data')
+    new_file2 = content / 'file2.jpg'
+    new_file2.write_text('image data')
+
+    exp_torrent_filepath = content.name + '.torrent'
+    run([str(content), '--exclude', '*file*', '--include-regex', r'file2\.jpg$'])
+    t = torf.Torrent.read(exp_torrent_filepath)
+    assert tuple(t.files) == (torf.File('My Content/file2.jpg', size=10),)
+
+    cap = capsys.readouterr()
+    print(cap.out)
+    assert 'Exclude\t*file*' in cap.out
+    assert 'Include\tfile2\\.jpg$' in cap.out
+    assert 'File Count\t1' in cap.out
+
+
 def test_name_option(capsys, mock_content):
     content_path = str(mock_content)
     name = 'Your Torrent'
