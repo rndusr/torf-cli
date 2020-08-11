@@ -530,6 +530,18 @@ may be given multiple times.  See <strong>EXCLUDING FILES</strong>.</p>
 <p>Exclude files from <em>PATH</em> that match the regular expression <em>PATTERN</em>.  This
 option may be given multiple times.  See <strong>EXCLUDING FILES</strong>.</p>
 </dd>
+<dt class="hdlist1"><strong>--include</strong> <em>PATTERN</em></dt>
+<dd>
+<p>Include files from <em>PATH</em> that match the glob pattern <em>PATTERN</em> even if they
+match any <strong>--exclude</strong> or <strong>--exclude-regex</strong> patterns.  This option may be given
+multiple times.  See <strong>EXCLUDING FILES</strong>.</p>
+</dd>
+<dt class="hdlist1"><strong>--include-regex</strong>, <strong>-ir</strong> <em>PATTERN</em></dt>
+<dd>
+<p>Include files from <em>PATH</em> that match the regular expression <em>PATTERN</em> even if
+they match any <strong>--exclude</strong> or <strong>--exclude-regex</strong> patterns.  This option may be
+given multiple times.  See <strong>EXCLUDING FILES</strong>.</p>
+</dd>
 <dt class="hdlist1"><strong>--in</strong>, <strong>-i</strong> <em>INPUT</em></dt>
 <dd>
 <p>Read metainfo from the torrent file or magnet URI <em>INPUT</em>.  If <em>INPUT</em> is "-"
@@ -856,9 +868,13 @@ path beneath <em>PATH</em>.  Files that match are not included in the torrent.
 Matching is case-insensitive.</p>
 </div>
 <div class="paragraph">
-<p>The <strong>--exclude-regex</strong> option takes a regular expression pattern that is matched
-against each file path beneath <em>PATH</em>.  Files that match are not included in the
-torrent.  Matching is case-sensitive.</p>
+<p>The <strong>--exclude-regex</strong> option works like <strong>--exclude</strong> but it takes a regular
+expression pattern and it does case-sensitive matching.</p>
+</div>
+<div class="paragraph">
+<p>The <strong>--include</strong> and <strong>--include-regex</strong> options are applied like their excluding
+counterparts, but any matching files are included even if they match any exclude
+patterns.</p>
 </div>
 <div class="paragraph">
 <p>File paths start with the torrent&#8217;s name (usually the last segment of <em>PATH</em>),
@@ -1059,7 +1075,7 @@ raw bytes for sizes, etc).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-18 11:47:16 +0200
+Last updated 2020-08-11 16:55:38 +0200
 </div>
 </div>
 </body>

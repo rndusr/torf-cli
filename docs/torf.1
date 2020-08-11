@@ -2,12 +2,12 @@
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
 .\" Generator: Asciidoctor 2.0.10
-.\"      Date: 2020-04-18
+.\"      Date: 2020-08-11
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2020-04-18" "\ \&" "\ \&"
+.TH "TORF" "1" "2020-08-11" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -137,6 +137,20 @@ may be given multiple times.  See \fBEXCLUDING FILES\fP.
 .RS 4
 Exclude files from \fIPATH\fP that match the regular expression \fIPATTERN\fP.  This
 option may be given multiple times.  See \fBEXCLUDING FILES\fP.
+.RE
+.sp
+\fB\-\-include\fP \fIPATTERN\fP
+.RS 4
+Include files from \fIPATH\fP that match the glob pattern \fIPATTERN\fP even if they
+match any \fB\-\-exclude\fP or \fB\-\-exclude\-regex\fP patterns.  This option may be given
+multiple times.  See \fBEXCLUDING FILES\fP.
+.RE
+.sp
+\fB\-\-include\-regex\fP, \fB\-ir\fP \fIPATTERN\fP
+.RS 4
+Include files from \fIPATH\fP that match the regular expression \fIPATTERN\fP even if
+they match any \fB\-\-exclude\fP or \fB\-\-exclude\-regex\fP patterns.  This option may be
+given multiple times.  See \fBEXCLUDING FILES\fP.
 .RE
 .sp
 \fB\-\-in\fP, \fB\-i\fP \fIINPUT\fP
@@ -522,9 +536,12 @@ The \fB\-\-exclude\fP option takes a glob pattern that is matched against each f
 path beneath \fIPATH\fP.  Files that match are not included in the torrent.
 Matching is case\-insensitive.
 .sp
-The \fB\-\-exclude\-regex\fP option takes a regular expression pattern that is matched
-against each file path beneath \fIPATH\fP.  Files that match are not included in the
-torrent.  Matching is case\-sensitive.
+The \fB\-\-exclude\-regex\fP option works like \fB\-\-exclude\fP but it takes a regular
+expression pattern and it does case\-sensitive matching.
+.sp
+The \fB\-\-include\fP and \fB\-\-include\-regex\fP options are applied like their excluding
+counterparts, but any matching files are included even if they match any exclude
+patterns.
 .sp
 File paths start with the torrent\(cqs name (usually the last segment of \fIPATH\fP),
 e.g. if \fIPATH\fP is \(lq/home/foo/bar\(rq, each file path starts with \(lqbar/\(rq
