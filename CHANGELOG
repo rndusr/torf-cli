@@ -1,6 +1,8 @@
-2020-??-?? ?.?.?
+2020-08-11 3.3.0
   - Always display which tier a tracker belongs to unless the whole torrent has
     only one tracker.
+  - New options: --include and --include-regex include files that match exclude
+    patterns.
   - Bugfix: --exclude-regex was ignored when editing an existing torrent.
 
 
