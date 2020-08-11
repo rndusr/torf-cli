@@ -67,6 +67,8 @@ def _create_mode(ui, cfg):
             name=cfg['name'] or None,
             exclude_globs=cfg['exclude'],
             exclude_regexs=cfg['exclude_regex'],
+            include_globs=cfg['include'],
+            include_regexs=cfg['include_regex'],
             trackers=() if cfg['notracker'] else trackers,
             webseeds=() if cfg['nowebseed'] else cfg['webseed'],
             private=False if cfg['noprivate'] else cfg['private'],
@@ -142,6 +144,8 @@ def _edit_mode(ui, cfg):
     if cfg['PATH']:
         list_set_or_remove('exclude', 'exclude_globs')
         list_set_or_remove('exclude_regex', 'exclude_regexs')
+        list_set_or_remove('include', 'include_globs')
+        list_set_or_remove('include_regex', 'include_regexs')
         try:
             torrent.path = cfg['PATH']
         except torf.TorfError as e:

@@ -10,6 +10,7 @@
 # http://www.gnu.org/licenses/gpl-3.0.txt
 
 import argparse
+import itertools
 import os
 import re
 
@@ -32,11 +33,16 @@ USAGE
 
 ARGUMENTS
     PATH                   Path to torrent's content
-    --exclude, -e PATTERN  Glob pattern that is used to exclude files
+    --exclude, -e PATTERN  Exclude files that match this glob pattern
                            (e.g. "*.txt")
+    --include PATTERN      Include excluded files that match this glob
+                           pattern
     --exclude-regex, -er PATTERN
-                           Regular expression that is used to exclude files
+                           Exclude files that match this regular expression
                            (e.g. ".*\\.txt$")
+    --include-regex, -ir PATTERN
+                           Include excluded files that match this regular
+                           expression
     --in, -i INPUT         Read metainfo from torrent file or magnet URI
     --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
     --name, -n NAME        Torrent name (default: basename of PATH)
@@ -91,6 +97,8 @@ _cliparser.add_argument('PATH', nargs='?')
 _cliparser.add_argument('--basename', '-b', action='store_true')
 _cliparser.add_argument('--exclude', '-e', default=[], action='append')
 _cliparser.add_argument('--exclude-regex', '-er', default=[], action='append')
+_cliparser.add_argument('--include', default=[], action='append')
+_cliparser.add_argument('--include-regex', '-ir', default=[], action='append')
 _cliparser.add_argument('--in', '-i', default='')
 _cliparser.add_argument('--out', '-o', default='')
 
@@ -177,8 +185,7 @@ def parse_args(args):
             raise _errors.CliError(e)
 
     # Validate regular expressions
-    import re
-    for regex in cfg['exclude_regex']:
+    for regex in itertools.chain(cfg['exclude_regex'], cfg['include_regex']):
         try:
             re.compile(regex)
         except re.error as e:
