@@ -81,6 +81,7 @@ ARGUMENTS
     --metainfo, -m         Print torrent metainfo as JSON object
     --human, -u            Force human-readable output
     --nohuman, -U          Force machine-readable output
+    --threads THREADS      Number of threads to use for hashing
     --help, -h             Show this help screen and exit
     --version              Show version number and exit
 """.strip()
@@ -134,6 +135,7 @@ _cliparser.add_argument('--json', '-j', action='store_true')
 _cliparser.add_argument('--metainfo', '-m', action='store_true')
 _cliparser.add_argument('--human', '-u', action='store_true')
 _cliparser.add_argument('--nohuman', '-U', action='store_true')
+_cliparser.add_argument('--threads', type=int, default=0)
 _cliparser.add_argument('--help', '-h', action='store_true')
 _cliparser.add_argument('--version', action='store_true')
 _cliparser.add_argument('--debug-file')

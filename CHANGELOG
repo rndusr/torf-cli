@@ -1,3 +1,7 @@
+2021-02-20 3.4.0
+  - New option: --threads
+
+
 2020-08-11 3.3.0
   - Always display which tier a tracker belongs to unless the whole torrent has
     only one tracker.
