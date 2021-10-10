@@ -11,8 +11,6 @@
 
 import io
 import sys
-import termios
-import tty
 
 # References:
 #   https://www.vt100.net/docs/vt100-ug/chapter3.html#DECSCNM
@@ -47,18 +45,23 @@ class _raw_mode():
 
     def enable(self):
         try:
+            import termios
+            import tty
+
             fd = sys.stdin.fileno()
             self._orig_attrs = termios.tcgetattr(fd)
             tty.setraw(sys.stdin.fileno())
-        except io.UnsupportedOperation:
+        except (ImportError, io.UnsupportedOperation):
             pass
 
     def disable(self):
         try:
+            import termios
+
             if self._orig_attrs is not None:
                 fd = sys.stdin.fileno()
                 termios.tcsetattr(fd, termios.TCSADRAIN, self._orig_attrs)
-        except io.UnsupportedOperation:
+        except (ImportError, io.UnsupportedOperation):
             pass
 
     def __enter__(self):
@@ -73,23 +76,27 @@ class _no_user_input():
     """Disable printing of characters as they are typed and hide cursor"""
     def enable(self):
         try:
+            import termios
+
             fd = sys.stdin.fileno()
             self._orig_attrs = termios.tcgetattr(fd)
             new = termios.tcgetattr(fd)
             new[3] = new[3] & ~termios.ECHO  # lflags
             termios.tcsetattr(fd, termios.TCSADRAIN, new)
             echo('hide_cursor')
-        except io.UnsupportedOperation:
+        except (ImportError, io.UnsupportedOperation):
             pass
 
     def disable(self):
         orig_attrs = getattr(self, '_orig_attrs', None)
         if orig_attrs is not None:
             try:
+                import termios
+
                 fd = sys.stdin.fileno()
                 termios.tcsetattr(fd, termios.TCSADRAIN, orig_attrs)
                 echo('show_cursor')
-            except io.UnsupportedOperation:
+            except (ImportError, io.UnsupportedOperation):
                 pass
 
     def __enter__(self):
