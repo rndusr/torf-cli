@@ -14,8 +14,6 @@ import sys
 
 # References:
 #   https://www.vt100.net/docs/vt100-ug/chapter3.html#DECSCNM
-#   http://ascii-table.com/ansi-escape-sequences.php
-#   http://ascii-table.com/ansi-escape-sequences-vt-100.php
 
 erase_line         = '\x1b[2K'
 erase_to_eol       = '\x1b[K'
