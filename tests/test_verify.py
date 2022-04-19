@@ -17,17 +17,6 @@ def test_torrent_unreadable(capsys, mock_content):
     assert cap.err == f'{_vars.__appname__}: nonexisting.torrent: No such file or directory\n'
 
 
-def test_skipping_files_with_increased_verbosity(mock_content, create_torrent):
-    with create_torrent(path=mock_content) as torrent_file:
-        with patch('torf.Torrent.verify') as mock_verify:
-            run([str(mock_content), '-i', torrent_file])
-            kwargs = mock_verify.call_args[1]
-            assert kwargs['skip_on_error'] is False
-            run([str(mock_content), '-i', torrent_file, '--verbose'])
-            kwargs = mock_verify.call_args[1]
-            assert kwargs['skip_on_error'] is True
-
-
 @pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
 def test_PATH_unreadable(create_torrent, human_readable, hr_enabled, capsys, clear_ansi, regex, assert_no_ctrl):
     with create_torrent() as torrent_file:

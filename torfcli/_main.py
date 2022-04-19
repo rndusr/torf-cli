@@ -174,15 +174,13 @@ def _verify_mode(ui, cfg):
         raise _errors.Error(e)
 
     with ui.StatusReporter() as sr:
-        skip_files = cfg['verbose'] > 0
         try:
             path = cfg['PATH']
             if path[-1] == os.path.sep:
                 path = os.path.join(path, torrent.metainfo['info'].get('name', ''))
             success = torrent.verify(path,
                                      callback=sr.verify_callback,
-                                     interval=PROGRESS_INTERVAL,
-                                     skip_on_error=skip_files)
+                                     interval=PROGRESS_INTERVAL)
         except torf.TorfError as e:
             raise _errors.Error(e)
         except KeyboardInterrupt:

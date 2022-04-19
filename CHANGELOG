@@ -1,3 +1,8 @@
+2022-??-?? 4.0.0
+  - In previous versions, each file was only verified up to the first corrupt
+    piece unless --verbose was given. Now, files are always completely verified.
+
+
 2021-02-20 3.4.0
   - New option: --threads
 
