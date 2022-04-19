@@ -48,24 +48,6 @@ Options that start with *--no* take precedence.
 _PATH_::
 The path to the torrent's content.
 
-*--exclude*, *-e* _PATTERN_::
-Exclude files from _PATH_ that match the glob pattern _PATTERN_.  This option
-may be given multiple times.  See *EXCLUDING FILES*.
-
-*--exclude-regex*, *-er* _PATTERN_::
-Exclude files from _PATH_ that match the regular expression _PATTERN_.  This
-option may be given multiple times.  See *EXCLUDING FILES*.
-
-*--include* _PATTERN_::
-Include files from _PATH_ that match the glob pattern _PATTERN_ even if they
-match any *--exclude* or *--exclude-regex* patterns.  This option may be given
-multiple times.  See *EXCLUDING FILES*.
-
-*--include-regex*, *-ir* _PATTERN_::
-Include files from _PATH_ that match the regular expression _PATTERN_ even if
-they match any *--exclude* or *--exclude-regex* patterns.  This option may be
-given multiple times.  See *EXCLUDING FILES*.
-
 *--in*, *-i* _INPUT_::
 Read metainfo from the torrent file or magnet URI _INPUT_.  If _INPUT_ is "-"
 and does not exist, the torrent data or magnet URI is read from stdin.
@@ -73,6 +55,24 @@ and does not exist, the torrent data or magnet URI is read from stdin.
 *--out*, *-o* _TORRENT_::
 Write to torrent file _TORRENT_. +
 Default: __NAME__**.torrent**
+
+*--exclude*, *-e* _PATTERN_::
+Exclude files from _PATH_ that match the glob pattern _PATTERN_.  This option
+may be given multiple times.  See *EXCLUDING FILES*.
+
+*--include* _PATTERN_::
+Include files from _PATH_ that match the glob pattern _PATTERN_ even if they
+match any *--exclude* or *--exclude-regex* patterns.  This option may be given
+multiple times.  See *EXCLUDING FILES*.
+
+*--exclude-regex*, *-er* _PATTERN_::
+Exclude files from _PATH_ that match the regular expression _PATTERN_.  This
+option may be given multiple times.  See *EXCLUDING FILES*.
+
+*--include-regex*, *-ir* _PATTERN_::
+Include files from _PATH_ that match the regular expression _PATTERN_ even if
+they match any *--exclude* or *--exclude-regex* patterns.  This option may be
+given multiple times.  See *EXCLUDING FILES*.
 
 *--notorrent*, *-N*::
 Do not create a torrent file.
