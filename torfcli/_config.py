@@ -95,7 +95,6 @@ class CLIParser(argparse.ArgumentParser):
 _cliparser = CLIParser(add_help=False)
 
 _cliparser.add_argument('PATH', nargs='?')
-_cliparser.add_argument('--basename', '-b', action='store_true')
 _cliparser.add_argument('--exclude', '-e', default=[], action='append')
 _cliparser.add_argument('--exclude-regex', '-er', default=[], action='append')
 _cliparser.add_argument('--include', default=[], action='append')
