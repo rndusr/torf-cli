@@ -433,14 +433,14 @@ def test_max_piece_size_option_not_taking_effect(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
     large_file = mock_content / 'large file'
     with open(large_file, 'ab') as f:
-        f.truncate(5**20)
+        f.truncate(2**20)
     content_path = str(mock_content)
     with patch.multiple('torfcli._main', _hash_pieces=DEFAULT, _write_torrent=DEFAULT):
         run([content_path, '--max-piece-size', '8'])
     cap = capsys.readouterr()
     piece_size = [line for line in cap.out.split('\n')
                   if 'Piece Size' in line][0].split('\t')[1]
-    assert int(piece_size) == 8 * 1048576
+    assert int(piece_size) < 8 * 1048576
 
 def test_max_piece_size_option_smaller_than_default(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
@@ -497,6 +497,7 @@ def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
         mock_exit.assert_called_once_with(err.Code.CLI)
         cap = capsys.readouterr()
         assert cap.err == f'{_vars.__appname__}: Piece size must be a power of 2: {exp_invalid_piece_size}\n'
+
 
 def test_default_date(capsys, mock_content):
     content_path = str(mock_content)
