@@ -32,7 +32,11 @@ USAGE
     {_vars.__appname__} -i TORRENT PATH                # Verify file content
 
 ARGUMENTS
-    PATH                   Path to torrent's content
+  PATH                     Path to torrent's content file or directory
+  --in, -i INPUT           Read metainfo from torrent file or magnet URI
+  --out, -o TORRENT        Write metainfo to TORRENT (default: NAME.torrent)
+
+  FILES SELECTION
     --exclude, -e PATTERN  Exclude files that match this glob pattern
                            (e.g. "*.txt")
     --include PATTERN      Include excluded files that match this glob
@@ -43,8 +47,8 @@ ARGUMENTS
     --include-regex, -ir PATTERN
                            Include excluded files that match this regular
                            expression
-    --in, -i INPUT         Read metainfo from torrent file or magnet URI
-    --out, -o TORRENT      Write metainfo to TORRENT (default: NAME.torrent)
+
+  TORRENT METADATA
     --name, -n NAME        Torrent name (default: basename of PATH)
     --tracker, -t TRACKER  List of comma-separated announce URLs; may be
                            given multiple times for multiple tiers
@@ -57,31 +61,32 @@ ARGUMENTS
     --xseed, -x            Randomize info hash
     --max-piece-size SIZE  Maximum piece size in multiples of 1 MiB
                            (must be a power of two)
-
     --notracker, -T        Remove trackers from INPUT
     --nowebseed, -W        Remove webseeds from INPUT
     --noprivate, -P        Remove private flag from INPUT
     --nocomment, -C        Remove comment from INPUT
-    --nodate, -D           Remove date from INPUT
     --nosource, -S         Remove "source" field from INPUT
     --noxseed, -X          De-randomize info hash of INPUT
-    --nocreator, -R        Remove creator from INPUT
+    --nodate, -D           Don't include date or remove date from INPUT
+    --nocreator, -R        Don't include creator or remove creator from INPUT
     --notorrent, -N        Don't create torrent file
     --nomagnet, -M         Don't create magnet URI
-    --novalidate, -V       Don't check SOURCE and/or TORRENT for errors
+    --novalidate, -V       Don't check INPUT and/or TORRENT for errors
 
+  CONFIGURATION
     --yes, -y              Answer all yes/no prompts with "yes"
     --config, -f FILE      Read configuration from FILE
                            (default: ~/.config/{_vars.__appname__}/config
     --noconfig, -F         Ignore configuration file
     --profile, -z PROFILE  Use options from PROFILE
+    --threads THREADS      Number of threads to use for hashing
 
-    --verbose, -v          Increase verbosity
-    --json, -j             Print a single JSON object
+  TEXT OUTPUT
+    --json, -j             Print output as JSON object
     --metainfo, -m         Print torrent metainfo as JSON object
     --human, -u            Force human-readable output
     --nohuman, -U          Force machine-readable output
-    --threads THREADS      Number of threads to use for hashing
+    --verbose, -v          Increase verbosity
     --help, -h             Show this help screen and exit
     --version              Show version number and exit
 """.strip()
@@ -95,12 +100,12 @@ class CLIParser(argparse.ArgumentParser):
 _cliparser = CLIParser(add_help=False)
 
 _cliparser.add_argument('PATH', nargs='?')
-_cliparser.add_argument('--exclude', '-e', default=[], action='append')
-_cliparser.add_argument('--exclude-regex', '-er', default=[], action='append')
-_cliparser.add_argument('--include', default=[], action='append')
-_cliparser.add_argument('--include-regex', '-ir', default=[], action='append')
 _cliparser.add_argument('--in', '-i', default='')
 _cliparser.add_argument('--out', '-o', default='')
+_cliparser.add_argument('--exclude', '-e', default=[], action='append')
+_cliparser.add_argument('--include', default=[], action='append')
+_cliparser.add_argument('--exclude-regex', '-er', default=[], action='append')
+_cliparser.add_argument('--include-regex', '-ir', default=[], action='append')
 
 _cliparser.add_argument('--name', '-n', default='')
 _cliparser.add_argument('--tracker', '-t', default=[], action='append')
@@ -116,9 +121,9 @@ _cliparser.add_argument('--notracker', '-T', action='store_true')
 _cliparser.add_argument('--nowebseed', '-W', action='store_true')
 _cliparser.add_argument('--noprivate', '-P', action='store_true')
 _cliparser.add_argument('--nocomment', '-C', action='store_true')
-_cliparser.add_argument('--nodate', '-D', action='store_true')
 _cliparser.add_argument('--nosource', '-S', action='store_true')
 _cliparser.add_argument('--noxseed', '-X', action='store_true')
+_cliparser.add_argument('--nodate', '-D', action='store_true')
 _cliparser.add_argument('--nocreator', '-R', action='store_true')
 _cliparser.add_argument('--notorrent', '-N', action='store_true')
 _cliparser.add_argument('--nomagnet', '-M', action='store_true')
@@ -128,13 +133,13 @@ _cliparser.add_argument('--yes', '-y', action='store_true')
 _cliparser.add_argument('--config', '-f')
 _cliparser.add_argument('--noconfig', '-F', action='store_true')
 _cliparser.add_argument('--profile', '-z', default=[], action='append')
+_cliparser.add_argument('--threads', type=int, default=0)
 
-_cliparser.add_argument('--verbose', '-v', action='count', default=0)
 _cliparser.add_argument('--json', '-j', action='store_true')
 _cliparser.add_argument('--metainfo', '-m', action='store_true')
 _cliparser.add_argument('--human', '-u', action='store_true')
 _cliparser.add_argument('--nohuman', '-U', action='store_true')
-_cliparser.add_argument('--threads', type=int, default=0)
+_cliparser.add_argument('--verbose', '-v', action='count', default=0)
 _cliparser.add_argument('--help', '-h', action='store_true')
 _cliparser.add_argument('--version', action='store_true')
 _cliparser.add_argument('--debug-file')
