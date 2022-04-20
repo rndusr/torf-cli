@@ -61,12 +61,12 @@ def test_VerifyError():
     with pytest.raises(err.VerifyError) as exc_info:
         raise err.Error(torf.VerifyNotDirectoryError('path/to/file'))
     assert exc_info.value.exit_code is err.Code.VERIFY
-    assert str(exc_info.value) == 'path/to/file: Is a directory'
+    assert str(exc_info.value) == 'path/to/file: Not a directory'
 
     with pytest.raises(err.VerifyError) as exc_info:
         raise err.Error(torf.VerifyIsDirectoryError('path/to/file'))
     assert exc_info.value.exit_code is err.Code.VERIFY
-    assert str(exc_info.value) == 'path/to/file: Not a directory'
+    assert str(exc_info.value) == 'path/to/file: Is a directory'
 
     with pytest.raises(err.VerifyError) as exc_info:
         raise err.Error(torf.VerifyFileSizeError('path/to/file', 123, 456))
