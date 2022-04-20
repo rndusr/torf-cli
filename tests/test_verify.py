@@ -161,15 +161,9 @@ def test_multifile_torrent__missing_file(tmp_path, create_torrent, human_readabl
     if hr_enabled:
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  {file1}: No such file or directory$',
                                             flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(r'^\s*Error  Corruption in piece 1, at least one of these files is corrupt:$',
-                                            flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(rf'^\s*      {file1}$', flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(rf'^\s*      {file2}$', flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Error\t{file1}: No such file or directory$', flags=re.MULTILINE)
-        assert cap.out == regex((rf'^Error\tCorruption in piece 1, at least one of these files is corrupt:\t{file1}\t{file2}$'),
-                                flags=re.MULTILINE)
 
 
 @pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
@@ -197,15 +191,9 @@ def test_multifile_torrent__wrong_size(tmp_path, create_torrent, human_readable,
     if hr_enabled:
         assert clear_ansi(cap.out) == regex(rf'^\s*Error  {file2}: Too big: 20 instead of 15 bytes$',
                                             flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(r'^\s*Error  Corruption in piece 1, at least one of these files is corrupt:$',
-                                            flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(rf'^\s*      {file1}$', flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(rf'^\s*      {file2}$', flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)
         assert cap.out == regex(rf'^Error\t{file2}: Too big: 20 instead of 15 bytes$', flags=re.MULTILINE)
-        assert cap.out == regex((rf'^Error\tCorruption in piece 1, at least one of these files is corrupt:\t{file1}\t{file2}$'),
-                                flags=re.MULTILINE)
 
 
 @pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
