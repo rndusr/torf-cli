@@ -92,7 +92,7 @@ def _create_mode(ui, cfg):
 
     ui.check_output_file_exists(_utils.get_torrent_filepath(torrent, cfg))
     ui.show_torrent(torrent)
-    _hash_pieces(ui, torrent, threads=cfg['threads'])
+    _hash_pieces(ui, torrent, reuse_paths=cfg['reuse'], threads=cfg['threads'])
     _write_torrent(ui, torrent, cfg)
     return torrent
 
@@ -192,12 +192,17 @@ def _verify_mode(ui, cfg):
                 raise _errors.VerifyError(content=cfg['PATH'], torrent=cfg['in'])
     return torrent
 
-def _hash_pieces(ui, torrent, threads=0):
+def _hash_pieces(ui, torrent, reuse_paths=None, threads=0):
     with ui.StatusReporter() as sr:
         try:
-            success = torrent.generate(callback=sr.generate_callback,
-                                       interval=PROGRESS_INTERVAL,
-                                       threads=threads or None)
+            # Try reusing existing torrent and generate() if that fails
+            success = False
+            if reuse_paths:
+                success = torrent.reuse(reuse_paths, callback=sr.reuse_callback)
+            if not success:
+                success = torrent.generate(callback=sr.generate_callback,
+                                           interval=PROGRESS_INTERVAL,
+                                           threads=threads or None)
         except torf.TorfError as e:
             raise _errors.Error(e)
         except KeyboardInterrupt:

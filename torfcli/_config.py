@@ -35,6 +35,7 @@ ARGUMENTS
   PATH                     Path to torrent's content file or directory
   --in, -i INPUT           Read metainfo from torrent file or magnet URI
   --out, -o TORRENT        Write metainfo to TORRENT (default: NAME.torrent)
+  --reuse, -r REUSE        Copy pieces from existing torrent file if possible
 
   FILES SELECTION
     --exclude, -e PATTERN  Exclude files that match this glob pattern
@@ -102,6 +103,7 @@ _cliparser = CLIParser(add_help=False)
 _cliparser.add_argument('PATH', nargs='?')
 _cliparser.add_argument('--in', '-i', default='')
 _cliparser.add_argument('--out', '-o', default='')
+_cliparser.add_argument('--reuse', '-r', default=[], action='append')
 _cliparser.add_argument('--exclude', '-e', default=[], action='append')
 _cliparser.add_argument('--include', default=[], action='append')
 _cliparser.add_argument('--exclude-regex', '-er', default=[], action='append')

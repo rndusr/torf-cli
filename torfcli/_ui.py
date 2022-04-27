@@ -363,6 +363,42 @@ class _StatusReporterBase():
         self._update_progress_info(torrent, filepath, pieces_done, pieces_total)
         self._ui.info('Progress', self._get_progress_string(self._info), newline=False)
 
+    def reuse_callback(self, torrent, torrent_filepath,
+                       torrent_files_done, torrent_files_total,
+                       is_match, exception):
+        if exception:
+            self._ui.info('Error', self._format_error(exception, torrent))
+
+        line = ''
+        if is_match is True:
+            label = 'Reused'
+            line = torrent_filepath
+
+        elif is_match is None:
+            label = 'Verifying'
+            line = torrent_filepath
+
+        elif torrent_filepath:
+            now = time.monotonic()
+            prev_update_time = getattr(self, '_prev_update_time', 0)
+            if now - prev_update_time > 0.1:
+                self._prev_update_time = now
+
+                label = 'Searching'
+                fraction_done = torrent_files_done / torrent_files_total
+                perc_str = f'{fraction_done * 100:5.2f} %'
+                done_str = f'{torrent_files_done} / {torrent_files_total}'
+                term_width,_ = shutil.get_terminal_size()
+                term_width = min(term_width, 76)
+                # Available width minus label
+                status_width = term_width - LABEL_WIDTH - len(LABEL_SEPARATOR)
+                filename = os.path.basename(torrent_filepath)
+                line = self._progress_line1(fraction_done, filename,
+                                            perc_str, done_str, status_width)
+
+        if line:
+            self._ui.info(label, line, newline=is_match)
+
     def verify_callback(self, torrent, filepath, pieces_done, pieces_total,
                         piece_index, piece_hash, exception):
         if exception:
