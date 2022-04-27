@@ -1,8 +1,11 @@
 2022-??-?? 4.0.0
-  - The --max-piece-size parameter was used as the actual piece size, even if it
-    was much too large for the given content.
+  - New option: --reuse <directory or torrent file> copies pieces hashes from an
+    existing torrent file if it contains the same files. If given a directory,
+    it is recursively searched for a matching torrent file.
   - In previous versions, each file was only verified up to the first corrupt
     piece unless --verbose was given. Now, files are always completely verified.
+  - Bugfix: The --max-piece-size parameter was always used as the actual piece
+    size, even if it was much too large for the given content.
 
 
 2021-02-20 3.4.0
