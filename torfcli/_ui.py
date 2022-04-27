@@ -367,7 +367,13 @@ class _StatusReporterBase():
                        torrent_files_done, torrent_files_total,
                        is_match, exception):
         if exception:
-            self._ui.info('Error', self._format_error(exception, torrent))
+            if isinstance(exception, torf.MetainfoError):
+                self._ui.info(
+                    'Error',
+                    f'{torrent_filepath}: {self._format_error(exception, torrent)}'
+                )
+            else:
+                self._ui.info('Error', self._format_error(exception, torrent))
 
         line = ''
         if is_match is True:
