@@ -332,13 +332,17 @@ class _StatusReporterBase():
         self._progress = _utils.Average(samples=5)
         self._time_left = _utils.Average(samples=3)
         self._info = types.SimpleNamespace(
-            torrent=None, filepath=None,
-            pieces_done=0, pieces_total=0,
-            fraction_done=0, bytes_per_sec=0,
+            torrent=None,
+            filepath=None,
+            items_done=0,
+            items_total=0,
+            fraction_done=0,
+            throughput=0,
             time_left=datetime.timedelta(0),
             time_elapsed=datetime.timedelta(0),
             time_total=datetime.timedelta(0),
-            eta=datetime.datetime.now() + datetime.timedelta(300))
+            eta=datetime.datetime.now() + datetime.timedelta(300),
+        )
 
     def __enter__(self):
         return self
@@ -363,25 +367,25 @@ class _StatusReporterBase():
         self._update_progress_info(torrent, filepath, pieces_done, pieces_total)
         self._ui.info('Progress', self._get_progress_string(self._info), newline=False)
 
-    def _update_progress_info(self, torrent, filepath, pieces_done, pieces_total):
+    def _update_progress_info(self, torrent, filepath, items_done, items_total):
         info = self._info
         info.torrent = torrent
         info.filepath = filepath
-        info.pieces_done = pieces_done
-        info.pieces_total = pieces_total
-        info.fraction_done = pieces_done / pieces_total
+        info.items_done = items_done
+        info.items_total = items_total
+        info.fraction_done = items_done / items_total
         progress = self._progress
-        if pieces_done < pieces_total:
-            progress.add(pieces_done)
+        if items_done < items_total:
+            progress.add(items_done)
             # Make sure we have enough samples to make estimates
             if len(progress.values) >= 2:
                 info.time_elapsed = datetime.timedelta(seconds=round(time.time() - self._start_time))
                 time_diff = progress.times[-1] - progress.times[0]
                 pieces_diff = progress.values[-1] - progress.values[0]
                 bytes_diff = pieces_diff * torrent.piece_size
-                info.bytes_per_sec = bytes_diff / time_diff + 0.001  # Prevent ZeroDivisionError
-                bytes_left = (pieces_total - pieces_done) * torrent.piece_size
-                self._time_left.add(bytes_left / info.bytes_per_sec)
+                info.throughput = bytes_diff / time_diff + 0.001  # Prevent ZeroDivisionError
+                bytes_left = (items_total - items_done) * torrent.piece_size
+                self._time_left.add(bytes_left / info.throughput)
                 info.time_left = datetime.timedelta(seconds=round(self._time_left.avg))
                 info.time_total = info.time_elapsed + info.time_left
                 info.eta = datetime.datetime.now() + info.time_left
@@ -389,7 +393,7 @@ class _StatusReporterBase():
             # The last piece was hashed
             info.time_elapsed = datetime.timedelta(seconds=round(time.time() - self._start_time))
             info.time_total = info.time_elapsed
-            info.bytes_per_sec = torrent.size / (info.time_total.total_seconds() + 0.001)  # Prevent ZeroDivisionError
+            info.throughput = torrent.size / (info.time_total.total_seconds() + 0.001)  # Prevent ZeroDivisionError
             info.time_left = datetime.timedelta(seconds=0)
             info.eta = datetime.datetime.now()
 
@@ -417,8 +421,8 @@ class _HumanStatusReporter(_StatusReporterBase):
 
     def _get_progress_string(self, info):
         perc_str = f'{info.fraction_done * 100:5.2f} %'
-        bps_str = f'{_utils.bytes2string(info.bytes_per_sec, trailing_zeros=True)}/s'
-        if info.pieces_done < info.pieces_total:
+        bps_str = f'{_utils.bytes2string(info.throughput, trailing_zeros=True)}/s'
+        if info.items_done < info.items_total:
             term_width,_ = shutil.get_terminal_size()
             term_width = min(term_width, 76)
             # Available width minus label ("   Progress  ")
@@ -505,7 +509,7 @@ class _MachineStatusReporter(_StatusReporterBase):
                           f'{round(info.time_left.total_seconds())}',
                           f'{round(info.time_total.total_seconds())}',
                           f'{round(info.eta.timestamp())}',
-                          f'{round(info.bytes_per_sec)}',
+                          f'{round(info.throughput)}',
                           f'{info.filepath}'))
 
     def _format_error(self, exception, torrent):
