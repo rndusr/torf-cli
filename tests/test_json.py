@@ -102,8 +102,6 @@ def test_json_with_magnet_uri(capsys, regex):
         'Name': 'My Torrent',
         'Size': 142631,
         'Trackers': ['https://localhost:123/announce', 'https://localhost:456/announce'],
-        'Piece Size': 16384,
-        'Piece Count': 9,
         'File Count': 1,
         'Files': ['My Torrent']
     }

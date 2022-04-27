@@ -172,4 +172,4 @@ def test_metainfo_with_magnet_uri(capsys, regex):
     j = json.loads(cap.out)
     assert j == {'announce': 'https://localhost:123/announce',
                  'announce-list': [['https://localhost:123/announce'], ['https://localhost:456/announce']],
-                 'info': {'name': 'My Torrent', 'piece length': 16384, 'length': 142631}}
+                 'info': {'name': 'My Torrent', 'length': 142631}}

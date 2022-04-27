@@ -336,8 +336,6 @@ def test_reading_magnet(capsys, human_readable, clear_ansi, regex):
                                          r'\s*Size  \d+\.\d+ [TMK]iB\n'
                                          r'\s*Tracker  https://localhost:123/announce\n'
                                          r'\s*Webseed  https://localhost/My\+Torrent\n'
-                                         r'\s*Piece Size  \d+ [TMK]iB\n'
-                                         r'\s*Piece Count  \d+\n'
                                          r'\s*File Count  \d+\n'
                                          r'\s*Files  My Torrent \[\d+\.\d+ [TMK]iB\]\n$'))
     assert cap.err == regex((rf'^{_vars.__appname__}: https://localhost:123/My\+Torrent.torrent: [\w\s]+\n'
@@ -353,8 +351,6 @@ def test_reading_magnet(capsys, human_readable, clear_ansi, regex):
                              r'Size\t\d+\n'
                              r'Tracker\thttps://localhost:123/announce\n'
                              r'Webseed\thttps://localhost/My\+Torrent\n'
-                             r'Piece Size\t\d+\n'
-                             r'Piece Count\t\d+\n'
                              r'File Count\t\d+\n'
                              r'Files\tMy Torrent$'))
     assert cap.err == regex((rf'^{_vars.__appname__}: https://localhost:123/My\+Torrent.torrent: [\w\s]+\n'

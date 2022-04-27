@@ -261,7 +261,7 @@ def test_metainfo_with_magnet_uri(capsys, tmp_path, regex):
                             r'%E1g%B1%FB%B4\.%A7/%05%1FOPC%27%030%8E%FB%8F%D1: [\w\s]+\n'
                             rf'{_vars.__appname__}: https://localhost:456/file\?info_hash='
                             r'%E1g%B1%FB%B4\.%A7/%05%1FOPC%27%030%8E%FB%8F%D1: [\w\s]+\n'
-                            rf"{_vars.__appname__}: Invalid metainfo: Missing 'pieces' in \['info'\]\n$")
+                            rf"{_vars.__appname__}: Invalid metainfo: Missing 'piece length' in \['info'\]\n$")
 
 
 def test_PATH_argument_with_trailing_slash(capsys, create_torrent):
