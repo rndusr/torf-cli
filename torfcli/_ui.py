@@ -116,7 +116,10 @@ class UI:
         include_patterns.extend(r.pattern for r in torrent.include_regexs)
         if include_patterns:
             info('Include', include_patterns)
-        info('Files', self._fmt.files(torrent))
+        try:
+            info('Files', self._fmt.files(torrent))
+        except torf.PathError as e:
+            self.error(e, exit=False)
 
     def StatusReporter(self):
         if self._cfg['json'] or self._cfg['metainfo']:
