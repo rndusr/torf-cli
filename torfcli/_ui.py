@@ -360,8 +360,9 @@ class _StatusReporterBase():
         pass
 
     def generate_callback(self, torrent, filepath, pieces_done, pieces_total):
-        self._update_progress_info(torrent, filepath, pieces_done, pieces_total)
-        self._ui.info('Progress', self._get_progress_string(self._info), newline=False)
+        self._update_progress_info_hashing(torrent, filepath, pieces_done, pieces_total)
+        progress_lines = self._get_hashing_progress_lines(self._info)
+        self._ui.info('Progress', progress_lines, newline=False)
 
     def reuse_callback(self, torrent, torrent_filepath,
                        torrent_files_done, torrent_files_total,
@@ -409,27 +410,31 @@ class _StatusReporterBase():
                         piece_index, piece_hash, exception):
         if exception:
             self._ui.info('Error', self._format_error(exception, torrent))
-        self._update_progress_info(torrent, filepath, pieces_done, pieces_total)
-        self._ui.info('Progress', self._get_progress_string(self._info), newline=False)
+        self._update_progress_info_hashing(torrent, filepath, pieces_done, pieces_total)
+        progress_lines = self._get_hashing_progress_lines(self._info)
+        self._ui.info('Progress', progress_lines, newline=False)
 
-    def _update_progress_info(self, torrent, filepath, items_done, items_total):
+    def _update_progress_info_common(self, torrent, filepath, items_done, items_total):
         info = self._info
         info.torrent = torrent
         info.filepath = filepath
         info.items_done = items_done
         info.items_total = items_total
         info.fraction_done = items_done / items_total
-        progress = self._progress
-        if items_done < items_total:
-            progress.add(items_done)
+
+    def _update_progress_info_hashing(self, torrent, filepath, pieces_done, pieces_total):
+        self._update_progress_info_common(torrent, filepath, pieces_done, pieces_total)
+        info = self._info
+        if pieces_done < pieces_total:
+            self._progress.add(pieces_done)
             # Make sure we have enough samples to make estimates
-            if len(progress.values) >= 2:
+            if len(self._progress.values) >= 2:
                 info.time_elapsed = datetime.timedelta(seconds=round(time.time() - self._start_time))
-                time_diff = progress.times[-1] - progress.times[0]
-                pieces_diff = progress.values[-1] - progress.values[0]
+                time_diff = self._progress.times[-1] - self._progress.times[0]
+                pieces_diff = self._progress.values[-1] - self._progress.values[0]
                 bytes_diff = pieces_diff * torrent.piece_size
                 info.throughput = bytes_diff / time_diff + 0.001  # Prevent ZeroDivisionError
-                bytes_left = (items_total - items_done) * torrent.piece_size
+                bytes_left = (pieces_total - pieces_done) * torrent.piece_size
                 self._time_left.add(bytes_left / info.throughput)
                 info.time_left = datetime.timedelta(seconds=round(self._time_left.avg))
                 info.time_total = info.time_elapsed + info.time_left
@@ -442,7 +447,7 @@ class _StatusReporterBase():
             info.time_left = datetime.timedelta(seconds=0)
             info.eta = datetime.datetime.now()
 
-    def _get_progress_string(self, info):
+    def _get_hashing_progress_lines(self, info):
         return str(info)
 
 class _HumanStatusReporter(_StatusReporterBase):
@@ -464,16 +469,16 @@ class _HumanStatusReporter(_StatusReporterBase):
     def __exit__(self, _, __, ___):
         _term.no_user_input.disable()
 
-    def _get_progress_string(self, info):
-        perc_str = f'{info.fraction_done * 100:5.2f} %'
-        bps_str = f'{_utils.bytes2string(info.throughput, trailing_zeros=True)}/s'
+    def _get_hashing_progress_lines(self, info):
+        percent_str = f'{info.fraction_done * 100:5.2f} %'
+        throughput_str = f'{_utils.bytes2string(info.throughput, trailing_zeros=True)}/s'
         if info.items_done < info.items_total:
             term_width,_ = shutil.get_terminal_size()
             term_width = min(term_width, 76)
             # Available width minus label ("   Progress  ")
             status_width = term_width - LABEL_WIDTH - len(LABEL_SEPARATOR)
             line1 = self._progress_line1(info.fraction_done, os.path.basename(info.filepath),
-                                         perc_str, bps_str, status_width)
+                                         percent_str, throughput_str, status_width)
             line2 = self._progress_line2(info, status_width)
             return ''.join((_term.save_cursor_pos,
                             _term.erase_to_eol,
@@ -482,18 +487,17 @@ class _HumanStatusReporter(_StatusReporterBase):
                             _term.restore_cursor_pos,
                             line1))
         else:
-            return STATUS_SEPARATOR.join((perc_str, f'{info.time_total} total', bps_str))
+            return STATUS_SEPARATOR.join((percent_str, f'{info.time_total} total', throughput_str))
 
-    def _progress_line1(self, fraction_done, filename, percent_str, bps_str, status_width):
-        progress_bar_width = (status_width - len('99.99 % ') - len(' 999.99 MiB/s') - 1)
+    def _progress_line1(self, fraction_done, filename, percent, suffix, status_width):
+        progress_bar_width = (status_width - len(percent) - len(suffix) - 1)
         if progress_bar_width >= 10:
-            progress_bar = self._progress_bar(filename, fraction_done,
-                                              width=progress_bar_width)
-            return ' '.join((percent_str, progress_bar, bps_str))
+            progress_bar = self._progress_bar(filename, fraction_done, progress_bar_width)
+            return ' '.join((percent, progress_bar, suffix))
         elif status_width >= 23:
-            return STATUS_SEPARATOR.join((percent_str, bps_str))
+            return STATUS_SEPARATOR.join((percent, suffix))
         else:
-            return percent_str
+            return percent
 
     def _progress_bar(self, text, fraction_done, width):
         text_width = width - 2
@@ -548,7 +552,7 @@ class _HumanStatusReporter(_StatusReporterBase):
             return str(exception)
 
 class _MachineStatusReporter(_StatusReporterBase):
-    def _get_progress_string(self, info):
+    def _get_hashing_progress_lines(self, info):
         return '\t'.join((f'{info.fraction_done * 100:.3f}',
                           f'{round(info.time_elapsed.total_seconds())}',
                           f'{round(info.time_left.total_seconds())}',
