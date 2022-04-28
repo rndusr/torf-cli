@@ -574,6 +574,11 @@ class _QuietStatusReporter(_MachineStatusReporter):
     def generate_callback(self, torrent, filepath, pieces_done, pieces_total):
         pass
 
+    def reuse_callback(self, torrent, torrent_filepath,
+                       torrent_files_done, torrent_files_total,
+                       is_match, exception):
+        pass
+
     def verify_callback(self, torrent, filepath, pieces_done, pieces_total,
                         piece_index, piece_hash, exception):
         if exception:
