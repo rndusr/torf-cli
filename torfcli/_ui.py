@@ -157,6 +157,7 @@ class _FormatterBase:
     def terminate(self, torrent):
         pass
 
+
 class _HumanFormatter(_FormatterBase):
     def private(self, torrent):
         return 'yes' if torrent.private else 'no'
@@ -241,6 +242,7 @@ class _HumanFormatter(_FormatterBase):
             answer = self.DIALOG_YES_NO_ANSWERS.get(key, None)
             if answer is not None:
                 return answer
+
 
 class _MachineFormatter(_FormatterBase):
     def private(self, torrent):
@@ -551,6 +553,7 @@ class _HumanStatusReporter(_StatusReporterBase):
         else:
             return str(exception)
 
+
 class _MachineStatusReporter(_StatusReporterBase):
     def _get_hashing_progress_lines(self, info):
         return '\t'.join((f'{info.fraction_done * 100:.3f}',
@@ -569,6 +572,7 @@ class _MachineStatusReporter(_StatusReporterBase):
             return lines
         else:
             return str(exception)
+
 
 class _QuietStatusReporter(_MachineStatusReporter):
     def generate_callback(self, torrent, filepath, pieces_done, pieces_total):
