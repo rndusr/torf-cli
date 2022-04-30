@@ -333,6 +333,9 @@ class _MetainfoFormatter(_JSONFormatter):
 class _StatusReporterBase():
     def __init__(self, ui):
         self._ui = ui
+        self.reset()
+
+    def reset(self):
         self._start_time = time.time()
         self._progress = _utils.Average(samples=5)
         self._time_left = _utils.Average(samples=3)
