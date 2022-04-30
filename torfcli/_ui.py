@@ -375,10 +375,7 @@ class _StatusReporterBase():
                        is_match, exception):
         if exception:
             if isinstance(exception, torf.MetainfoError):
-                self._ui.info(
-                    'Error',
-                    f'{torrent_filepath}: {self._format_error(exception, torrent)}'
-                )
+                self._ui.info('Error', f'{torrent_filepath}: {self._format_error(exception, torrent)}')
             else:
                 self._ui.info('Error', self._format_error(exception, torrent))
 
