@@ -18,6 +18,8 @@ clean:
 venv:
 	"$(PYTHON)" -m venv "$(VENV_PATH)"
 	"$(VENV_PATH)"/bin/pip install --upgrade wheel tox pytest flake8 isort
+	"$(VENV_PATH)"/bin/pip install --upgrade coverage pytest-cov
+	"$(VENV_PATH)"/bin/pip install --upgrade flake8 isort
 	"$(VENV_PATH)"/bin/pip install --editable ../torf
 	"$(VENV_PATH)"/bin/pip install --editable .
 	# Dependencies for `setup.py check -r -s`
