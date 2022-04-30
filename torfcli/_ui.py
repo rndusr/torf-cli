@@ -474,14 +474,16 @@ class _HumanStatusReporter(_StatusReporterBase):
     def __exit__(self, _, __, ___):
         _term.no_user_input.disable()
 
+    def _get_status_width(self):
+        term_width, _ = shutil.get_terminal_size()
+        term_width = min(term_width, 76)
+        return term_width - LABEL_WIDTH - len(LABEL_SEPARATOR)
+
     def _get_hashing_progress_lines(self, info):
         percent_str = f'{info.fraction_done * 100:5.2f} %'
         throughput_str = f'{_utils.bytes2string(info.throughput, trailing_zeros=True)}/s'
         if info.items_done < info.items_total:
-            term_width,_ = shutil.get_terminal_size()
-            term_width = min(term_width, 76)
-            # Available width minus label ("   Progress  ")
-            status_width = term_width - LABEL_WIDTH - len(LABEL_SEPARATOR)
+            status_width = self._get_status_width()
             line1 = self._progress_line1(info.fraction_done, os.path.basename(info.filepath),
                                          percent_str, throughput_str, status_width)
             line2 = self._progress_line2(info, status_width)
