@@ -295,7 +295,7 @@ class _JSONFormatter(_MachineFormatter):
         return torrent.files
 
     def info(self, key, value, newline=None):
-        # Join multiple values with a tab character
+        # Make sure we can JSON-encode all kinds of iterable
         if not isinstance(value, str) and isinstance(value, abc.Iterable):
             value = tuple(value)
         if key == 'Error':
