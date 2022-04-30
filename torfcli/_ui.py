@@ -516,7 +516,7 @@ class _HumanStatusReporter(_StatusReporterBase):
                  'left'    : f'{info.time_left} left',
                  'total'   : f'{info.time_total} total',
                  'eta'     : f'ETA: {"{0:%H}:{0:%M}:{0:%S}".format(info.eta)}'}
-        priority = iter(('left', 'total', 'elapsed', 'eta'))
+        priority = ('left', 'total', 'elapsed', 'eta')
         order = ('elapsed', 'left', 'total', 'eta')
         parts = []
         priority = iter(priority)
