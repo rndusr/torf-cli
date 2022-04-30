@@ -219,6 +219,7 @@ class _HumanFormatter(_FormatterBase):
         _term.echo('move_pos1')
         if newline:
             sys.stdout.write(f'{label}{LABEL_SEPARATOR}{value}\n')
+            _term.echo('ensure_line_below')
         else:
             sys.stdout.write(f'{label}{LABEL_SEPARATOR}{value}')
             _utils.flush(sys.stdout)
