@@ -423,7 +423,10 @@ class _StatusReporterBase():
         info.filepath = filepath
         info.items_done = items_done
         info.items_total = items_total
-        info.fraction_done = items_done / items_total
+        if items_total > 0:
+            info.fraction_done = items_done / items_total
+        else:
+            info.fraction_done = 100.0
 
     def _update_progress_info_hashing(self, torrent, filepath, pieces_done, pieces_total):
         self._update_progress_info_common(torrent, filepath, pieces_done, pieces_total)
