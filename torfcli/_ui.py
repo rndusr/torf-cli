@@ -439,7 +439,7 @@ class _StatusReporterBase():
                 time_diff = self._progress.times[-1] - self._progress.times[0]
                 pieces_diff = self._progress.values[-1] - self._progress.values[0]
                 bytes_diff = pieces_diff * torrent.piece_size
-                info.throughput = bytes_diff / time_diff + 0.001  # Prevent ZeroDivisionError
+                info.throughput = bytes_diff / (time_diff + 0.001)  # Prevent ZeroDivisionError
                 bytes_left = (pieces_total - pieces_done) * torrent.piece_size
                 self._time_left.add(bytes_left / info.throughput)
                 info.time_left = datetime.timedelta(seconds=round(self._time_left.avg))
