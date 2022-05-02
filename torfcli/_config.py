@@ -36,6 +36,7 @@ ARGUMENTS
   --in, -i INPUT           Read metainfo from torrent file or magnet URI
   --out, -o TORRENT        Write metainfo to TORRENT (default: NAME.torrent)
   --reuse, -r REUSE        Copy pieces from existing torrent file if possible
+  --noreuse, -R            Ignore any --reuse paths
 
   FILES SELECTION
     --exclude, -e PATTERN  Exclude files that match this glob pattern
@@ -104,6 +105,7 @@ _cliparser.add_argument('PATH', nargs='?')
 _cliparser.add_argument('--in', '-i', default='')
 _cliparser.add_argument('--out', '-o', default='')
 _cliparser.add_argument('--reuse', '-r', default=[], action='append')
+_cliparser.add_argument('--noreuse', '-R', action='store_true')
 _cliparser.add_argument('--exclude', '-e', default=[], action='append')
 _cliparser.add_argument('--include', default=[], action='append')
 _cliparser.add_argument('--exclude-regex', '-er', default=[], action='append')
@@ -126,7 +128,7 @@ _cliparser.add_argument('--nocomment', '-C', action='store_true')
 _cliparser.add_argument('--nosource', '-S', action='store_true')
 _cliparser.add_argument('--noxseed', '-X', action='store_true')
 _cliparser.add_argument('--nodate', '-D', action='store_true')
-_cliparser.add_argument('--nocreator', '-R', action='store_true')
+_cliparser.add_argument('--nocreator', '-A', action='store_true')
 _cliparser.add_argument('--notorrent', '-N', action='store_true')
 _cliparser.add_argument('--nomagnet', '-M', action='store_true')
 _cliparser.add_argument('--novalidate', '-V', action='store_true')

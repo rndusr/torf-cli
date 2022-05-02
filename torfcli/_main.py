@@ -92,7 +92,12 @@ def _create_mode(ui, cfg):
 
     ui.check_output_file_exists(_utils.get_torrent_filepath(torrent, cfg))
     ui.show_torrent(torrent)
-    _hash_pieces(ui, torrent, reuse_paths=cfg['reuse'], threads=cfg['threads'])
+    _hash_pieces(
+        ui=ui,
+        torrent=torrent,
+        reuse_paths=cfg['reuse'] if not cfg['noreuse'] else (),
+        threads=cfg['threads'],
+    )
     _write_torrent(ui, torrent, cfg)
     return torrent
 

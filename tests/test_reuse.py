@@ -145,3 +145,45 @@ def test_does_not_find_matching_torrent(hr_enabled, create_existing_torrent, reg
         assert cap.out != regex(rf'^Reused\t$', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Progress\t.*?/{mock_content.name}/', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Torrent\t{exp_torrent}$', flags=re.MULTILINE)
+
+
+@pytest.mark.parametrize('hr_enabled', (True, False), ids=('human_readable=True', 'human_readable=False'))
+def test_noreuse_argument(hr_enabled, create_existing_torrent, regex, capsys,
+                          human_readable, clear_ansi, assert_no_ctrl):
+    existing_torrents = [
+        create_existing_torrent(('foo1.jpg', b'just an image 1')),
+        create_existing_torrent(('foo2.jpg', b'just an image 2')),
+        create_existing_torrent(('foo3.jpg', b'just an image 3')),
+        create_existing_torrent(
+            ('bar/this.mp4', b'just a video'),
+            ('bar/that.txt', b'just a text'),
+            ('bar/baz/oh.pdf', b'a subdirectory!'),
+        ),
+        create_existing_torrent(
+            ('baz/hello.mp4', b'just a video'),
+            ('baz/yo.txt', b'just a text'),
+        ),
+    ]
+    existing_torrents_path = pathlib.Path(os.path.commonpath(existing_torrents))
+    existing_contents_path = existing_torrents_path.parent / 'contents'
+    content_path = existing_contents_path / 'foo2.jpg'
+    exp_reused_torrent = existing_torrents[1]
+    exp_torrent = content_path.name + '.torrent'
+
+    with human_readable(hr_enabled):
+        run([str(content_path), '--reuse', str(existing_torrents_path), '--noreuse'])
+    cap = capsys.readouterr()
+    assert cap.err == ''
+    if hr_enabled:
+        assert cap.out != regex(rf'Reuse', flags=re.MULTILINE)
+        assert cap.out != regex(rf'Verifying', flags=re.MULTILINE)
+        assert clear_ansi(cap.out) != regex(rf'^\s*Reused', flags=re.MULTILINE)
+        assert clear_ansi(cap.out) == regex(rf'^\s+Progress\s+', flags=re.MULTILINE)
+        assert clear_ansi(cap.out) == regex(rf'^\s*Torrent  {exp_torrent}$', flags=re.MULTILINE)
+    else:
+        assert_no_ctrl(cap.out)
+        assert cap.out != regex(r'^Reuse\t', flags=re.MULTILINE)
+        assert cap.out != regex(rf'^Verifying\t', flags=re.MULTILINE)
+        assert cap.out != regex(rf'^Reused\t', flags=re.MULTILINE)
+        assert cap.out == regex(rf'^Progress\t', flags=re.MULTILINE)
+        assert cap.out == regex(rf'^Torrent\t{exp_torrent}$', flags=re.MULTILINE)
