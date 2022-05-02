@@ -198,7 +198,9 @@ def _hash_pieces(ui, torrent, reuse_paths=None, threads=0):
             # Try reusing existing torrent and generate() if that fails
             success = False
             if reuse_paths and torrent.files:
-                success = torrent.reuse(reuse_paths, callback=sr.reuse_callback)
+                success = torrent.reuse(reuse_paths,
+                                        callback=sr.reuse_callback,
+                                        interval=PROGRESS_INTERVAL)
             if not success:
                 sr.reset()
                 success = torrent.generate(callback=sr.generate_callback,

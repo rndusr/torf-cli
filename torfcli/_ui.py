@@ -493,22 +493,15 @@ class _HumanStatusReporter(_StatusReporterBase):
             return STATUS_SEPARATOR.join((percent_str, f'{info.time_total} total', throughput_str))
 
     def _get_reuse_progress_lines(self, info):
-        now = time.monotonic()
-        prev_reuse_update_time = getattr(self, '_prev_reuse_update_time', 0)
-        if now - prev_reuse_update_time > 0.5:
-            self._prev_reuse_update_time = now
-
-            filename = os.path.basename(info.filepath)
-            term_width,_ = shutil.get_terminal_size()
-            term_width = min(term_width, 76)
-            # Available width minus label
-            status_width = term_width - LABEL_WIDTH - len(LABEL_SEPARATOR)
-            percent_str = f'{info.fraction_done * 100:5.2f} %'
-            throughput_str = f'{info.throughput:4.0f} files/s'
-            self._reuse_progress_lines = self._progress_line1(
-                info.fraction_done, filename, percent_str, throughput_str, status_width)
-
-        return self._reuse_progress_lines
+        filename = os.path.basename(info.filepath)
+        term_width,_ = shutil.get_terminal_size()
+        term_width = min(term_width, 76)
+        # Available width minus label
+        status_width = term_width - LABEL_WIDTH - len(LABEL_SEPARATOR)
+        percent_str = f'{info.fraction_done * 100:5.2f} %'
+        throughput_str = f'{info.throughput:4.0f} files/s'
+        return self._progress_line1(info.fraction_done, filename,
+                                    percent_str, throughput_str, status_width)
 
     def _progress_line1(self, fraction_done, filename, percent, suffix, status_width):
         progress_bar_width = (status_width - len(percent) - len(suffix) - 1)
