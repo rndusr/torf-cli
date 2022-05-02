@@ -200,6 +200,7 @@ def _hash_pieces(ui, torrent, reuse_paths=None, threads=0):
             if reuse_paths and torrent.files:
                 success = torrent.reuse(reuse_paths, callback=sr.reuse_callback)
             if not success:
+                sr.reset()
                 success = torrent.generate(callback=sr.generate_callback,
                                            interval=PROGRESS_INTERVAL,
                                            threads=threads or None)
