@@ -17,7 +17,7 @@ torf - command line tool to create, display and edit torrents
 == DESCRIPTION
 
 torf can create, display and edit torrent files and verify the integrity of a
-torrent's content.
+torrent's files.
 
 * *torf* _PATH_ [_OPTIONS_] [*-o* _TORRENT_] +
 Create the torrent file _TORRENT_ from the file or directory _PATH_.
@@ -112,13 +112,13 @@ A webseed URL (BEP19).  This option may be given multiple times.
 Remove webseeds from an existing torrent.
 
 *--private*, *-p*::
-Tell clients to use tracker(s) exclusively for peer discovery.
+Tell clients to only use tracker(s) for peer discovery, not DHT or PEX.
 +
 WARNING: When editing, this option changes the info hash and creates a new
 torrent.
 
 *--noprivate*, *-P*::
-Allow clients to use DHT and PEX for peer discovery.
+Allow clients to use trackerless methods like DHT and PEX for peer discovery.
 +
 WARNING: When editing, this option changes the info hash and creates a new
 torrent.
@@ -209,8 +209,10 @@ the "info" section) are encoded in Base64.  Progress is not reported.  Errors
 are reported normally on stderr.
 +
 Unless *--verbose* is given, any non-standard fields are excluded and metainfo
-that doesn't represent a valid torrent results in an error.  Unless *--verbose*
-is given twice, the "pieces" field in the "info" section is excluded.
+that doesn't represent a valid torrent results in an error.
++
+Unless *--verbose* is given twice, the "pieces" field in the "info" section is
+excluded.
 
 *--human*, *-u*::
 Display information in human-readable output even if stdout is not a TTY.  See
