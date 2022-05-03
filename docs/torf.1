@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
-.\" Generator: Asciidoctor 2.0.10
-.\"      Date: 2020-08-11
+.\" Generator: Asciidoctor 2.0.16
+.\"      Date: 2022-05-03
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2020-08-11" "\ \&" "\ \&"
+.TH "TORF" "1" "2022-05-03" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -42,7 +42,7 @@ torf \- command line tool to create, display and edit torrents
 .SH "DESCRIPTION"
 .sp
 torf can create, display and edit torrent files and verify the integrity of a
-torrent\(cqs content.
+torrent\(cqs files.
 .sp
 .RS 4
 .ie n \{\
@@ -113,8 +113,8 @@ whether a certain option will change the hash.
 Verify that the content in \fIPATH\fP matches the metadata in the torrent file
 \fITORRENT\fP.
 .sp
-If \fIPATH\fP ends with a path separator (e.g. "/"), the name of the torrent (as
-specified in \fITORRENT\fP) is appended.
+If \fIPATH\fP ends with a path separator (usually "/"), the name of the torrent (as
+specified by the metadata in \fITORRENT\fP) is appended.
 .RE
 .SH "OPTIONS"
 .sp
@@ -123,34 +123,6 @@ Options that start with \fB\-\-no\fP take precedence.
 \fIPATH\fP
 .RS 4
 The path to the torrent\(cqs content.
-.sp
-When verifying data, the torrent\(cqs name is appended.
-.RE
-.sp
-\fB\-\-exclude\fP, \fB\-e\fP \fIPATTERN\fP
-.RS 4
-Exclude files from \fIPATH\fP that match the glob pattern \fIPATTERN\fP.  This option
-may be given multiple times.  See \fBEXCLUDING FILES\fP.
-.RE
-.sp
-\fB\-\-exclude\-regex\fP, \fB\-er\fP \fIPATTERN\fP
-.RS 4
-Exclude files from \fIPATH\fP that match the regular expression \fIPATTERN\fP.  This
-option may be given multiple times.  See \fBEXCLUDING FILES\fP.
-.RE
-.sp
-\fB\-\-include\fP \fIPATTERN\fP
-.RS 4
-Include files from \fIPATH\fP that match the glob pattern \fIPATTERN\fP even if they
-match any \fB\-\-exclude\fP or \fB\-\-exclude\-regex\fP patterns.  This option may be given
-multiple times.  See \fBEXCLUDING FILES\fP.
-.RE
-.sp
-\fB\-\-include\-regex\fP, \fB\-ir\fP \fIPATTERN\fP
-.RS 4
-Include files from \fIPATH\fP that match the regular expression \fIPATTERN\fP even if
-they match any \fB\-\-exclude\fP or \fB\-\-exclude\-regex\fP patterns.  This option may be
-given multiple times.  See \fBEXCLUDING FILES\fP.
 .RE
 .sp
 \fB\-\-in\fP, \fB\-i\fP \fIINPUT\fP
@@ -164,6 +136,46 @@ and does not exist, the torrent data or magnet URI is read from stdin.
 Write to torrent file \fITORRENT\fP.
 .br
 Default: \fINAME\fP\fB.torrent\fP
+.RE
+.sp
+\fB\-\-reuse\fP, \fB\-r\fP \fIPATH\fP
+.RS 4
+Copy piece size and piece hashes from existing torrent \fIPATH\fP.  The existing
+torrent must have identical name and files.  If \fIPATH\fP is a directory, it is
+searched recursively for a matching torrent.  This option may be given multiple
+times.
+.RE
+.sp
+\fB\-\-noreuse\fP, \fB\-R\fP
+.RS 4
+Ignore all \fB\-\-reuse\fP arguments.  This is particularly useful you have reuse
+paths in your configuration file.
+.RE
+.sp
+\fB\-\-exclude\fP, \fB\-e\fP \fIPATTERN\fP
+.RS 4
+Exclude files from \fIPATH\fP that match the glob pattern \fIPATTERN\fP.  This option
+may be given multiple times.  See \fBEXCLUDING FILES\fP.
+.RE
+.sp
+\fB\-\-include\fP \fIPATTERN\fP
+.RS 4
+Include files from \fIPATH\fP that match the glob pattern \fIPATTERN\fP even if they
+match any \fB\-\-exclude\fP or \fB\-\-exclude\-regex\fP patterns.  This option may be given
+multiple times.  See \fBEXCLUDING FILES\fP.
+.RE
+.sp
+\fB\-\-exclude\-regex\fP, \fB\-er\fP \fIPATTERN\fP
+.RS 4
+Exclude files from \fIPATH\fP that match the regular expression \fIPATTERN\fP.  This
+option may be given multiple times.  See \fBEXCLUDING FILES\fP.
+.RE
+.sp
+\fB\-\-include\-regex\fP, \fB\-ir\fP \fIPATTERN\fP
+.RS 4
+Include files from \fIPATH\fP that match the regular expression \fIPATTERN\fP even if
+they match any \fB\-\-exclude\fP or \fB\-\-exclude\-regex\fP patterns.  This option may be
+given multiple times.  See \fBEXCLUDING FILES\fP.
 .RE
 .sp
 \fB\-\-notorrent\fP, \fB\-N\fP
@@ -222,7 +234,7 @@ Remove webseeds from an existing torrent.
 .sp
 \fB\-\-private\fP, \fB\-p\fP
 .RS 4
-Tell clients to use tracker(s) exclusively for peer discovery.
+Tell clients to only use tracker(s) for peer discovery, not DHT or PEX.
 .if n .sp
 .RS 4
 .it 1 an-trap
@@ -242,7 +254,7 @@ torrent.
 .sp
 \fB\-\-noprivate\fP, \fB\-P\fP
 .RS 4
-Allow clients to use DHT and PEX for peer discovery.
+Allow clients to use trackerless methods like DHT and PEX for peer discovery.
 .if n .sp
 .RS 4
 .it 1 an-trap
@@ -376,7 +388,7 @@ etc.).  Numbers smaller than 1 are allowed, e.g. \(lq0.25\(rq sets the maximum p
 size to 256 KiB.
 .RE
 .sp
-\fB\-\-nocreator\fP, \fB\-R\fP
+\fB\-\-nocreator\fP, \fB\-A\fP
 .RS 4
 Remove the name of the application that created the torrent from an existing
 torrent.
@@ -432,19 +444,7 @@ Display bytes with and without unit prefix, e.g. "1.38 MiB / 1,448,576 B".
 .  sp -1
 .  IP \(bu 2.3
 .\}
-When verifying, corrupt files are always read to the end instead of skipping
-them after the first corrupt piece.
-.RE
-.sp
-.RS 4
-.ie n \{\
-\h'-04'\(bu\h'+03'\c
-.\}
-.el \{\
-.  sp -1
-.  IP \(bu 2.3
-.\}
-Any other effects are explained in the relevant arguments\(aq documentation.
+Any other effects are explained in the relevant arguments\*(Aq documentation.
 .RE
 .RE
 .sp
@@ -460,8 +460,10 @@ the "info" section) are encoded in Base64.  Progress is not reported.  Errors
 are reported normally on stderr.
 .sp
 Unless \fB\-\-verbose\fP is given, any non\-standard fields are excluded and metainfo
-that doesn\(cqt represent a valid torrent results in an error.  Unless \fB\-\-verbose\fP
-is given twice, the "pieces" field in the "info" section is excluded.
+that doesn\(cqt represent a valid torrent results in an error.
+.sp
+Unless \fB\-\-verbose\fP is given twice, the "pieces" field in the "info" section is
+excluded.
 .RE
 .sp
 \fB\-\-human\fP, \fB\-u\fP
@@ -491,10 +493,12 @@ Create \(lqfoo.torrent\(rq with two trackers and don\(cqt store the creation dat
 .sp
 .if n .RS 4
 .nf
+.fam C
 $ torf path/to/foo \(rs
        \-t http://example.org:6881/announce \(rs
        \-t http://example.com:6881/announce \(rs
        \-\-nodate
+.fam
 .fi
 .if n .RE
 .sp
@@ -502,7 +506,9 @@ Read \(lqfoo.torrent\(rq and print its metainfo:
 .sp
 .if n .RS 4
 .nf
+.fam C
 $ torf \-i foo.torrent
+.fam
 .fi
 .if n .RE
 .sp
@@ -510,7 +516,9 @@ Print only the name:
 .sp
 .if n .RS 4
 .nf
-$ torf \-i foo.torrent | grep \(aq^Name\(aq | cut \-f2
+.fam C
+$ torf \-i foo.torrent | grep \*(Aq^Name\*(Aq | cut \-f2
+.fam
 .fi
 .if n .RE
 .sp
@@ -519,7 +527,9 @@ Change the comment and remove the date from \(lqfoo.torrent\(rq, write the resul
 .sp
 .if n .RS 4
 .nf
-$ torf \-i foo.torrent \-c \(aqNew comment\(aq \-D \-o bar.torrent
+.fam C
+$ torf \-i foo.torrent \-c \*(AqNew comment\*(Aq \-D \-o bar.torrent
+.fam
 .fi
 .if n .RE
 .sp
@@ -527,7 +537,9 @@ Check if \(lqpath/to/foo\(rq contains valid data as specified in \(lqbar.torrent
 .sp
 .if n .RS 4
 .nf
+.fam C
 $ torf \-i bar.torrent path/to/foo
+.fam
 .fi
 .if n .RE
 .SH "EXCLUDING FILES"
@@ -549,7 +561,7 @@ e.g. if \fIPATH\fP is \(lq/home/foo/bar\(rq, each file path starts with \(lqbar/
 Empty directories and empty files are automatically excluded.
 .sp
 Regular expressions should be Perl\-compatible for simple patterns.  See
-.URL "https://docs.python.org/3/library/re.html#regular\-expression\-syntax" "" " "
+.URL "https://docs.python.org/3/library/re.html#regular\-expression\-syntax" "" ""
 for the
 complete documentation.
 .sp
@@ -616,6 +628,7 @@ two profiles \(lqfoo\(rq and \(lqbar\(rq:
 .sp
 .if n .RS 4
 .nf
+.fam C
 yes
 nodate
 exclude = *.txt
@@ -628,6 +641,7 @@ private
 [bar]
 tracker = https://bar/announce
 comment = I love bar.
+.fam
 .fi
 .if n .RE
 .sp
@@ -635,9 +649,11 @@ With this configuration file, these arguments are always used:
 .sp
 .if n .RS 4
 .nf
+.fam C
 \-\-yes
 \-\-nodate
-\-\-exclude \(aq*.txt\(aq
+\-\-exclude \*(Aq*.txt\*(Aq
+.fam
 .fi
 .if n .RE
 .sp
@@ -645,9 +661,11 @@ If \(lq\-\-profile foo\(rq is given, it also adds these arguments:
 .sp
 .if n .RS 4
 .nf
+.fam C
 \-\-tracker https://foo1/announce
 \-\-tracker https://foo2/announce
 \-\-private
+.fam
 .fi
 .if n .RE
 .sp
@@ -655,8 +673,10 @@ If \(lq\-\-profile bar\(rq is given, it also adds these arguments:
 .sp
 .if n .RS 4
 .nf
+.fam C
 \-\-tracker https://bar/announce
-\-\-comment \(aqI love bar.\(aq
+\-\-comment \*(AqI love bar.\*(Aq
+.fam
 .fi
 .if n .RE
 .SH "PIPING OUTPUT"
