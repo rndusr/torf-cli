@@ -58,9 +58,8 @@ Default: __NAME__**.torrent**
 
 *--reuse*, *-r* _PATH_::
 Copy piece size and piece hashes from existing torrent _PATH_.  The existing
-torrent must have identical name and files.  If _PATH_ is a directory, it is
-searched recursively for a matching torrent.  This option may be given multiple
-times.
+torrent must have identical files.  If _PATH_ is a directory, it is searched
+recursively for a matching torrent.  This option may be given multiple times.
 
 *--noreuse*, *-R*::
 Ignore all *--reuse* arguments.  This is particularly useful you have reuse

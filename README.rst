@@ -4,8 +4,8 @@ torf-cli
 torf-cli is a command line tool that can create, read and edit torrent files and
 magnet URIs. It can also verify a file system path against a torrent and provide
 detailed errors. When creating a torrent, it can find an existing torrent with
-the same name and files and copy its piece hashes to the freshly created torrent
-to avoid hashing the files again.
+the same files and copy its piece hashes to the freshly created torrent to avoid
+hashing the files again.
 
 The output is pleasant to read for humans or easy to parse with common CLI
 tools.
