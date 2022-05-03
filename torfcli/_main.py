@@ -171,8 +171,14 @@ def _edit_mode(ui, cfg):
 
 def _verify_mode(ui, cfg):
     torrent = _utils.get_torrent(cfg, ui)
+    # Append torrent's name to path if it ends with "/"
+    path = cfg['PATH']
+    if path[-1] == os.path.sep:
+        path = os.path.join(path, torrent.metainfo['info'].get('name', ''))
+
     ui.show_torrent(torrent)
-    ui.info('Path', cfg['PATH'])
+    ui.info('Path', path)
+
     try:
         ui.info('Info Hash', torrent.infohash)
     except torf.TorfError as e:
@@ -180,9 +186,6 @@ def _verify_mode(ui, cfg):
 
     with ui.StatusReporter() as sr:
         try:
-            path = cfg['PATH']
-            if path[-1] == os.path.sep:
-                path = os.path.join(path, torrent.metainfo['info'].get('name', ''))
             success = torrent.verify(path,
                                      callback=sr.verify_callback,
                                      interval=PROGRESS_INTERVAL)
