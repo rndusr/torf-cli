@@ -293,7 +293,10 @@ class _JSONFormatter(_MachineFormatter):
         return torrent.private
 
     def files(self, torrent):
-        return torrent.files
+        return (
+            {'Path': str(f), 'Size': f.size}
+            for f in torrent.files
+        )
 
     def info(self, key, value, newline=None):
         # Make sure we can JSON-encode all kinds of iterable

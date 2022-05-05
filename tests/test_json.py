@@ -22,7 +22,10 @@ def test_json_contains_standard_fields(capsys, mock_content):
     assert isinstance(j['File Count'], int)
     assert isinstance(j['Files'], list)
     for f in j['Files']:
-        assert isinstance(f, str)
+        assert isinstance(f, dict)
+        assert tuple(f.keys()) == ('Path', 'Size')
+        assert isinstance(f['Path'], str)
+        assert isinstance(f['Size'], int)
     assert isinstance(j['Info Hash'], str)
     assert len(j['Info Hash']) == 40
     assert j['Magnet'].startswith('magnet:?xt=urn:btih:')
@@ -103,5 +106,7 @@ def test_json_with_magnet_uri(capsys, regex):
         'Size': 142631,
         'Trackers': ['https://localhost:123/announce', 'https://localhost:456/announce'],
         'File Count': 1,
-        'Files': ['My Torrent']
+        'Files': [
+            {'Path': 'My Torrent', 'Size': 142631},
+        ]
     }
