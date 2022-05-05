@@ -1,11 +1,12 @@
-2022-??-?? 4.0.0
+2022-05-05 4.0.0
   - New option: --reuse <directory or torrent file> copies piece hashes from an
     existing torrent file if it contains the same files. If given a directory,
     it is recursively searched for a matching torrent file.
   - The short flag -R for --nocreator was renamed to -A so -R can be used for
     --noreuse.
-  - In previous versions, each file was only verified up to the first corrupt
-    piece unless --verbose was given. Now, files are always completely verified.
+  - When verifying files against a torrent in previous versions, each file was
+    only verified up to the first corrupt piece unless --verbose was given. Now
+    all files are always completely verified.
   - The "Files" field in --json output is now a list of objects like this:
     {"Path": <relative file path>, "Size": <file size>}
   - Bugfix: The --max-piece-size parameter was always used as the actual piece
