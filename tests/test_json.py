@@ -94,6 +94,8 @@ def test_json_contains_verification_errors(capsys, tmp_path, create_torrent):
                           f'{content_path} does not satisfy {torrent_file}']
 
 def test_json_with_magnet_uri(capsys, regex):
+    # Notice the double "&" in the URI, which is syntactically correct but
+    # should be fixed in the output.
     magnet = ('magnet:?xt=urn:btih:e167b1fbb42ea72f051f4f50432703308efb8fd1&dn=My+Torrent&xl=142631'
               '&tr=https%3A%2F%2Flocalhost%3A123%2Fannounce&&tr=https%3A%2F%2Flocalhost%3A456%2Fannounce')
     run(['-i', magnet, '--json'])
@@ -108,5 +110,6 @@ def test_json_with_magnet_uri(capsys, regex):
         'File Count': 1,
         'Files': [
             {'Path': 'My Torrent', 'Size': 142631},
-        ]
+        ],
+        'Magnet': magnet.replace('&&', '&'),
     }

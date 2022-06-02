@@ -49,7 +49,7 @@ def run(ui):
 def _info_mode(ui, cfg):
     torrent = _utils.get_torrent(cfg, ui)
     ui.show_torrent(torrent)
-    if not _utils.is_magnet(cfg['in']):
+    if not cfg['nomagnet']:
         try:
             ui.info('Magnet', torrent.magnet())
         except torf.TorfError as e:

@@ -43,6 +43,21 @@ def test_magnet(capsys, create_torrent, human_readable, clear_ansi, regex):
             assert cap.err == ''
 
 
+def test_nomagnet(capsys, create_torrent, human_readable, clear_ansi, regex):
+    with create_torrent(name='foo') as torrent_file:
+        with human_readable(True):
+            run(['-i', torrent_file, '--nomagnet'])
+            cap = capsys.readouterr()
+            assert clear_ansi(cap.out) != regex(r'^\s*Magnet', flags=re.MULTILINE)
+            assert cap.err == ''
+
+        with human_readable(False):
+            run(['-i', torrent_file, '--nomagnet'])
+            cap = capsys.readouterr()
+            assert cap.out != regex(r'^Magnet', flags=re.MULTILINE)
+            assert cap.err == ''
+
+
 def test_name(capsys, create_torrent, human_readable, clear_ansi, regex):
     with create_torrent(name='foo') as torrent_file:
         with human_readable(True):
@@ -337,7 +352,8 @@ def test_reading_magnet(capsys, human_readable, clear_ansi, regex):
                                          r'\s*Tracker  https://localhost:123/announce\n'
                                          r'\s*Webseed  https://localhost/My\+Torrent\n'
                                          r'\s*File Count  \d+\n'
-                                         r'\s*Files  My Torrent \[\d+\.\d+ [TMK]iB\]\n$'))
+                                         r'\s*Files  My Torrent \[\d+\.\d+ [TMK]iB\]\n'
+                                         r'\s*Magnet  magnet:\?xt=urn:btih:[0-9a-z]{40}.*?\n$'))
     assert cap.err == regex((rf'^{_vars.__appname__}: https://localhost:123/My\+Torrent.torrent: [\w\s]+\n'
                              rf'{_vars.__appname__}: https://localhost:456/My\+Torrent.torrent: [\w\s]+\n'
                              rf'{_vars.__appname__}: https://localhost/My\+Torrent.torrent: [\w\s]+\n'
@@ -352,7 +368,8 @@ def test_reading_magnet(capsys, human_readable, clear_ansi, regex):
                              r'Tracker\thttps://localhost:123/announce\n'
                              r'Webseed\thttps://localhost/My\+Torrent\n'
                              r'File Count\t\d+\n'
-                             r'Files\tMy Torrent$'))
+                             r'Files\tMy Torrent\n'
+                             r'Magnet\tmagnet:\?xt=urn:btih:[0-9a-z]{40}.*?\n$'))
     assert cap.err == regex((rf'^{_vars.__appname__}: https://localhost:123/My\+Torrent.torrent: [\w\s]+\n'
                              rf'{_vars.__appname__}: https://localhost:456/My\+Torrent.torrent: [\w\s]+\n'
                              rf'{_vars.__appname__}: https://localhost/My\+Torrent.torrent: [\w\s]+\n'

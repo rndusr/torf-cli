@@ -1,3 +1,9 @@
+2022-06-02 4.0.1
+  - Bugfix: --nomagnet was ignored in info mode.
+  - Include magnet link in output even if input is also a magnet link.
+    Only exclude it with --nomagnet.
+
+
 2022-05-05 4.0.0
   - New option: --reuse <directory or torrent file> copies piece hashes from an
     existing torrent file if it contains the same files. If given a directory,
