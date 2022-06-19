@@ -1,3 +1,7 @@
+2022-06-19 4.0.2
+  - Bugfix: --max-piece-size was ignored with reused torrents.
+
+
 2022-06-02 4.0.1
   - Bugfix: --nomagnet was ignored in info mode.
   - Include magnet link in output even if input is also a magnet link.
