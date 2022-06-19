@@ -62,7 +62,7 @@ torrent must have identical files.  If _PATH_ is a directory, it is searched
 recursively for a matching torrent.  This option may be given multiple times.
 
 *--noreuse*, *-R*::
-Ignore all *--reuse* arguments.  This is particularly useful you have reuse
+Ignore all *--reuse* arguments.  This is particularly useful if you have reuse
 paths in your configuration file.
 
 *--exclude*, *-e* _PATTERN_::
