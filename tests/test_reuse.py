@@ -79,14 +79,26 @@ def test_finds_matching_torrent(hr_enabled, create_existing_torrent, regex, caps
             ('baz/yo.txt', b'just a text'),
         ),
     ]
+
     existing_torrents_path = pathlib.Path(os.path.commonpath(existing_torrents))
     existing_contents_path = existing_torrents_path.parent / 'contents'
+
+    # Copy matching torrent with different piece sizes
+    for piece_size in (4, 2, 8):
+        t = torf.Torrent.read(existing_torrents_path / 'foo2.jpg.torrent')
+        piece_size_max = torf.Torrent.piece_size_max
+        torf.Torrent.piece_size_max = 16 * 1048576
+        t.piece_size = piece_size * 1048576
+        torf.Torrent.piece_size_max = piece_size_max
+        t.write(existing_torrents_path / f'foo2.{piece_size}.jpg.torrent')
+    os.unlink(existing_torrents_path / 'foo2.jpg.torrent')
+
     content_path = existing_contents_path / 'foo2.jpg'
-    exp_reused_torrent = existing_torrents[1]
+    exp_reused_torrent = existing_torrents_path / 'foo2.2.jpg.torrent'
     exp_torrent = content_path.name + '.torrent'
 
     with human_readable(hr_enabled):
-        run([str(content_path), '--reuse', str(existing_torrents_path)])
+        run([str(content_path), '--reuse', str(existing_torrents_path), '--max-piece-size', '2'])
     cap = capsys.readouterr()
     assert cap.err == ''
     if hr_enabled:
@@ -97,7 +109,7 @@ def test_finds_matching_torrent(hr_enabled, create_existing_torrent, regex, caps
     else:
         assert_no_ctrl(cap.out)
         assert cap.out == regex(r'^Reuse\t'
-                                rf'{existing_torrents_path}{os.sep}(?:foo\d\.jpg|bar|baz)\.torrent\t'
+                                rf'{existing_torrents_path}{os.sep}(?:foo\d\.\d\.jpg|bar|baz)\.torrent\t'
                                 r'\d+\.\d+\t\d+\t\d+$',
                                 flags=re.MULTILINE)
         assert cap.out == regex(rf'^Verifying\t{exp_reused_torrent}$', flags=re.MULTILINE)
