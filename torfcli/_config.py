@@ -70,7 +70,7 @@ ARGUMENTS
     --nosource, -S         Remove "source" field from INPUT
     --noxseed, -X          De-randomize info hash of INPUT
     --nodate, -D           Don't include date or remove date from INPUT
-    --nocreator, -R        Don't include creator or remove creator from INPUT
+    --nocreator, -A        Don't include creator or remove creator from INPUT
     --notorrent, -N        Don't create torrent file
     --nomagnet, -M         Don't create magnet URI
     --novalidate, -V       Don't check INPUT and/or TORRENT for errors
