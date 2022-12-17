@@ -86,10 +86,10 @@ def test_finds_matching_torrent(hr_enabled, create_existing_torrent, regex, caps
     # Copy matching torrent with different piece sizes
     for piece_size in (4, 2, 8):
         t = torf.Torrent.read(existing_torrents_path / 'foo2.jpg.torrent')
-        piece_size_max = torf.Torrent.piece_size_max
-        torf.Torrent.piece_size_max = 16 * 1048576
+        piece_size_max = t.piece_size_max
+        t.piece_size_max = 16 * 1048576
         t.piece_size = piece_size * 1048576
-        torf.Torrent.piece_size_max = piece_size_max
+        t.piece_size_max = piece_size_max
         t.write(existing_torrents_path / f'foo2.{piece_size}.jpg.torrent')
     os.unlink(existing_torrents_path / 'foo2.jpg.torrent')
 

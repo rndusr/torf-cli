@@ -480,7 +480,7 @@ def test_max_piece_size_option_not_given(capsys, mock_content):
     cap = capsys.readouterr()
     piece_size = [line for line in cap.out.split('\n')
                   if 'Piece Size' in line][0].split('\t')[1]
-    assert int(piece_size) == torf.Torrent.piece_size_max
+    assert int(piece_size) == torf.Torrent().piece_size_max
 
 def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
     # Create large sparse file, i.e. a file that isn't actually written to disk
