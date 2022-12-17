@@ -23,7 +23,7 @@ setup(
 
     packages           = find_packages(),
     python_requires    = '>=3.6',
-    install_requires   = ['torf==4.*', 'pyxdg'],
+    install_requires   = ['torf==4.*,>=4.1.2', 'pyxdg'],
 
     entry_points       = { 'console_scripts': [ 'torf = torfcli:run' ] },
     data_files         = [('share/man/man1', ['docs/torf.1'])],
