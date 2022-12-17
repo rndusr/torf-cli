@@ -69,6 +69,7 @@ def _create_mode(ui, cfg):
             exclude_regexs=cfg['exclude_regex'],
             include_globs=cfg['include'],
             include_regexs=cfg['include_regex'],
+            piece_size_max=cfg['max_piece_size'] if cfg['max_piece_size'] else None,
             trackers=() if cfg['notracker'] else trackers,
             webseeds=() if cfg['nowebseed'] else cfg['webseed'],
             private=False if cfg['noprivate'] else cfg['private'],
@@ -86,11 +87,6 @@ def _create_mode(ui, cfg):
         torrent.creation_date = cfg['date']
     else:
         torrent.creation_date = datetime.datetime.now()
-
-    if cfg['max_piece_size']:
-        torf.Torrent.piece_size_max = cfg['max_piece_size']
-        if torrent.piece_size > cfg['max_piece_size']:
-            torrent.piece_size = cfg['max_piece_size']
 
     ui.check_output_file_exists(_utils.get_torrent_filepath(torrent, cfg))
     ui.show_torrent(torrent)
