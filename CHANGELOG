@@ -1,3 +1,7 @@
+2022-12-17 4.0.4
+  - Bugfix: Fix --max-piece-size
+
+
 2022-07-05 4.0.3
   - Bugfix: Fix --help output: Short form of --nocreator is now -A.
 
