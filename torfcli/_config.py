@@ -214,7 +214,7 @@ def get_cfg(cliargs):
 
     if clicfg['debug_file']:
         import logging
-        logging.basicConfig(level=logging.DEBUG, format='%(message)s',
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s',
                             filename=clicfg['debug_file'])
 
     # If we don't need to read a config file, return parsed CLI arguments
