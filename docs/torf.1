@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
-.\" Generator: Asciidoctor 2.0.16
-.\"      Date: 2022-05-03
+.\" Generator: Asciidoctor 2.0.18
+.\"      Date: 2023-04-10
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2022-05-03" "\ \&" "\ \&"
+.TH "TORF" "1" "2023-04-10" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -41,8 +41,8 @@ torf \- command line tool to create, display and edit torrents
 .br
 .SH "DESCRIPTION"
 .sp
-torf can create, display and edit torrent files and verify the integrity of a
-torrent\(cqs files.
+torf can create, display and edit torrent files and verify the integrity of the
+files in a torrent.
 .sp
 .RS 4
 .ie n \{\
@@ -147,7 +147,7 @@ recursively for a matching torrent.  This option may be given multiple times.
 .sp
 \fB\-\-noreuse\fP, \fB\-R\fP
 .RS 4
-Ignore all \fB\-\-reuse\fP arguments.  This is particularly useful you have reuse
+Ignore all \fB\-\-reuse\fP arguments.  This is particularly useful if you have reuse
 paths in your configuration file.
 .RE
 .sp
@@ -610,9 +610,9 @@ All of the options listed in the \fBOPTIONS\fP section are allowed except for
 \fIPATH\fP, \fBin\fP, \fBout\fP, \fBname\fP, \fBconfig\fP, \fBnoconfig\fP, \fBprofile\fP, \fBhelp\fP, \fBversion\fP.
 .sp
 There is rudimental support for environment variables in parameters. As usual,
-\(lq$FOO\(rq or \(lq${FOO}\(rq will be replaced with the value of the variable \fBFOO\fP,
-\(lq$\(rq is escaped with \(lq\(rs\(rq (backslash) and a literal \(lq\(rs\(rq is represented by
-two \(lq\(rs\(rq.  More complex string manipulation syntax (e.g. \(lq${FOO:3}\(rq) is not
+\(lq$FOO\(rq or \(lq${FOO}\(rq is replaced with the value of the variable \fBFOO\fP, \(lq$\(rq
+is escaped with \(lq\(rs\(rq (backslash) and a literal \(lq\(rs\(rq is represented by two
+\(lq\(rs\(rq.  More complex string manipulation syntax (e.g. \(lq${FOO:3}\(rq) is not
 supported.
 .SS "Profiles"
 .sp
