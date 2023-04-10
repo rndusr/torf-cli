@@ -16,8 +16,8 @@ torf - command line tool to create, display and edit torrents
 
 == DESCRIPTION
 
-torf can create, display and edit torrent files and verify the integrity of a
-torrent's files.
+torf can create, display and edit torrent files and verify the integrity of the
+files in a torrent.
 
 * *torf* _PATH_ [_OPTIONS_] [*-o* _TORRENT_] +
 Create the torrent file _TORRENT_ from the file or directory _PATH_.
@@ -300,9 +300,9 @@ All of the options listed in the *OPTIONS* section are allowed except for
 _PATH_, *in*, *out*, *name*, *config*, *noconfig*, *profile*, *help*, *version*.
 
 There is rudimental support for environment variables in parameters. As usual,
-"`$FOO`" or "`${FOO}`" will be replaced with the value of the variable *FOO*,
-"`$`" is escaped with "`\`" (backslash) and a literal "`\`" is represented by
-two "`\`".  More complex string manipulation syntax (e.g. "`${FOO:3}`") is not
+"`$FOO`" or "`${FOO}`" is replaced with the value of the variable *FOO*, "`$`"
+is escaped with "`\`" (backslash) and a literal "`\`" is represented by two
+"`\`".  More complex string manipulation syntax (e.g. "`${FOO:3}`") is not
 supported.
 
 === Profiles
