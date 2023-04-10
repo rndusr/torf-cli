@@ -1,17 +1,13 @@
-import copy
 import datetime
-import errno
 import os
 import pathlib
 import random
 import re
-from unittest.mock import patch
 
 import pytest
 import torf
 
-from torfcli import _errors as err
-from torfcli import _vars, run
+from torfcli import run
 
 
 @pytest.fixture
@@ -104,7 +100,7 @@ def test_finds_matching_torrent(hr_enabled, create_existing_torrent, regex, caps
     if hr_enabled:
         assert cap.out == regex(rf'Verifying  {exp_reused_torrent}', flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*Reused  {exp_reused_torrent}$', flags=re.MULTILINE)
-        assert clear_ansi(cap.out) != regex(rf'^\s+Progress\s+', flags=re.MULTILINE)
+        assert clear_ansi(cap.out) != regex(r'^\s+Progress\s+', flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*Torrent  {exp_torrent}$', flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)
@@ -114,7 +110,7 @@ def test_finds_matching_torrent(hr_enabled, create_existing_torrent, regex, caps
                                 flags=re.MULTILINE)
         assert cap.out == regex(rf'^Verifying\t{exp_reused_torrent}$', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Reused\t{exp_reused_torrent}$', flags=re.MULTILINE)
-        assert cap.out != regex(rf'^Progress\t', flags=re.MULTILINE)
+        assert cap.out != regex(r'^Progress\t', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Torrent\t{exp_torrent}$', flags=re.MULTILINE)
 
 
@@ -136,7 +132,6 @@ def test_does_not_find_matching_torrent(hr_enabled, create_existing_torrent, reg
         ),
     ]
     existing_torrents_path = pathlib.Path(os.path.commonpath(existing_torrents))
-    existing_contents_path = existing_torrents_path.parent / 'contents'
     exp_torrent = mock_content.name + '.torrent'
 
     with human_readable(hr_enabled):
@@ -144,17 +139,17 @@ def test_does_not_find_matching_torrent(hr_enabled, create_existing_torrent, reg
     cap = capsys.readouterr()
     assert cap.err == ''
     if hr_enabled:
-        assert cap.out == regex(rf'\s+Reuse\s+', flags=re.MULTILINE)
-        assert cap.out != regex(rf'\s+Verifying\s+', flags=re.MULTILINE)
-        assert clear_ansi(cap.out) != regex(rf'^\s+Reused\s+', flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(rf'^\s+Progress  100\.00 % \| \d+:\d+:\d+ total \| \d+.\d+ \w+/s$',
+        assert cap.out == regex(r'\s+Reuse\s+', flags=re.MULTILINE)
+        assert cap.out != regex(r'\s+Verifying\s+', flags=re.MULTILINE)
+        assert clear_ansi(cap.out) != regex(r'^\s+Reused\s+', flags=re.MULTILINE)
+        assert clear_ansi(cap.out) == regex(r'^\s+Progress  100\.00 % \| \d+:\d+:\d+ total \| \d+.\d+ \w+/s$',
                                             flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*Torrent  {exp_torrent}$', flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)
         assert cap.out == regex(r'^Reuse\t', flags=re.MULTILINE)
-        assert cap.out != regex(rf'^Verifying\t$', flags=re.MULTILINE)
-        assert cap.out != regex(rf'^Reused\t$', flags=re.MULTILINE)
+        assert cap.out != regex(r'^Verifying\t$', flags=re.MULTILINE)
+        assert cap.out != regex(r'^Reused\t$', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Progress\t.*?/{mock_content.name}/', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Torrent\t{exp_torrent}$', flags=re.MULTILINE)
 
@@ -179,7 +174,6 @@ def test_noreuse_argument(hr_enabled, create_existing_torrent, regex, capsys,
     existing_torrents_path = pathlib.Path(os.path.commonpath(existing_torrents))
     existing_contents_path = existing_torrents_path.parent / 'contents'
     content_path = existing_contents_path / 'foo2.jpg'
-    exp_reused_torrent = existing_torrents[1]
     exp_torrent = content_path.name + '.torrent'
 
     with human_readable(hr_enabled):
@@ -187,15 +181,15 @@ def test_noreuse_argument(hr_enabled, create_existing_torrent, regex, capsys,
     cap = capsys.readouterr()
     assert cap.err == ''
     if hr_enabled:
-        assert cap.out != regex(rf'Reuse', flags=re.MULTILINE)
-        assert cap.out != regex(rf'Verifying', flags=re.MULTILINE)
-        assert clear_ansi(cap.out) != regex(rf'^\s*Reused', flags=re.MULTILINE)
-        assert clear_ansi(cap.out) == regex(rf'^\s+Progress\s+', flags=re.MULTILINE)
+        assert cap.out != regex(r'Reuse', flags=re.MULTILINE)
+        assert cap.out != regex(r'Verifying', flags=re.MULTILINE)
+        assert clear_ansi(cap.out) != regex(r'^\s*Reused', flags=re.MULTILINE)
+        assert clear_ansi(cap.out) == regex(r'^\s+Progress\s+', flags=re.MULTILINE)
         assert clear_ansi(cap.out) == regex(rf'^\s*Torrent  {exp_torrent}$', flags=re.MULTILINE)
     else:
         assert_no_ctrl(cap.out)
         assert cap.out != regex(r'^Reuse\t', flags=re.MULTILINE)
-        assert cap.out != regex(rf'^Verifying\t', flags=re.MULTILINE)
-        assert cap.out != regex(rf'^Reused\t', flags=re.MULTILINE)
-        assert cap.out == regex(rf'^Progress\t', flags=re.MULTILINE)
+        assert cap.out != regex(r'^Verifying\t', flags=re.MULTILINE)
+        assert cap.out != regex(r'^Reused\t', flags=re.MULTILINE)
+        assert cap.out == regex(r'^Progress\t', flags=re.MULTILINE)
         assert cap.out == regex(rf'^Torrent\t{exp_torrent}$', flags=re.MULTILINE)
