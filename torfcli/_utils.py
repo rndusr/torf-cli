@@ -81,8 +81,11 @@ def get_torrent_filepath(torrent, cfg):
         # User-given torrent file path
         return cfg['out']
     else:
-        # Default to torrent's name in cwd
-        return torrent.name + '.torrent'
+        filename = torrent.name
+        profiles = cfg.get('profile', ())
+        if profiles:
+            filename += '.' + '.'.join(profiles)
+        return filename + '.torrent'
 
 
 def is_magnet(string):

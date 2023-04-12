@@ -1,3 +1,7 @@
+2023-??-?? 5.0.0
+  - Include profile name (if given) in torrent file name by default
+
+
 2022-12-17 4.0.4
   - Bugfix: Fix --max-piece-size
 
