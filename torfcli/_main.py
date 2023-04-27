@@ -138,6 +138,8 @@ def _edit_mode(ui, cfg):
 
     if cfg['nocreator']:
         torrent.created_by = None
+    elif cfg['creator']:
+        torrent.created_by = cfg['creator']
 
     if cfg['nodate']:
         torrent.creation_date = None
