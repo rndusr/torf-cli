@@ -7,6 +7,7 @@ import torf
 
 from torfcli import _errors as err
 from torfcli import _vars, run
+from torfcli import _config as config
 
 
 def test_nonexisting_input(capsys):
@@ -70,6 +71,30 @@ def test_remove_creator(create_torrent, tmp_path, assert_torrents_equal):
         run(['-i', infile, '--nocreator', '-o', outfile])
         new = torf.Torrent.read(outfile)
         assert_torrents_equal(orig, new, created_by=None)
+
+def test_remove_creator_even_when_creator_provided(create_torrent, tmp_path, assert_torrents_equal):
+    outfile = str(tmp_path / 'out.torrent')
+    with create_torrent(created_by='The creator') as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile, '--nocreator', '--creator', 'A conflicting creator', '-o', outfile])
+        new = torf.Torrent.read(outfile)
+        assert_torrents_equal(orig, new, created_by=None)
+
+def test_edit_creator(create_torrent, tmp_path, assert_torrents_equal):
+    outfile = str(tmp_path / 'out.torrent')
+    with create_torrent(created_by='The creator') as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile, '--creator', 'A different creator', '-o', outfile])
+        new = torf.Torrent.read(outfile)
+        assert_torrents_equal(orig, new, created_by='A different creator')
+
+def test_edit_default_creator(create_torrent, tmp_path, assert_torrents_equal):
+    outfile = str(tmp_path / 'out.torrent')
+    with create_torrent(created_by='The creator') as infile:
+        orig = torf.Torrent.read(infile)
+        run(['-i', infile, '--creator', '-o', outfile])
+        new = torf.Torrent.read(outfile)
+        assert_torrents_equal(orig, new, created_by=config.DEFAULT_CREATOR)
 
 
 def test_remove_private(create_torrent, tmp_path, assert_torrents_equal):
