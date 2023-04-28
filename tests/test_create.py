@@ -496,7 +496,7 @@ def test_max_piece_size_is_no_power_of_two(capsys, mock_content):
             run([content_path, '--max-piece-size', str(factor)])
         mock_exit.assert_called_once_with(err.Code.CLI)
         cap = capsys.readouterr()
-        assert cap.err == f'{_vars.__appname__}: Piece size must be a power of 2: {exp_invalid_piece_size}\n'
+        assert cap.err == f'{_vars.__appname__}: Piece size must be divisible by 16 KiB: {exp_invalid_piece_size}\n'
 
 
 def test_default_date(capsys, mock_content):
