@@ -171,6 +171,9 @@ The maximum piece size when creating a torrent.  SIZE is multiplied by 1 MiB
 etc.).  Numbers smaller than 1 are allowed, e.g. "`0.25`" sets the maximum piece
 size to 256 KiB.
 
+*--creator*, *-a* _CREATOR_::
+Name and version of the application that created the torrent.
+
 *--nocreator*, *-A*::
 Remove the name of the application that created the torrent from an existing
 torrent.
