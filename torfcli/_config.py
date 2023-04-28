@@ -59,7 +59,7 @@ ARGUMENTS
     --comment, -c COMMENT  Comment that is stored in the torrent file
     --date, -d DATE        Creation date as YYYY-MM-DD[ HH:MM[:SS]], 'now'
                            or 'today' (default: 'now')
-    --creator, -a CREATOR  Name of application used to create torrent file. 
+    --creator, -a CREATOR  Name of application used to create torrent file.
                            (default: '{DEFAULT_CREATOR}')
     --source, -s SOURCE    Add "source" field
     --xseed, -x            Randomize info hash
