@@ -76,7 +76,7 @@ def _create_mode(ui, cfg):
             source=None if cfg['nosource'] or not cfg['source'] else cfg['source'],
             randomize_infohash=False if cfg['noxseed'] else cfg['xseed'],
             comment=None if cfg['nocomment'] else cfg['comment'],
-            created_by=None if cfg['nocreator'] else _config.DEFAULT_CREATOR
+            created_by=None if cfg['nocreator'] else (cfg['creator'] or _config.DEFAULT_CREATOR),
         )
     except torf.TorfError as e:
         raise _errors.Error(e)

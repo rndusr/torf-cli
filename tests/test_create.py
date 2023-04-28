@@ -648,6 +648,20 @@ def test_nocomment_option(capsys, mock_content):
     assert 'Comment\t' not in cap.out
 
 
+def test_creator_option(capsys, mock_content):
+    content_path = str(mock_content)
+    exp_torrent_filename = os.path.basename(content_path) + '.torrent'
+    exp_torrent_filepath = os.path.join(os.getcwd(), exp_torrent_filename)
+
+    run([content_path, '--creator', 'Mbombo'])
+
+    t = torf.Torrent.read(exp_torrent_filepath)
+    assert t.created_by == 'Mbombo'
+
+    cap = capsys.readouterr()
+    assert 'Created By\tMbombo' in cap.out
+
+
 def test_nocreator_option(capsys, mock_content):
     content_path = str(mock_content)
     exp_torrent_filename = os.path.basename(content_path) + '.torrent'
