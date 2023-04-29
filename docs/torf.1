@@ -2,12 +2,12 @@
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
 .\" Generator: Asciidoctor 2.0.18
-.\"      Date: 2023-04-10
+.\"      Date: 2023-04-29
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2023-04-10" "\ \&" "\ \&"
+.TH "TORF" "1" "2023-04-29" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -385,6 +385,11 @@ The maximum piece size when creating a torrent.  SIZE is multiplied by 1 MiB
 (1048576 bytes).  The resulting number must be a power of two (2, 4, 8, 16,
 etc.).  Numbers smaller than 1 are allowed, e.g. \(lq0.25\(rq sets the maximum piece
 size to 256 KiB.
+.RE
+.sp
+\fB\-\-creator\fP, \fB\-a\fP \fICREATOR\fP
+.RS 4
+Name and version of the application that created the torrent.
 .RE
 .sp
 \fB\-\-nocreator\fP, \fB\-A\fP
