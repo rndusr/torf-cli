@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 import torf
 
+from torfcli import _config as config
 from torfcli import _errors as err
 from torfcli import _vars, run
-from torfcli import _config as config
 
 
 def test_nonexisting_input(capsys):
