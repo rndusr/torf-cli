@@ -4,7 +4,7 @@ MANPAGE ?= docs/torf.1
 MANPAGE_HTML ?= docs/torf.1.html
 MANPAGE_SRC ?= docs/torf.1.asciidoc
 
-.PHONY: clean test man release
+.PHONY: clean man release
 
 clean:
 	find . -name "*.pyc" -delete
@@ -17,30 +17,7 @@ clean:
 
 venv:
 	"$(PYTHON)" -m venv "$(VENV_PATH)"
-	"$(VENV_PATH)"/bin/pip install --upgrade wheel tox pytest flake8 isort
-	"$(VENV_PATH)"/bin/pip install --upgrade coverage pytest-cov
-	"$(VENV_PATH)"/bin/pip install --upgrade flake8 isort
-	"$(VENV_PATH)"/bin/pip install --editable ../torf
-	"$(VENV_PATH)"/bin/pip install --editable .
-	# Dependencies for `setup.py check -r -s`
-	"$(VENV_PATH)"/bin/pip install --upgrade docutils pygments
-
-test: venv
-	. "$(VENV_PATH)"/bin/activate ; \
-	"$(VENV_PATH)"/bin/pytest --exitfirst tests
-
-fulltest: venv testreadme
-	. "$(VENV_PATH)"/bin/activate ; \
-	  tox
-	. "$(VENV_PATH)"/bin/activate ; \
-	  flake8 torfcli tests
-	. "$(VENV_PATH)"/bin/activate ; \
-	  isort torfcli tests
-
-testreadme: venv
-	# Check if README.org converts correctly to rst for PyPI
-	. "$(VENV_PATH)"/bin/activate ; \
-	  "$(PYTHON)" setup.py check -r -s >/dev/null
+	"$(VENV_PATH)"/bin/pip install --editable '.[dev]'
 
 man:
 	asciidoctor $(MANPAGE_SRC) -o $(MANPAGE) --doctype=manpage --backend=manpage

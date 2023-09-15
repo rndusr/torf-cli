@@ -1,0 +1,55 @@
+[project]
+name = "torf-cli"
+description = "CLI tool to create, read and edit torrent files"
+readme = "README.rst"
+license = {text = "GPL-3.0-or-later"}
+authors = [
+  { name="Random User", email="rndusr@posteo.de" },
+]
+keywords = ["bittorrent", "torrent", "magnet", "cli"]
+dynamic = ["version"]  # Get version from PROJECT/__version__
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.7"
+dependencies = [
+    "torf==4.*,>=4.1.2",
+    "pyxdg",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+
+    "tox",
+
+    "coverage",
+    "pytest-cov",
+
+    "ruff",
+    "flake8",
+    "isort",
+]
+
+[project.urls]
+Repository = "https://github.com/rndusr/torf-cli"
+Documentation = "https://rndusr.github.io/torf-cli/torf.1.html"
+"Bug Tracker" = "https://github.com/rndusr/torf-cli/issues"
+Changelog = "https://raw.githubusercontent.com/rndusr/torf-cli/master/CHANGELOG"
+
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+# For some unknown reason, we need to specify explicity to scan the project
+# directory with default parameters or setuptools gets confused about
+# directories like "docs" or "venv".
+[tool.setuptools.packages]
+find = {}
+
+[tool.setuptools.dynamic]
+version = {attr = "torfcli._vars.__version__"}
