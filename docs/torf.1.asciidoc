@@ -167,9 +167,9 @@ torrent.
 
 *--max-piece-size* _SIZE_::
 The maximum piece size when creating a torrent.  SIZE is multiplied by 1 MiB
-(1048576 bytes).  The resulting number must be a power of two (2, 4, 8, 16,
-etc.).  Numbers smaller than 1 are allowed, e.g. "`0.25`" sets the maximum piece
-size to 256 KiB.
+(1048576 bytes).  The resulting number must be a multiple of 16 KiB (16384
+bytes).  Use fractions for piece sizes smaller than 1 MiB (e.g. 0.5 for 512
+KiB).
 
 *--creator*, *-a* _CREATOR_::
 Name and version of the application that created the torrent.

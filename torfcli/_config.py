@@ -64,7 +64,6 @@ ARGUMENTS
     --source, -s SOURCE    Add "source" field
     --xseed, -x            Randomize info hash
     --max-piece-size SIZE  Maximum piece size in multiples of 1 MiB
-                           (must be a power of two)
     --notracker, -T        Remove trackers from INPUT
     --nowebseed, -W        Remove webseeds from INPUT
     --noprivate, -P        Remove private flag from INPUT
