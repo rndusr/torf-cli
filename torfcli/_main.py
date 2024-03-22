@@ -228,19 +228,7 @@ def _hash_pieces(ui, torrent, reuse_paths=None, threads=0):
                     raise _errors.Error(e)
 
 def _write_torrent(ui, torrent, cfg):
-    try:
-        torrent.validate()
-    except torf.TorfError as e:
-        if cfg['notorrent']:
-            # Not writing torrent file; do not fail because,
-            # e.g., magnet URI lacks ['info']
-            pass
-        elif cfg['validate']:
-            # Croak with validation error
-            raise _errors.Error(e)
-        else:
-            # Report validation error but write torrent/magnet anyway
-            ui.warn(_errors.Error(e))
+    _validate_torrent(ui, torrent, cfg)
 
     if not cfg['nomagnet']:
         try:
@@ -262,3 +250,18 @@ def _write_torrent(ui, torrent, cfg):
 
     if torrent.private and not torrent.trackers:
         ui.warn('Torrent is private and has no trackers')
+
+def _validate_torrent(ui, torrent, cfg):
+    try:
+        torrent.validate()
+    except torf.TorfError as e:
+        if cfg['notorrent']:
+            # Not writing torrent file; do not fail because,
+            # e.g., magnet URI lacks ['info']
+            pass
+        elif cfg['validate']:
+            # Croak with validation error
+            raise _errors.Error(e)
+        else:
+            # Report validation error but write torrent/magnet anyway
+            ui.warn(_errors.Error(e))
