@@ -105,7 +105,7 @@ def test_finds_matching_torrent(hr_enabled, create_existing_torrent, regex, caps
     else:
         assert_no_ctrl(cap.out)
         assert cap.out == regex(r'^Reuse\t'
-                                rf'{existing_torrents_path}{os.sep}(?:foo\d\.\d\.jpg|bar|baz)\.torrent\t'
+                                rf'{existing_torrents_path}{os.sep}(?:foo[\d\.]+\.jpg|bar|baz)\.torrent\t'
                                 r'\d+\.\d+\t\d+\t\d+$',
                                 flags=re.MULTILINE)
         assert cap.out == regex(rf'^Verifying\t{exp_reused_torrent}$', flags=re.MULTILINE)
