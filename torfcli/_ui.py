@@ -166,7 +166,10 @@ class _HumanFormatter(_FormatterBase):
         return _utils.bytes2string(torrent.size, plain_bytes=self._cfg['verbose'] > 0)
 
     def creation_date(self, torrent):
-        return torrent.creation_date.isoformat(sep=' ', timespec='seconds')
+        if isinstance(torrent.creation_date, datetime.datetime):
+            return torrent.creation_date.isoformat(sep=' ', timespec='seconds')
+        else:
+            return torrent.creation_date
 
     def piece_size(self, torrent):
         return _utils.bytes2string(torrent.piece_size, plain_bytes=self._cfg['verbose'] > 0)
@@ -253,7 +256,10 @@ class _MachineFormatter(_FormatterBase):
         return int(torrent.size)
 
     def creation_date(self, torrent):
-        return int(torrent.creation_date.timestamp())
+        if isinstance(torrent.creation_date, datetime.datetime):
+            return int(torrent.creation_date.timestamp())
+        else:
+            return torrent.creation_date
 
     def piece_size(self, torrent):
         return int(torrent.piece_size)
