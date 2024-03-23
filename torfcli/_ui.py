@@ -205,7 +205,7 @@ class _HumanFormatter(_FormatterBase):
     def info(self, key, value, newline=True):
         label = key.rjust(LABEL_WIDTH)
         # Show multiple values as indented list
-        if not isinstance(value, str) and isinstance(value, abc.Iterable):
+        if not isinstance(value, str) and isinstance(value, abc.Sequence):
             if value:
                 # Print one indented value per line
                 value_parts = [f'{value[0]}']
@@ -277,7 +277,7 @@ class _MachineFormatter(_FormatterBase):
 
     def info(self, key, value, newline=None):
         # Join multiple values with a tab character
-        if not isinstance(value, str) and isinstance(value, abc.Iterable):
+        if not isinstance(value, str) and isinstance(value, abc.Sequence):
             value = '\t'.join(str(v) for v in value)
         sys.stdout.write(f'{key}\t{value}\n')
         _utils.flush(sys.stdout)
@@ -306,7 +306,7 @@ class _JSONFormatter(_MachineFormatter):
 
     def info(self, key, value, newline=None):
         # Make sure we can JSON-encode all kinds of iterable
-        if not isinstance(value, str) and isinstance(value, abc.Iterable):
+        if not isinstance(value, str) and isinstance(value, abc.Sequence):
             value = tuple(value)
         if key == 'Error':
             errors = self._info.get(key, [])
