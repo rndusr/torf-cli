@@ -182,7 +182,7 @@ def bytes2string(b, plain_bytes=False, trailing_zeros=False):
     for minval,_prefix in _PREFIXES:
         if b >= minval:
             prefix = _prefix
-            string = f'{b/minval:.02f}'
+            string = f'{b / minval:.02f}'
             # Remove trailing zeros after the point
             while not trailing_zeros and string[-1] == '0':
                 string = string[:-1]
