@@ -144,6 +144,28 @@ torrent's info hash unique per tracker.
 WARNING: When editing, this option changes the info hash and creates a new
 torrent.
 
+*--merge* _JSON_::
+Update existing metainfo in _TORRENT_ with a JSON object.  This option may be
+given multiple times.  Fields in _JSON_ that have a value of `null` (unquoted)
+are removed in the output _TORRENT_.  Adding or removing items from an existing
+list is not supported.
++
+This example adds add a "`custom`" section to the "`info`" section, removes the
+"`comment`" field and changes "`creation date`".
++
+    $ torf -i old.torrent \
+           --merge '{"info": {"custom": {"this": "that", "numbers": [1, 2, 3]}}}' \
+           --merge '{"comment": null, "creation date": 123456789}' \
+           -o new.torrent
++
+This also works when creating a torrent.
++
+    $ torf path/to/my/files \
+           --merge '{"my stuff": {"my": ["s", "e", "c", "r", "e", "t"]}}'
++
+WARNING: If the "`info`" section is modified, the info hash changes and a new
+torrent is created.
+
 *--nosource*, *-S*::
 Remove the "`source`" field from an existing torrent.
 +
