@@ -808,3 +808,67 @@ def test_nowebseed_option(capsys, mock_content):
 
     cap = capsys.readouterr()
     assert 'Webseed\t' not in cap.out
+
+
+@pytest.mark.parametrize(
+    argnames='merges, exp_result',
+    argvalues=(
+        (
+            [
+                '{"creation date": 1352534887}',
+                '{"created by": null, "info": {"name": "New Name"}, "nosuchkey": null}',
+                (
+                    '{'
+                    '"my stuff": {"my numbers": [57, [1, 2, 3]], "my strings": ["foo", "bar"]},'
+                    '"info": {"foo": [{"bar": 123}, "baz"], "your strings": []}'
+                    '}'
+                ),
+            ],
+            {
+                'creation_date': datetime(2012, 11, 10, 9, 8, 7),
+                'created_by': None,
+                'name': 'New Name',
+                'path_map': {
+                    ('my stuff', 'my numbers'): [57, [1, 2, 3]],
+                    ('my stuff', 'my strings'): ['foo', 'bar'],
+                    ('info', 'foo'): [{'bar': 123}, 'baz'],
+                    ('info', 'your strings'): [],
+                },
+            },
+        ),
+        (
+            ['"Hello, World!"'],
+            err.CliError("Not a JSON object: Hello, World!"),
+        ),
+    ),
+    ids=lambda v: repr(v),
+)
+def test_merge_option(merges, exp_result, capsys, mock_content, assert_torrents_equal, tmp_path):
+    content_path = str(mock_content)
+    torrent_filepath = str(tmp_path / 'my.torrent')
+    cmd = [content_path, '-o', torrent_filepath]
+    for merge in merges:
+        cmd.extend(('--merge', merge))
+
+    if isinstance(exp_result, err.Error):
+        with patch('sys.exit') as mock_exit:
+            run(cmd)
+        mock_exit.assert_called_once_with(exp_result.exit_code)
+        cap = capsys.readouterr()
+        assert cap.err == f'{_vars.__appname__}: {str(exp_result)}\n'
+        assert not os.path.exists(torrent_filepath)
+    else:
+        run(cmd)
+        new = torf.Torrent.read(torrent_filepath)
+        for attr, exp_value in exp_result.items():
+            if attr == 'path_map':
+                for path, exp_value in exp_value.items():
+                    path = list(path)
+                    value = new.metainfo
+                    while path:
+                        key = path.pop(0)
+                        value = value[key]
+                    assert value == exp_value
+            else:
+                value = getattr(new, attr)
+                assert value == exp_value

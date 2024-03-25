@@ -88,6 +88,9 @@ def _create_mode(ui, cfg):
     else:
         torrent.creation_date = datetime.datetime.now()
 
+    # Apply custom JSON objects from --merge
+    _customize_torrent(torrent, cfg)
+
     ui.check_output_file_exists(_utils.get_torrent_filepath(torrent, cfg))
     ui.show_torrent(torrent)
     _hash_pieces(
