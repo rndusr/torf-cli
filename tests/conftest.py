@@ -50,7 +50,7 @@ def cfgfile(tmp_path, monkeypatch):
     return cfgfile
 
 
-def _assert_torrents_equal(orig, new, ignore=(), **new_attrs):
+def _assert_torrents_equal(orig, new, path_map=None, ignore=(), **new_attrs, ):
     attrs = ['comment', 'created_by', 'creation_date', 'files', 'filetree',
              'httpseeds', 'name', 'piece_size', 'pieces',
              'private', 'randomize_infohash', 'size', 'source', 'trackers',
@@ -64,6 +64,16 @@ def _assert_torrents_equal(orig, new, ignore=(), **new_attrs):
 
     for attr,val in new_attrs.items():
         assert getattr(new, attr) == val
+
+    if path_map:
+        for path, exp_value in path_map.items():
+            path = list(path)
+            value = new.metainfo
+            while path:
+                key = path.pop(0)
+                value = value[key]
+            assert value == exp_value
+
 
 @pytest.fixture
 def assert_torrents_equal():
