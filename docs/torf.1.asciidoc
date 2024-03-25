@@ -37,8 +37,8 @@ WARNING: Editing a torrent can change its hash, depending on what is changed,
 Verify that the content in _PATH_ matches the metadata in the torrent file
 _TORRENT_.
 +
-If _PATH_ ends with a path separator (usually "/"), the name of the torrent (as
-specified by the metadata in _TORRENT_) is appended.
+If _PATH_ ends with a path separator (usually "`/`"), the name of the torrent
+(as specified by the metadata in _TORRENT_) is appended.
 
 
 == OPTIONS
@@ -49,7 +49,7 @@ _PATH_::
 The path to the torrent's content.
 
 *--in*, *-i* _INPUT_::
-Read metainfo from the torrent file or magnet URI _INPUT_.  If _INPUT_ is "-"
+Read metainfo from the torrent file or magnet URI _INPUT_.  If _INPUT_ is "`-`"
 and does not exist, the torrent data or magnet URI is read from stdin.
 
 *--out*, *-o* _TORRENT_::
@@ -199,22 +199,22 @@ multiple times.  See *CONFIGURATION FILE*.
 Produce more output or be more thorough.  This option may be given multiple
 times.
 +
-* Display bytes with and without unit prefix, e.g. "1.38 MiB / 1,448,576 B".
+* Display bytes with and without unit prefix, e.g. "`1.38 MiB / 1,448,576 B`".
 * Any other effects are explained in the relevant arguments' documentation.
 
 *--json*, *-j*::
 Print information and errors as a JSON object.  Progress is not reported.
 
 *--metainfo*, *-m*::
-Print the torrent's metainfo as a JSON object.  Byte strings (e.g. "pieces" in
-the "info" section) are encoded in Base64.  Progress is not reported.  Errors
+Print the torrent's metainfo as a JSON object.  Byte strings (e.g. "`pieces`" in
+the "`info`" section) are encoded in Base64.  Progress is not reported.  Errors
 are reported normally on stderr.
 +
 Unless *--verbose* is given, any non-standard fields are excluded and metainfo
 that doesn't represent a valid torrent results in an error.
 +
-Unless *--verbose* is given twice, the "pieces" field in the "info" section is
-excluded.
+Unless *--verbose* is given twice, the "`pieces`" field in the "`info`" section
+is excluded.
 
 *--human*, *-u*::
 Display information in human-readable output even if stdout is not a TTY.  See
