@@ -1,3 +1,8 @@
+2024-03-25 5.2.0
+  - New option: --merge JSON: Add custom information to a torrent's metainfo or
+    remove arbitrary information from it
+
+
 2023-04-29 5.1.0
   - New option: --creator
 
