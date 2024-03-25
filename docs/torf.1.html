@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="generator" content="Asciidoctor 2.0.20">
 <title>TORF(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -208,13 +208,10 @@ table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
 .admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6);word-wrap:anywhere}
 .admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
 .exampleblock>.content{border:1px solid #e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;border-radius:4px}
-.exampleblock>.content>:first-child{margin-top:0}
-.exampleblock>.content>:last-child{margin-bottom:0}
 .sidebarblock{border:1px solid #dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;border-radius:4px}
-.sidebarblock>:first-child{margin-top:0}
-.sidebarblock>:last-child{margin-bottom:0}
 .sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
-.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content>:first-child,.sidebarblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child,.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
 .literalblock pre,.listingblock>.content>pre{border-radius:4px;overflow-x:auto;padding:1em;font-size:.8125em}
 @media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
 @media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
@@ -393,7 +390,7 @@ b.conum *{color:inherit!important}
 dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
 h1,h2,p,td.content,span.alt,summary{letter-spacing:-.01em}
 p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
-p,blockquote,dt,td.content,span.alt,summary{font-size:1.0625rem}
+p,blockquote,dt,td.content,td.hdlist1,span.alt,summary{font-size:1.0625rem}
 p{margin-bottom:1.25rem}
 .sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
 .exampleblock>.content{background:#fffef7;border-color:#e0e0dc;box-shadow:0 1px 4px #e0e0dc}
@@ -497,8 +494,8 @@ Editing a torrent can change its hash, depending on what is changed,
 Verify that the content in <em>PATH</em> matches the metadata in the torrent file
 <em>TORRENT</em>.</p>
 <div class="paragraph">
-<p>If <em>PATH</em> ends with a path separator (usually "/"), the name of the torrent (as
-specified by the metadata in <em>TORRENT</em>) is appended.</p>
+<p>If <em>PATH</em> ends with a path separator (usually &#8220;/&#8221;), the name of the torrent
+(as specified by the metadata in <em>TORRENT</em>) is appended.</p>
 </div>
 </li>
 </ul>
@@ -519,7 +516,7 @@ specified by the metadata in <em>TORRENT</em>) is appended.</p>
 </dd>
 <dt class="hdlist1"><strong>--in</strong>, <strong>-i</strong> <em>INPUT</em></dt>
 <dd>
-<p>Read metainfo from the torrent file or magnet URI <em>INPUT</em>.  If <em>INPUT</em> is "-"
+<p>Read metainfo from the torrent file or magnet URI <em>INPUT</em>.  If <em>INPUT</em> is &#8220;-&#8221;
 and does not exist, the torrent data or magnet URI is read from stdin.</p>
 </dd>
 <dt class="hdlist1"><strong>--out</strong>, <strong>-o</strong> <em>TORRENT</em></dt>
@@ -675,6 +672,47 @@ torrent.
 </table>
 </div>
 </dd>
+<dt class="hdlist1"><strong>--merge</strong> <em>JSON</em></dt>
+<dd>
+<p>Update existing metainfo in <em>TORRENT</em> with a JSON object.  This option may be
+given multiple times.  Fields in <em>JSON</em> that have a value of <code>null</code> (unquoted)
+are removed in the output <em>TORRENT</em>.  Adding or removing items from an existing
+list is not supported.</p>
+<div class="paragraph">
+<p>This example adds add a &#8220;custom&#8221; section to the &#8220;info&#8221; section, removes the
+&#8220;comment&#8221; field and changes &#8220;creation date&#8221;.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ torf -i old.torrent \
+       --merge '{"info": {"custom": {"this": "that", "numbers": [1, 2, 3]}}}' \
+       --merge '{"comment": null, "creation date": 123456789}' \
+       -o new.torrent</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This also works when creating a torrent.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ torf path/to/my/files \
+       --merge '{"my stuff": {"my": ["s", "e", "c", "r", "e", "t"]}}'</pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+If the &#8220;info&#8221; section is modified, the info hash changes and a new
+torrent is created.
+</td>
+</tr>
+</table>
+</div>
+</dd>
 <dt class="hdlist1"><strong>--nosource</strong>, <strong>-S</strong></dt>
 <dd>
 <p>Remove the &#8220;source&#8221; field from an existing torrent.</p>
@@ -732,9 +770,9 @@ torrent.
 <dt class="hdlist1"><strong>--max-piece-size</strong> <em>SIZE</em></dt>
 <dd>
 <p>The maximum piece size when creating a torrent.  SIZE is multiplied by 1 MiB
-(1048576 bytes).  The resulting number must be a power of two (2, 4, 8, 16,
-etc.).  Numbers smaller than 1 are allowed, e.g. &#8220;0.25&#8221; sets the maximum piece
-size to 256 KiB.</p>
+(1048576 bytes).  The resulting number must be a multiple of 16 KiB (16384
+bytes).  Use fractions for piece sizes smaller than 1 MiB (e.g. 0.5 for 512
+KiB).</p>
 </dd>
 <dt class="hdlist1"><strong>--creator</strong>, <strong>-a</strong> <em>CREATOR</em></dt>
 <dd>
@@ -773,7 +811,7 @@ times.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Display bytes with and without unit prefix, e.g. "1.38 MiB / 1,448,576 B".</p>
+<p>Display bytes with and without unit prefix, e.g. &#8220;1.38 MiB / 1,448,576 B&#8221;.</p>
 </li>
 <li>
 <p>Any other effects are explained in the relevant arguments' documentation.</p>
@@ -787,16 +825,16 @@ times.</p>
 </dd>
 <dt class="hdlist1"><strong>--metainfo</strong>, <strong>-m</strong></dt>
 <dd>
-<p>Print the torrent&#8217;s metainfo as a JSON object.  Byte strings (e.g. "pieces" in
-the "info" section) are encoded in Base64.  Progress is not reported.  Errors
+<p>Print the torrent&#8217;s metainfo as a JSON object.  Byte strings (e.g. &#8220;pieces&#8221; in
+the &#8220;info&#8221; section) are encoded in Base64.  Progress is not reported.  Errors
 are reported normally on stderr.</p>
 <div class="paragraph">
 <p>Unless <strong>--verbose</strong> is given, any non-standard fields are excluded and metainfo
 that doesn&#8217;t represent a valid torrent results in an error.</p>
 </div>
 <div class="paragraph">
-<p>Unless <strong>--verbose</strong> is given twice, the "pieces" field in the "info" section is
-excluded.</p>
+<p>Unless <strong>--verbose</strong> is given twice, the &#8220;pieces&#8221; field in the &#8220;info&#8221; section
+is excluded.</p>
 </div>
 </dd>
 <dt class="hdlist1"><strong>--human</strong>, <strong>-u</strong></dt>
@@ -1086,7 +1124,7 @@ raw bytes for sizes, etc).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-04-29 14:45:43 +0200
+Last updated 2024-03-25 11:02:54 +0100
 </div>
 </div>
 </body>

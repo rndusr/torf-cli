@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: torf
 .\"    Author: [see the "AUTHOR(S)" section]
-.\" Generator: Asciidoctor 2.0.18
-.\"      Date: 2023-04-29
+.\" Generator: Asciidoctor 2.0.20
+.\"      Date: 2024-03-25
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TORF" "1" "2023-04-29" "\ \&" "\ \&"
+.TH "TORF" "1" "2024-03-25" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -113,8 +113,8 @@ whether a certain option will change the hash.
 Verify that the content in \fIPATH\fP matches the metadata in the torrent file
 \fITORRENT\fP.
 .sp
-If \fIPATH\fP ends with a path separator (usually "/"), the name of the torrent (as
-specified by the metadata in \fITORRENT\fP) is appended.
+If \fIPATH\fP ends with a path separator (usually \(lq/\(rq), the name of the torrent
+(as specified by the metadata in \fITORRENT\fP) is appended.
 .RE
 .SH "OPTIONS"
 .sp
@@ -127,7 +127,7 @@ The path to the torrent\(cqs content.
 .sp
 \fB\-\-in\fP, \fB\-i\fP \fIINPUT\fP
 .RS 4
-Read metainfo from the torrent file or magnet URI \fIINPUT\fP.  If \fIINPUT\fP is "\-"
+Read metainfo from the torrent file or magnet URI \fIINPUT\fP.  If \fIINPUT\fP is \(lq\-\(rq
 and does not exist, the torrent data or magnet URI is read from stdin.
 .RE
 .sp
@@ -316,6 +316,54 @@ torrent.
 .RE
 .RE
 .sp
+\fB\-\-merge\fP \fIJSON\fP
+.RS 4
+Update existing metainfo in \fITORRENT\fP with a JSON object.  This option may be
+given multiple times.  Fields in \fIJSON\fP that have a value of \f(CRnull\fP (unquoted)
+are removed in the output \fITORRENT\fP.  Adding or removing items from an existing
+list is not supported.
+.sp
+This example adds add a \(lqcustom\(rq section to the \(lqinfo\(rq section, removes the
+\(lqcomment\(rq field and changes \(lqcreation date\(rq.
+.sp
+.if n .RS 4
+.nf
+.fam C
+$ torf \-i old.torrent \(rs
+       \-\-merge \*(Aq{"info": {"custom": {"this": "that", "numbers": [1, 2, 3]}}}\*(Aq \(rs
+       \-\-merge \*(Aq{"comment": null, "creation date": 123456789}\*(Aq \(rs
+       \-o new.torrent
+.fam
+.fi
+.if n .RE
+.sp
+This also works when creating a torrent.
+.sp
+.if n .RS 4
+.nf
+.fam C
+$ torf path/to/my/files \(rs
+       \-\-merge \*(Aq{"my stuff": {"my": ["s", "e", "c", "r", "e", "t"]}}\*(Aq
+.fam
+.fi
+.if n .RE
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Warning
+.ps -1
+.br
+.sp
+If the \(lqinfo\(rq section is modified, the info hash changes and a new
+torrent is created.
+.sp .5v
+.RE
+.RE
+.sp
 \fB\-\-nosource\fP, \fB\-S\fP
 .RS 4
 Remove the \(lqsource\(rq field from an existing torrent.
@@ -382,9 +430,9 @@ torrent.
 \fB\-\-max\-piece\-size\fP \fISIZE\fP
 .RS 4
 The maximum piece size when creating a torrent.  SIZE is multiplied by 1 MiB
-(1048576 bytes).  The resulting number must be a power of two (2, 4, 8, 16,
-etc.).  Numbers smaller than 1 are allowed, e.g. \(lq0.25\(rq sets the maximum piece
-size to 256 KiB.
+(1048576 bytes).  The resulting number must be a multiple of 16 KiB (16384
+bytes).  Use fractions for piece sizes smaller than 1 MiB (e.g. 0.5 for 512
+KiB).
 .RE
 .sp
 \fB\-\-creator\fP, \fB\-a\fP \fICREATOR\fP
@@ -437,7 +485,7 @@ times.
 .  sp -1
 .  IP \(bu 2.3
 .\}
-Display bytes with and without unit prefix, e.g. "1.38 MiB / 1,448,576 B".
+Display bytes with and without unit prefix, e.g. \(lq1.38 MiB / 1,448,576 B\(rq.
 .RE
 .sp
 .RS 4
@@ -459,15 +507,15 @@ Print information and errors as a JSON object.  Progress is not reported.
 .sp
 \fB\-\-metainfo\fP, \fB\-m\fP
 .RS 4
-Print the torrent\(cqs metainfo as a JSON object.  Byte strings (e.g. "pieces" in
-the "info" section) are encoded in Base64.  Progress is not reported.  Errors
+Print the torrent\(cqs metainfo as a JSON object.  Byte strings (e.g. \(lqpieces\(rq in
+the \(lqinfo\(rq section) are encoded in Base64.  Progress is not reported.  Errors
 are reported normally on stderr.
 .sp
 Unless \fB\-\-verbose\fP is given, any non\-standard fields are excluded and metainfo
 that doesn\(cqt represent a valid torrent results in an error.
 .sp
-Unless \fB\-\-verbose\fP is given twice, the "pieces" field in the "info" section is
-excluded.
+Unless \fB\-\-verbose\fP is given twice, the \(lqpieces\(rq field in the \(lqinfo\(rq section
+is excluded.
 .RE
 .sp
 \fB\-\-human\fP, \fB\-u\fP
