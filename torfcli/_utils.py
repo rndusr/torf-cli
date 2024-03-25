@@ -156,6 +156,21 @@ def make_filetree(tree, parents_is_last=(), plain_bytes=False):
     return lines
 
 
+def merge_metainfo(a, b):
+    # Merge dictionary `b` into dictionary `a`, overwriting or adding values
+    # from `b` and preserving existing values in `a`.
+    if isinstance(b, abc.Mapping):
+        for k, v in b.items():
+            if k in a and isinstance(a[k], abc.Mapping) and isinstance(v, abc.Mapping):
+                merge_metainfo(a[k], v)
+            elif k in a and v is None:
+                del a[k]
+            elif v is not None:
+                a[k] = v
+    else:
+        raise ValueError(f'Not a JSON object: {b}')
+
+
 _DATE_FORMATS = ('%Y-%m-%d %H:%M:%S',
                  '%Y-%m-%dT%H:%M:%S',
                  '%Y-%m-%d %H:%M',
