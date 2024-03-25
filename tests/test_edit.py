@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from unittest.mock import patch
 
+import pytest
 import torf
 
 from torfcli import _config as config
@@ -417,3 +418,49 @@ def test_edit_magnet_uri_and_create_torrent_with_validation_disabled(capsys, tmp
     assert torrent.size == 142631
     assert torrent.name == 'New Name'
     assert torrent.trackers == [['http://bar']]
+
+
+@pytest.mark.parametrize(
+    argnames='merges, exp_result',
+    argvalues=(
+        (
+            [
+                '{"creation date": 1352534887}',
+                '{"info": {"foo": ["Hello", "World!"], "bar": "baz", "private": null, "nosuchkey": null}}',
+                '{"created by": null}',
+            ],
+            {
+                'creation_date': datetime(2012, 11, 10, 9, 8, 7),
+                'created_by': None,
+                'private': None,
+                'path_map': {
+                    ('info', 'foo'): ['Hello', 'World!'],
+                    ('info', 'bar'): 'baz',
+                },
+            },
+        ),
+        (
+            ['["Hello", "World!"]'],
+            err.CliError("Not a JSON object: ['Hello', 'World!']"),
+        ),
+    ),
+    ids=lambda v: repr(v),
+)
+def test_merge_option(merges, exp_result, create_torrent, tmp_path, assert_torrents_equal, capsys):
+    outfile = str(tmp_path / 'out.torrent')
+    with create_torrent() as infile:
+        orig = torf.Torrent.read(infile)
+        cmd = ['-i', infile, '-o', outfile]
+        for merge in merges:
+            cmd.extend(('--merge', merge))
+
+        if isinstance(exp_result, err.Error):
+            with patch('sys.exit') as mock_exit:
+                run(cmd)
+            mock_exit.assert_called_once_with(exp_result.exit_code)
+            cap = capsys.readouterr()
+            assert cap.err == f'{_vars.__appname__}: {str(exp_result)}\n'
+        else:
+            run(cmd)
+            new = torf.Torrent.read(outfile)
+            assert_torrents_equal(orig, new, **exp_result)

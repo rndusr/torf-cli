@@ -146,6 +146,9 @@ def _edit_mode(ui, cfg):
     elif cfg['date']:
         torrent.creation_date = cfg['date']
 
+    # Apply custom JSON objects from --merge
+    _customize_torrent(torrent, cfg)
+
     if cfg['PATH']:
         list_set_or_remove('exclude', 'exclude_globs')
         list_set_or_remove('exclude_regex', 'exclude_regexs')
@@ -265,3 +268,12 @@ def _validate_torrent(ui, torrent, cfg):
         else:
             # Report validation error but write torrent/magnet anyway
             ui.warn(_errors.Error(e))
+
+def _customize_torrent(torrent, cfg):
+    # Apply JSON objects from --merge argument(s)
+    if cfg['merge']:
+        for merge in cfg['merge']:
+            try:
+                _utils.merge_metainfo(torrent.metainfo, merge)
+            except ValueError as e:
+                raise _errors.CliError(e)
