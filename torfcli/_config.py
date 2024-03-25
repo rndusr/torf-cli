@@ -11,6 +11,7 @@
 
 import argparse
 import itertools
+import json
 import os
 import re
 
@@ -62,6 +63,7 @@ ARGUMENTS
     --creator, -a CREATOR  Name of application used to create torrent file.
                            (default: '{DEFAULT_CREATOR}')
     --source, -s SOURCE    Add "source" field
+    --merge JSON           Insert or remove arbitrary metainfo (see man page)
     --xseed, -x            Randomize info hash
     --max-piece-size SIZE  Maximum piece size in multiples of 1 MiB
     --notracker, -T        Remove trackers from INPUT
@@ -95,6 +97,14 @@ ARGUMENTS
 """.strip()
 
 
+class DictFromJSON(dict):
+    def __new__(cls, string):
+        try:
+            return json.loads(string)
+        except ValueError as e:
+            raise argparse.ArgumentTypeError(f'Invalid JSON: {e}')
+
+
 class CLIParser(argparse.ArgumentParser):
     def error(self, msg):
         msg = msg[0].upper() + msg[1:]
@@ -120,6 +130,7 @@ _cliparser.add_argument('--comment', '-c')
 _cliparser.add_argument('--date', '-d', default='')
 _cliparser.add_argument('--creator', '-a', nargs='?', const=DEFAULT_CREATOR)
 _cliparser.add_argument('--source', '-s', default='')
+_cliparser.add_argument('--merge', type=DictFromJSON, action='append')
 _cliparser.add_argument('--xseed', '-x', action='store_true')
 _cliparser.add_argument('--max-piece-size', default=0, type=float)
 
