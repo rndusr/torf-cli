@@ -1,3 +1,7 @@
+2024-06-13 5.2.1
+  - Exclude tests from package
+
+
 2024-03-25 5.2.0
   - New option: --merge JSON: Add custom information to a torrent's metainfo or
     remove arbitrary information from it
