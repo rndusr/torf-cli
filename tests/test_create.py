@@ -815,7 +815,7 @@ def test_nowebseed_option(capsys, mock_content):
     argvalues=(
         (
             [
-                '{"creation date": 1352534887}',
+                f'{{"creation date": {int(datetime(2012, 11, 10, 9, 8, 7).timestamp())}}}',
                 '{"created by": null, "info": {"name": "New Name"}, "nosuchkey": null}',
                 (
                     '{'

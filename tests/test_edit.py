@@ -425,7 +425,7 @@ def test_edit_magnet_uri_and_create_torrent_with_validation_disabled(capsys, tmp
     argvalues=(
         (
             [
-                '{"creation date": 1352534887}',
+                f'{{"creation date": {int(datetime(2012, 11, 10, 9, 8, 7).timestamp())}}}',
                 '{"info": {"foo": ["Hello", "World!"], "bar": "baz", "private": null, "nosuchkey": null}}',
                 '{"created by": null}',
             ],
