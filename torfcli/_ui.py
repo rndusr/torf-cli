@@ -265,7 +265,7 @@ class _MachineFormatter(_FormatterBase):
         return int(torrent.piece_size)
 
     def files(self, torrent):
-        return '\t'.join(str(f) for f in torrent.files)
+        return '\n'.join(str(f) for f in torrent.files)
 
     def comment(self, torrent):
         return torrent.comment.splitlines()
@@ -278,8 +278,8 @@ class _MachineFormatter(_FormatterBase):
     def info(self, key, value, newline=None):
         # Join multiple values with a tab character
         if not isinstance(value, str) and isinstance(value, abc.Sequence):
-            value = '\t'.join(str(v) for v in value)
-        sys.stdout.write(f'{key}\t{value}\n')
+            value = '\n'.join(str(v) for v in value)
+        sys.stdout.write(f'\n{key}\n{value}\n')
         _utils.flush(sys.stdout)
 
     def infos(self, pairs):
