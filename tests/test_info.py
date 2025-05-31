@@ -265,7 +265,7 @@ def test_trackers___multiple_trackers_per_tier(capsys, create_torrent, human_rea
 
 
 def test_webseeds(capsys, create_torrent, human_readable, clear_ansi, regex):
-    webseeds = ['http://webseed1', 'http://webseed2']
+    webseeds = ['http://webseed1', 'webseed2']
     with create_torrent(webseeds=webseeds) as torrent_file:
         with human_readable(True):
             run(['-i', torrent_file])
