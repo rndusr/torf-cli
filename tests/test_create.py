@@ -825,7 +825,7 @@ def test_nowebseed_option(capsys, mock_content):
                 ),
             ],
             {
-                'creation_date': datetime(2012, 11, 10, 9, 8, 7),
+                'creation_date': datetime.fromtimestamp(1352534887),
                 'created_by': None,
                 'name': 'New Name',
                 'path_map': {

@@ -430,7 +430,7 @@ def test_edit_magnet_uri_and_create_torrent_with_validation_disabled(capsys, tmp
                 '{"created by": null}',
             ],
             {
-                'creation_date': datetime(2012, 11, 10, 9, 8, 7),
+                'creation_date': datetime.fromtimestamp(1352534887),
                 'created_by': None,
                 'private': None,
                 'path_map': {
