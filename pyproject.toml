@@ -14,7 +14,7 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Programming Language :: Python :: 3",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 dependencies = [
     "torf==4.*,>=4.1.2",
     "pyxdg",
