@@ -245,6 +245,17 @@ def test_invalid_webseed_url(capsys, create_torrent, tmp_path, assert_torrents_e
         assert not os.path.exists(outfile)
 
 
+def _platform_supports_far_future_date():
+    # 32-bit platforms have a 32-bit time_t and cannot represent dates beyond 2038, so
+    # datetime.timestamp() raises OverflowError there
+    try:
+        datetime(3000, 5, 30, 15, 3, 1).timestamp()
+        return True
+    except (OverflowError, OSError):
+        return False
+
+@pytest.mark.skipif(not _platform_supports_far_future_date(),
+                    reason="Platform time_t cannot represent dates beyond 2038")
 def test_edit_creation_date(create_torrent, tmp_path, assert_torrents_equal):
     outfile = str(tmp_path / 'out.torrent')
     with create_torrent() as infile:
