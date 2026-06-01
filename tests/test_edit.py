@@ -249,9 +249,9 @@ def test_edit_creation_date(create_torrent, tmp_path, assert_torrents_equal):
     outfile = str(tmp_path / 'out.torrent')
     with create_torrent() as infile:
         orig = torf.Torrent.read(infile)
-        run(['-i', infile, '--date', '3000-05-30 15:03:01', '-o', outfile])
+        run(['-i', infile, '--date', '2000-05-30 15:03:01', '-o', outfile])
         new = torf.Torrent.read(outfile)
-        assert_torrents_equal(orig, new, creation_date=datetime(3000, 5, 30, 15, 3, 1))
+        assert_torrents_equal(orig, new, creation_date=datetime(2000, 5, 30, 15, 3, 1))
 
 def test_remove_creation_date(create_torrent, tmp_path, assert_torrents_equal):
     outfile = str(tmp_path / 'out.torrent')
