@@ -54,3 +54,15 @@ def test_reading_invalid_magnet_URI_from_stdin(capsys, monkeypatch, clear_ansi, 
     cap = capsys.readouterr()
     assert cap.out == ''
     assert cap.err == f'{_vars.__appname__}: one million things: Invalid exact length ("xl")\n'
+
+def test_reading_non_utf8_binary_data_from_stdin(capsys, monkeypatch):
+    r, w = os.pipe()
+    monkeypatch.setattr(sys, 'stdin', os.fdopen(r))
+    os.fdopen(w, 'wb').write(b'\xff\xfe\x00\x01not-a-torrent')
+
+    with patch('sys.exit') as mock_exit:
+        run(['-i', '-'])
+    mock_exit.assert_called_once_with(_errors.Code.READ)
+    cap = capsys.readouterr()
+    assert cap.out == ''
+    assert f'{_vars.__appname__}: Invalid input on stdin' in cap.err
