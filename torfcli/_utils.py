@@ -65,7 +65,11 @@ def get_torrent(cfg, ui):
             return torf.Torrent.read_stream(io.BytesIO(data), validate=cfg['validate'])
         except torf.TorfError as exc:
             # Parse magnet URI from stdin
-            return get_torrent_from_magnet(data.decode('utf-8'), exc)
+            try:
+                text = data.decode('utf-8')
+            except UnicodeDecodeError as ude:
+                raise _errors.Error(f'Invalid input on stdin: {ude}', code=_errors.Code.READ)
+            return get_torrent_from_magnet(text, exc)
     else:
         try:
             # Read torrent data from file path
